@@ -35,13 +35,16 @@ async function main () {
   const APP_PORT = 3000
   const HUB_PORT = 3001
 
-  const provider = HDWalletProvider.http(MNEMONIC, PROVIDER_URL)
+  const provider = HDWalletProvider.mnemonic({
+    mnemonic: MNEMONIC!,
+    rpc: PROVIDER_URL
+  })
   const web3 = new Web3(provider)
 
   /**
    * Account that receives payments.
    */
-  let receiver = await provider.getAddress(0)
+  let receiver = (await provider.getAddresses())[0]
 
   /**
    * Create machinomy instance that provides API for accepting payments.

@@ -1,6 +1,6 @@
 {
   "name": "@machinomy/wraptso",
-  "version": "0.1.4",
+  "version": "2.0.0",
   "description": "Generate TypeScript wrapper class for Solidity smart contract",
   "license": "Apache-2.0",
   "homepage": "https://github.com/machinomy/machinomy#readme",
@@ -42,5 +42,13 @@
     "@types/handlebars": "^4.0.38",
     "@types/mkdirp": "^0.5.2",
     "@types/yargs": "^11.1.0"
+  },
+  "resolutions": {
+    "natives": "^1.1.3",
+    "upath": "^1.0.5",
+    "nan": "^2.15.0",
+    "scrypt.js": "0.3.0",
+    "sha3": "^2.1.4",
+    "sqlite3": "^5.0.2"
   }
 }

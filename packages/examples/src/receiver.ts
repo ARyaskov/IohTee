@@ -17,8 +17,12 @@ async function run () {
   LOG.info(`PROVIDER = ${PROVIDER}`)
   LOG.info(`MNEMONIC = ${MNEMONIC}`)
 
-  const provider = HDWalletProvider.http(MNEMONIC, PROVIDER, 2)
-  const receiverAccount = await provider.getAddress(1)
+  const provider = HDWalletProvider.mnemonic({
+    mnemonic: MNEMONIC!,
+    rpc: PROVIDER,
+    numberOfAccounts: 2
+  })
+  const receiverAccount = (await provider.getAddresses())[0]
   const receiverWeb3 = new Web3(provider)
   const minimumChannelAmount = new BigNumber(1).shift(4)
   const receiverMachinomy = new Machinomy(

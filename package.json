@@ -1,7 +1,7 @@
 {
   "name": "@machinomy/monorepo",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "repository": "git@github.com:machinomy/machinomy.git",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
   "license": "Apache-2.0",
@@ -26,14 +26,20 @@
   "devDependencies": {
     "coveralls": "^3.0.1",
     "lerna": "^2.11.0",
-    "typescript": "^2.8.3",
+    "typescript": "^4.5.4",
     "wsrun": "^2.2.0",
     "ts-node": "^7.0.x"
   },
   "resolutions": {
+    "@types/bluebird": "3.5.36",
+    "@types/express-serve-static-core": "4.17.27",
+    "@types/node": "14.18.3",
+    "**/fsevents": "^1.2.9",
     "natives": "^1.1.3",
     "upath": "^1.0.5",
-    "nan": "^2.10.0",
-    "sha3": "^1.2.2"
+    "nan": "^2.15.0",
+    "scrypt.js": "0.3.0",
+    "sha3": "^2.1.4",
+    "sqlite3": "^5.0.2"
   }
 }

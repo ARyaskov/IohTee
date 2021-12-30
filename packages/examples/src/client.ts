@@ -26,13 +26,16 @@ async function main (): Promise<string> {
   const MNEMONIC = String(process.env.MNEMONIC).trim()
 
   const TARGET = 'https://playground.machinomy.com/hello'
-  const provider = HDWalletProvider.http(MNEMONIC, PROVIDER_URL)
+  const provider = HDWalletProvider.mnemonic({
+    mnemonic: MNEMONIC!,
+    rpc: PROVIDER_URL
+  })
   let web3 = new Web3(provider)
 
   /**
    * Account that send payments payments.
    */
-  let sender = await provider.getAddress(0)
+  let sender = (await provider.getAddresses())[0]
   console.log('sender address', sender)
 
   /**

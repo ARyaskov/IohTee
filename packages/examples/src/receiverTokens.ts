@@ -19,10 +19,16 @@ async function run () {
   LOG.info(`MNEMONIC SENDER = ${MNEMONIC_SENDER}`)
   LOG.info(`MNEMONIC RECEIVER = ${MNEMONIC_RECEIVER}`)
 
-  const provider1 = HDWalletProvider.http(MNEMONIC_SENDER, PROVIDER)
-  const provider2 = HDWalletProvider.http(MNEMONIC_RECEIVER, PROVIDER)
-  const senderAccount = await provider1.getAddress(0)
-  const receiverAccount = await provider2.getAddress(0)
+  const provider1 = HDWalletProvider.mnemonic({
+    mnemonic: MNEMONIC_SENDER!,
+    rpc: PROVIDER
+  })
+  const provider2 = HDWalletProvider.mnemonic({
+    mnemonic: MNEMONIC_RECEIVER!,
+    rpc: PROVIDER
+  })
+  const senderAccount = (await provider1.getAddresses())[0]
+  const receiverAccount = (await provider2.getAddresses())[0]
   const receiverWeb3 = new Web3(provider2)
   const tokenAddress = payment.tokenContract
   const TestToken = contracts.TestToken.contract(receiverWeb3.currentProvider)

@@ -1,6 +1,6 @@
 {
   "name": "@machinomy/contracts",
-  "version": "4.1.5",
+  "version": "5.0.0",
   "description": "Machinomy contracts managed by Truffle",
   "license": "Apache-2.0",
   "homepage": "https://github.com/machinomy/machinomy-contracts#readme",
@@ -47,28 +47,28 @@
     "@machinomy/types-truffle-deployer": "^0.0.3",
     "@machinomy/types-truffle-resolver": "^0.0.1",
     "@machinomy/wraptso": "^0.0.10",
+    "@truffle/hdwallet-provider": "1.0.19",
     "@types/bignumber.js": "^4.0.2",
     "@types/chai": "^4.1.3",
     "@types/chai-as-promised": "^7.1.0",
     "@types/mocha": "^5.2.0",
-    "@types/node": "^10.1.3",
+    "@types/node": "14.18.3",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.1",
     "eth-sig-util": "^2.1.0",
+    "ethlint": "1.2.5",
     "mocha": "^5.2.0",
     "nyc": "^11.8.0",
     "openzeppelin-solidity": "^1.9.0",
     "run-with-testrpc": "^0.3.0",
     "solidity-coverage": "^0.5.4",
-    "solium": "^1.1.7",
     "truffle": "^4.1.11",
-    "truffle-hdwallet-provider": "^0.0.5",
     "tslint": "^5.10.0",
     "tslint-config-standard": "^7.0.0"
   },
   "dependencies": {
-    "@machinomy/hdwallet-provider": "^1.1.0",
+    "@machinomy/hdwallet-provider": "^2.0.8",
     "@machinomy/types-web3": "^0.0.4",
     "bignumber.js": "4.1.0",
     "dotenv": "^4.0.0",
@@ -76,5 +76,13 @@
     "ethereumjs-util": "^5.2.0",
     "truffle-contract": "^3.0.0",
     "web3": "^0.20.1"
+  },
+  "resolutions": {
+    "natives": "^1.1.3",
+    "upath": "^1.0.5",
+    "nan": "^2.15.0",
+    "scrypt.js": "0.3.0",
+    "sha3": "^2.1.4",
+    "sqlite3": "^5.0.2"
   }
 }

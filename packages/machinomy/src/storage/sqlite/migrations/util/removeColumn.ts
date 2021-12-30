@@ -1,4 +1,4 @@
-import { Base, CallbackFunction } from 'db-migrate-base'
+import Base, { CallbackFunction } from 'db-migrate-base'
 
 interface Row {
   name: string

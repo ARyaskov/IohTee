@@ -93,7 +93,8 @@ export class Transport {
      * @param {{uri: string, headers: object, onWillPreflight: function, onDidPreflight: function, onWillOpenChannel: function, onDidOpenChannel: function, onWillSendPayment: function, onDidSendPayment: function, onWillLoad: function, onDidLoad: function}} opts
      * @return {Promise<string>}
      */
-  requestToken (uri: string, payment: Payment, opts: RequestTokenOpts = {}): Promise<string> {
+    // Partial<Payment> doesn't let error "TS2790: The operand of a 'delete' operator must be optional." occur
+  requestToken (uri: string, payment: Partial<Payment>, opts: RequestTokenOpts = {}): Promise<string> {
     if (!payment.tokenContract) {
       delete payment.tokenContract
     }

@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
     "sourceRoot": "src/",
     "outDir": "lib/",
     "types": [

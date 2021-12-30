@@ -1,4 +1,4 @@
-import { Base, CallbackFunction } from 'db-migrate-base'
+import Base, { CallbackFunction } from 'db-migrate-base'
 import removeColumn from './util/removeColumn'
 
 export function up (db: Base, callback: CallbackFunction) {

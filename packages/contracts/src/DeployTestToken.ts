@@ -13,12 +13,15 @@ async function run () {
 
   LOG.info(`ETH_RPC_URL = ${ETH_RPC_URL}`)
 
-  const provider = HDWalletProvider.http(KEY, ETH_RPC_URL)
+  const provider = HDWalletProvider.mnemonic({
+    mnemonic: KEY,
+    rpc: ETH_RPC_URL
+  })
 
   LOG.info(`Wait for 30-60 seconds, please.`)
 
   const TestToken = contracts.TestToken.contract(provider)
-  const instanceTestToken = await TestToken.new({ from: await provider.getAddress(0) })
+  const instanceTestToken = await TestToken.new({ from: (await provider.getAddresses())[0] })
 
   const address = instanceTestToken.address
   const transactionHash = instanceTestToken.transactionHash

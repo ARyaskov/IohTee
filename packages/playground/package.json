@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@machinomy/playground",
-  "version": "1.4.29",
+  "version": "2.0.0",
   "description": "Playground for Machinomy dapplications",
   "main": "dist/index.js",
   "author": "Sergey Ukustov",
@@ -14,7 +14,8 @@
     "coverage": "exit 0"
   },
   "dependencies": {
-    "@machinomy/hdwallet-provider": "^1.1.0",
+    "@types/express-serve-static-core": "4.17.27",
+    "@machinomy/hdwallet-provider": "2.0.8",
     "@machinomy/types-ethereumjs-util": "^0.0.12",
     "@machinomy/types-truffle-contract": "^0.0.4",
     "@types/debug": "^0.0.30",
@@ -27,10 +28,18 @@
     "express": "^4.14.0",
     "machinomy": "^1.13.32",
     "morgan": "^1.9.0",
-    "sqlite3": "^4.0.4",
+    "sqlite3": "^5.0.2",
     "tslint": "^5.10.0",
     "tslint-config-standard": "^7.0.0",
-    "typescript": "^2.8.3",
+    "typescript": "^4.5.4",
     "url-join": "^4.0.0"
+  },
+  "resolutions": {
+    "natives": "^1.1.3",
+    "upath": "^1.0.5",
+    "nan": "^2.15.0",
+    "scrypt.js": "0.3.0",
+    "sha3": "^2.1.4",
+    "sqlite3": "^5.0.2"
   }
 }

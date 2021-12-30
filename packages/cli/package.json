@@ -1,6 +1,6 @@
 {
   "name": "@machinomy/cli",
-  "version": "0.0.28",
+  "version": "2.0.0",
   "description": "Machinomy Command Line Interface",
   "license": "Apache-2.0",
   "homepage": "https://github.com/machinomy/machinomy#readme",
@@ -21,6 +21,7 @@
     "coverage": "exit 0"
   },
   "dependencies": {
+    "@types/express-serve-static-core": "4.17.27",
     "bignumber.js": "^7.2.1",
     "commander": "^2.9.0",
     "homedir": "https://github.com/ukstv/node-homedir",
@@ -29,10 +30,18 @@
   },
   "devDependencies": {
     "@types/bignumber.js": "^5.0.0",
-    "@types/node": "^10.3.6",
+    "@types/node": "^12.3.6",
     "tslint": "^5.10.0",
     "tslint-config-standard": "^7.1.0",
-    "typescript": "^2.8.3",
-    "typescript-logger": "^1.1.0"
+    "typescript": "^4.5.4",
+    "typescript-logger": "^1.1.1"
+  },
+  "resolutions": {
+    "natives": "^1.1.3",
+    "upath": "^1.0.5",
+    "nan": "^2.15.0",
+    "scrypt.js": "0.3.0",
+    "sha3": "^2.1.4",
+    "sqlite3": "^5.0.2"
   }
 }

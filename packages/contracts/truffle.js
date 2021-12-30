@@ -1,4 +1,4 @@
-const HDWalletProvider = require("truffle-hdwallet-provider")
+const HDWalletProvider = require("@truffle/hdwallet-provider")
 const MNEMONIC = process.env.MNEMONIC
 const GAS_LIMIT = 2700000
 

@@ -1,4 +1,4 @@
-import { Base, CallbackFunction } from 'db-migrate-base'
+import Base, { CallbackFunction } from 'db-migrate-base'
 import bigNumberColumn from './util/bigNumberColumn'
 
 export function up (db: Base, callback: CallbackFunction) {

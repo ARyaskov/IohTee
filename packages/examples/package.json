@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@machinomy/examples",
-  "version": "1.0.27",
+  "version": "2.0.0",
   "description": "Examples of Machinomy usage",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
   "license": "Apache-2.0",
@@ -27,11 +27,12 @@
     "serverTokens": "yarn build && DEBUG=* node ./src/serverTokens.js"
   },
   "dependencies": {
-    "@machinomy/hdwallet-provider": "^1.1.0",
+    "@machinomy/hdwallet-provider": "^2.0.8",
     "@machinomy/types-bn": "^0.0.3",
     "@machinomy/types-truffle-contract": "^0.0.4",
     "@machinomy/types-web3": "^0.0.4",
     "@types/bignumber.js": "^4.0.2",
+    "@types/express-serve-static-core": "4.17.27",
     "@types/fs-extra": "^5.0.4",
     "bignumber.js": "^4.1.0",
     "commander": "^2.9.0",
@@ -53,6 +54,14 @@
   "devDependencies": {
     "tslint": "^5.10.0",
     "tslint-config-standard": "^7.0.0",
-    "typescript": "^2.8.3"
+    "typescript": "^4.5.4"
+  },
+  "resolutions": {
+    "natives": "^1.1.3",
+    "upath": "^1.0.5",
+    "nan": "^2.15.0",
+    "scrypt.js": "0.3.0",
+    "sha3": "^2.1.4",
+    "sqlite3": "^5.0.2"
   }
 }

@@ -22,7 +22,7 @@ export default class NedbPaymentsDatabase extends AbstractPaymentsDatabase<Engin
     // log.info(`Trying to find last payment for channel ${channelId.toString()}`)
     let query = { kind: this.kind, channelId: channelId.toString() }
     let raw = await this.engine.exec(client => {
-      return pify<Array<PaymentJSON>>((cb: (error: Error, documents: Array<PaymentJSON>) => void) => {
+      return pify<Array<PaymentJSON>>((cb: (error: Error | null, documents: Array<PaymentJSON>) => void) => {
         client.datastore.find<PaymentJSON>(query).sort({ value: -1 }).limit(1).exec(cb)
       })
     })

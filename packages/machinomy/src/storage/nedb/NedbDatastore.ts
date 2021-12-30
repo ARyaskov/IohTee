@@ -9,7 +9,7 @@ export default class NedbDatastore {
 
   find<A> (query: any): Promise<Array<A>> {
     return new Promise<Array<A>>((resolve, reject) => {
-      this.datastore.find<A>(query, (error, documents) => {
+      this.datastore.find<A>(query, (error: Error, documents: A[]) => {
         error ? reject(error) : resolve(documents)
       })
     })

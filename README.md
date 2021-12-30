@@ -26,13 +26,17 @@ FAQ: [GitHub Wiki Page](https://github.com/machinomy/machinomy/wiki/Frequently-A
 
 ## Installation
 
-Using [yarn](https://yarnpkg.com/lang/en/) and Node.js **v9** is mandatory (**don't use npm!**)
+Using [yarn](https://yarnpkg.com/lang/en/) and Node.js **v14** is mandatory (**don't use npm!**)
 
     $ yarn add machinomy
 
 The library supports mainnet, Ropsten, and [Rinkeby](https://www.rinkeby.io/) networks.
 
 ## Tinkering
+
+First of all, please check your Node's arch -- it should not be arm64 (for M1 chip) otherwise node-gyp will fail. 
+It works fine with Node.js v14.18 x64.
+
 
 It takes two to tango: a seller and a buyer. Seller is `packages/examples/src/server.ts` script. Build it or run through node-ts.
 ```

@@ -1,5 +1,5 @@
 import bigNumberColumn from './util/bigNumberColumn'
-import { Base, CallbackFunction } from 'db-migrate-base'
+import Base, { CallbackFunction } from 'db-migrate-base'
 
 export async function up (db: Base, callback: CallbackFunction) {
   const createTableOptions = {

@@ -1,8 +1,9 @@
 {
   "name": "machinomy",
-  "version": "1.13.32",
+  "version": "2.0.0",
   "description": "Micropayments powered by Ethereum",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
+  "contributors": ["Andrei Riaskov <mail@riaskov.com>"],
   "license": "Apache-2.0",
   "keywords": [
     "micropayments",
@@ -49,9 +50,9 @@
     "browser-or-node": "^1.0.2",
     "commander": "^2.9.0",
     "connection-string": "^0.5.3",
-    "db-migrate": "^0.11.1",
-    "db-migrate-pg": "^0.4.0",
-    "db-migrate-sqlite3": "^0.3.x",
+    "db-migrate": "0.11.13",
+    "db-migrate-pg": "1.2.2",
+    "db-migrate-sqlite3": "0.4.0",
     "debug": "^3.1.0",
     "decko": "^1.2.0",
     "eth-sig-util": "^2.1.0",
@@ -68,14 +69,15 @@
   },
   "peerDependencies": {
     "pg": "^7.4.1",
-    "sqlite3": "^4.0.4"
+    "sqlite3": "5.0.2"
   },
   "devDependencies": {
     "@machinomy/hdwallet-provider": "^1.1.0",
     "@machinomy/types-ethereumjs-util": "^0.0.12",
+    "@types/bluebird": "3.5.36",
     "@types/body-parser": "^1.16.4",
     "@types/db-migrate": "https://github.com/machinomy/types-node-db-migrate",
-    "@types/db-migrate-base": "^0.0.4",
+    "@types/db-migrate-base": "0.0.10",
     "@types/debug": "^0.0.30",
     "@types/ethereumjs-abi": "^0.6.1",
     "@types/expect": "^1.20.3",
@@ -83,11 +85,11 @@
     "@types/mocha": "^2.2.43",
     "@types/nedb": "^1.8.3",
     "@types/nock": "^8.2.1",
-    "@types/node": "^10.0.0",
+    "@types/node": "14.18.3",
     "@types/pg": "^7.4.5",
     "@types/request": "^2.0.13",
     "@types/sinon": "^4.1.3",
-    "@types/sqlite3": "^3.1.3",
+    "@types/sqlite3": "^3.1.8",
     "@types/tmp": "^0.0.33",
     "@types/uuid": "^3.4.3",
     "body-parser": "^1.15.2",
@@ -102,10 +104,18 @@
     "nyc": "^11.8.0",
     "pg": "^7.4.1",
     "sinon": "^4.1.5",
-    "sqlite3": "^4.0.4",
+    "sqlite3": "^5.0.2",
     "tmp": "0.0.33",
     "tslint": "^5.10.0",
     "tslint-config-standard": "^7.0.0",
-    "typescript": "^2.8.3"
+    "typescript": "^4.5.4"
+  },
+  "resolutions": {
+    "natives": "^1.1.3",
+    "upath": "^1.0.5",
+    "nan": "^2.15.0",
+    "scrypt.js": "0.3.0",
+    "sha3": "^2.1.4",
+    "sqlite3": "^5.0.2"
   }
 }
