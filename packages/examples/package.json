@@ -30,7 +30,7 @@
     "@machinomy/hdwallet-provider": "^2.0.8",
     "@machinomy/types-bn": "^0.0.3",
     "@machinomy/types-truffle-contract": "^0.0.4",
-    "@machinomy/types-web3": "^0.0.4",
+    "@machinomy/types-web3": "0.0.12",
     "@types/bignumber.js": "^4.0.2",
     "@types/express-serve-static-core": "4.17.27",
     "@types/fs-extra": "^5.0.4",

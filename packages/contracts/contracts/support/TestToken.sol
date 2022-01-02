@@ -1,16 +1,11 @@
-pragma solidity ^0.4.24;
+// SPDX-License-Identifier: Apache-2.0
+pragma solidity ^0.8.11;
 
-import "openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 
-contract TestToken is MintableToken {
-    function transfer(address _to, uint256 _value) public returns (bool) {
-        require(_to != address(0));
-        require(_value <= balances[msg.sender]);
+contract TestToken is ERC20 {
+    constructor(string memory name_, string memory symbol_) public ERC20(name_, symbol_) {
 
-        balances[msg.sender] = balances[msg.sender].sub(_value);
-        balances[_to] = balances[_to].add(_value);
-        emit Transfer(msg.sender, _to, _value);
-        return true;
     }
 }

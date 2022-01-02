@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "sourceRoot": "src/",
     "outDir": "lib/",
     "types": [
@@ -10,7 +12,6 @@
       "@machinomy/types-ethereumjs-units",
       "@machinomy/types-ethereumjs-util",
       "@machinomy/types-eth-sig-util",
-      "@machinomy/types-web3",
       "@types/node",
       "@types/mocha"
     ]

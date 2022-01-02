@@ -1,7 +1,7 @@
-import Unidirectional from './wrappers/Unidirectional'
-import TokenUnidirectional from './wrappers/TokenUnidirectional'
-import StandardToken from './wrappers/StandardToken'
-import TestToken from './wrappers/TestToken'
+import { Unidirectional } from './wrappers/Unidirectional'
+import { TokenUnidirectional } from './wrappers/TokenUnidirectional'
+import { StandardToken } from './wrappers/StandardToken'
+import { TestToken } from './wrappers/TestToken'
 import * as ethUtil from 'ethereumjs-util'
 import Units from './Units'
 

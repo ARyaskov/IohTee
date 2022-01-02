@@ -4,7 +4,7 @@ import * as yargs from 'yargs'
 import * as contracts from './index'
 import Logger from '@machinomy/logger'
 import HDWalletProvider from '@machinomy/hdwallet-provider'
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import * as BigNumber from 'bignumber.js'
 
 const LOG = new Logger('mint-test-tokens')

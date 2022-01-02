@@ -1,7 +1,7 @@
 import * as Web3 from 'web3'
 import * as chai from 'chai'
 import * as BigNumber from 'bignumber.js'
-import * as asPromised from 'chai-as-promised'
+import asPromised from 'chai-as-promised'
 import * as contracts from './index'
 import * as support from './support'
 import * as abi from 'ethereumjs-abi'
@@ -44,17 +44,14 @@ contract('Unidirectional', accounts => {
   }
 
   async function paymentSignature (sender: string, channelId: string, payment: BigNumber.BigNumber): Promise<string> {
-    let digest = await instance.paymentDigest(channelId, payment)
+    let digest = await instance.paymentDigest.call(channelId, payment)
     let alternative = abi.soliditySHA3(['address', 'bytes32', 'uint256'],
       [instance.address, channelId, payment.toString()])
     assert(digest === '0x' + alternative.toString('hex'))
-    let signature = web3.eth.sign(sender, digest)
-    let recovered = sigUtil.recoverPersonalSignature({
-      data: digest,
-      sig: signature
-    })
+    let signature = await web3.eth.sign(digest, sender)
+    let recovered = web3.eth.accounts.recover(digest, signature)
     assert(recovered === sender)
-    return signature
+    return signature.slice(0, -2) + (parseInt(signature.slice(-2), 10) + 27).toString(16)
   }
 
   before(async () => {
@@ -75,7 +72,7 @@ contract('Unidirectional', accounts => {
 
     specify('open channel', async () => {
       let event = await createChannel()
-      let channel = await instance.channels(event.channelId)
+      let channel = await instance.channels.call(event.channelId)
       assert.equal(channel[0], sender)
       assert.equal(channel[1], receiver)
       assert.equal(channel[2].toString(), channelValue.toString())
@@ -89,20 +86,20 @@ contract('Unidirectional', accounts => {
     })
 
     specify('increase contract balance', async () => {
-      let before = web3.eth.getBalance(instance.address)
+      let before = await web3.eth.getBalance(instance.address)
       await createChannel()
-      let after = web3.eth.getBalance(instance.address)
-      let delta = after.minus(before)
+      let after = await web3.eth.getBalance(instance.address)
+      let delta = new BigNumber.BigNumber(after).minus(before)
       assert.equal(delta.toString(), channelValue.toString())
     })
 
     specify('decrease sender balance', async () => {
-      let before = web3.eth.getBalance(sender)
+      let before = await web3.eth.getBalance(sender)
       let channelId = contracts.channelId(sender, receiver)
       let log = await createChannelRaw(channelId)
-      let after = web3.eth.getBalance(sender)
-      let txCost = support.txPrice(web3, log)
-      let actual = after.minus(before)
+      let after = await web3.eth.getBalance(sender)
+      let txCost = await support.txPrice(web3, log)
+      let actual = new BigNumber.BigNumber(after).minus(before)
       let expected = channelValue.plus(txCost).neg()
       assert.equal(actual.toString(), expected.toString())
     })
@@ -130,7 +127,7 @@ contract('Unidirectional', accounts => {
       let event = tx.logs[0].args
       let channelId = event.channelId
 
-      let channel = await instance.channels(channelId)
+      let channel = await instance.channels.call(channelId)
       assert.equal(channel[0], '0x0000000000000000000000000000000000000000')
       assert.equal(channel[1], '0x0000000000000000000000000000000000000000')
       assert.equal(channel[2].toString(), '0')
@@ -144,41 +141,41 @@ contract('Unidirectional', accounts => {
     })
     specify('decrease contract balance', async () => {
       let didOpenEvent = await createChannel()
-      let before = web3.eth.getBalance(instance.address)
+      let before = await web3.eth.getBalance(instance.address)
       let signature = await paymentSignature(sender, didOpenEvent.channelId, payment)
       await instance.claim(didOpenEvent.channelId, payment, signature, { from: receiver })
-      let after = web3.eth.getBalance(instance.address)
-      let delta = before.minus(after)
+      let after = await web3.eth.getBalance(instance.address)
+      let delta = new BigNumber.BigNumber(before).minus(new BigNumber.BigNumber(after))
       assert.equal(delta.toString(), channelValue.toString())
     })
     specify('send money to receiver', async () => {
       let didOpenEvent = await createChannel()
       let signature = await paymentSignature(sender, didOpenEvent.channelId, payment)
-      let before = web3.eth.getBalance(receiver)
+      let before = await web3.eth.getBalance(receiver)
       let tx = await instance.claim(didOpenEvent.channelId, payment, signature, { from: receiver })
-      let txCost = support.txPrice(web3, tx)
-      let after = web3.eth.getBalance(receiver)
-      let delta = after.minus(before).plus(txCost)
+      let txCost = await support.txPrice(web3, tx)
+      let after = await web3.eth.getBalance(receiver)
+      let delta = new BigNumber.BigNumber(after).minus(before).plus(txCost)
       assert.equal(delta.toString(), payment.toString())
     })
     specify('send channel value to receiver', async () => {
       let didOpenEvent = await createChannel()
       let _payment = channelValue.plus(payment)
       let signature = await paymentSignature(sender, didOpenEvent.channelId, _payment)
-      let before = web3.eth.getBalance(receiver)
+      let before = await web3.eth.getBalance(receiver)
       let tx = await instance.claim(didOpenEvent.channelId, _payment, signature, { from: receiver })
-      let txCost = support.txPrice(web3, tx)
-      let after = web3.eth.getBalance(receiver)
-      let delta = after.minus(before).plus(txCost)
+      let txCost = await support.txPrice(web3, tx)
+      let after = await web3.eth.getBalance(receiver)
+      let delta = new BigNumber.BigNumber(after).minus(before).plus(txCost)
       assert.equal(delta.toString(), channelValue.toString())
     })
     specify('send change to sender', async () => {
       let didOpenEvent = await createChannel()
       let signature = await paymentSignature(sender, didOpenEvent.channelId, payment)
-      let before = web3.eth.getBalance(sender)
+      let before = await web3.eth.getBalance(sender)
       await instance.claim(didOpenEvent.channelId, payment, signature, { from: receiver })
-      let after = web3.eth.getBalance(sender)
-      let delta = after.minus(before)
+      let after = await web3.eth.getBalance(sender)
+      let delta = new BigNumber.BigNumber(after).minus(before)
       assert.equal(delta.toString(), channelValue.minus(payment).toString())
     })
     specify('refuse if sender', async () => {
@@ -212,7 +209,7 @@ contract('Unidirectional', accounts => {
       let didOpenEvent = await createChannel(settlingPeriod)
       let channelId = didOpenEvent.channelId
       let tx = await instance.startSettling(channelId, { from: sender })
-      let channel = await instance.channels(channelId)
+      let channel = await instance.channels.call(channelId)
       let expected = tx.receipt.blockNumber + settlingPeriod
       let actual = channel[4]
       assert.equal(actual.toString(), expected.toString())
@@ -247,11 +244,11 @@ contract('Unidirectional', accounts => {
     specify('send money to sender', async () => {
       let didOpenEvent = await createChannel()
       await instance.startSettling(didOpenEvent.channelId, { from: sender })
-      let before = web3.eth.getBalance(sender)
+      let before = await web3.eth.getBalance(sender)
       let log = await instance.settle(didOpenEvent.channelId)
-      let txCost = support.txPrice(web3, log)
-      let after = web3.eth.getBalance(sender)
-      let actual = after.minus(before)
+      let txCost = await support.txPrice(web3, log)
+      let after = await web3.eth.getBalance(sender)
+      let actual = new BigNumber.BigNumber(after).minus(new BigNumber.BigNumber(before))
       assert.equal(actual.toString(), channelValue.minus(txCost).toString())
     })
     specify('remove channel', async () => {
@@ -285,30 +282,30 @@ contract('Unidirectional', accounts => {
     })
 
     specify('increase contract balance', async () => {
-      let before = web3.eth.getBalance(instance.address)
+      let before = await web3.eth.getBalance(instance.address)
       let channelId = (await createChannel()).channelId
       await instance.deposit(channelId, { value: payment, from: sender })
-      let after = web3.eth.getBalance(instance.address)
-      let delta = after.minus(before)
+      let after = await web3.eth.getBalance(instance.address)
+      let delta = new BigNumber.BigNumber(after).minus(before)
       assert.equal(delta.toString(), channelValue.plus(payment).toString())
     })
 
     specify('increase channel value', async () => {
       let channelId = (await createChannel()).channelId
-      let before = (await instance.channels(channelId))[2]
+      let before = (await instance.channels.call(channelId))[2]
       await instance.deposit(channelId, { value: payment, from: sender })
-      let after = (await instance.channels(channelId))[2]
-      let delta = after.minus(before)
+      let after = (await instance.channels.call(channelId))[2]
+      let delta = new BigNumber.BigNumber(after).minus(before)
       assert.equal(delta.toString(), payment.toString())
     })
 
     specify('decrease sender balance', async () => {
       let channelId = (await createChannel()).channelId
-      let before = web3.eth.getBalance(sender)
+      let before = await web3.eth.getBalance(sender)
       let log = await instance.deposit(channelId, { value: payment, from: sender })
-      let after = web3.eth.getBalance(sender)
-      let txCost = support.txPrice(web3, log)
-      let actual = before.minus(after)
+      let after = await web3.eth.getBalance(sender)
+      let txCost = await support.txPrice(web3, log)
+      let actual = new BigNumber.BigNumber(before).minus(new BigNumber.BigNumber(after))
       let expected = txCost.plus(payment)
       assert.equal(actual.toString(), expected.toString())
     })

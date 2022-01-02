@@ -1,14 +1,12 @@
-pragma solidity ^0.4.24;
+// SPDX-License-Identifier: Apache-2.0
+pragma solidity ^0.8.11;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ECRecovery.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "openzeppelin-solidity/contracts/utils/cryptography/ECDSA.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 
 /// @title Unidirectional payment channels contract for ERC20 tokens.
 contract TokenUnidirectional {
-    using SafeMath for uint256;
-
     struct PaymentChannel {
         address sender;
         address receiver;
@@ -40,7 +38,7 @@ contract TokenUnidirectional {
     function open(bytes32 channelId, address receiver, uint256 settlingPeriod, address tokenContract, uint256 value) public {
         require(isAbsent(channelId), "Channel with the same id is present");
 
-        StandardToken token = StandardToken(tokenContract);
+        ERC20 token = ERC20(tokenContract);
         require(token.transferFrom(msg.sender, address(this), value), "Unable to transfer token to the contract");
 
         channels[channelId] = PaymentChannel({
@@ -72,9 +70,9 @@ contract TokenUnidirectional {
         require(canDeposit(channelId, msg.sender), "canDeposit returned false");
 
         PaymentChannel storage channel = channels[channelId];
-        StandardToken token = StandardToken(channel.tokenContract);
+        ERC20 token = ERC20(channel.tokenContract);
         require(token.transferFrom(msg.sender, address(this), value), "Unable to transfer token to the contract");
-        channel.value = channel.value.add(value);
+        channel.value += value;
 
         emit DidDeposit(channelId, value);
     }
@@ -96,7 +94,7 @@ contract TokenUnidirectional {
         require(canStartSettling(channelId, msg.sender), "canStartSettling returned false");
 
         PaymentChannel storage channel = channels[channelId];
-        channel.settlingUntil = block.number.add(channel.settlingPeriod);
+        channel.settlingUntil = block.number + channel.settlingPeriod;
 
         emit DidStartSettling(channelId);
     }
@@ -117,7 +115,7 @@ contract TokenUnidirectional {
         require(canSettle(channelId), "canSettle returned false");
 
         PaymentChannel storage channel = channels[channelId];
-        StandardToken token = StandardToken(channel.tokenContract);
+        ERC20 token = ERC20(channel.tokenContract);
 
         require(token.transfer(channel.sender, channel.value), "Unable to transfer token to channel sender");
 
@@ -131,11 +129,11 @@ contract TokenUnidirectional {
     /// @param payment Amount claimed.
     /// @param origin Caller of `claim` function.
     /// @param signature Signature for the payment promise.
-    function canClaim(bytes32 channelId, uint256 payment, address origin, bytes signature) public view returns(bool) {
+    function canClaim(bytes32 channelId, uint256 payment, address origin, bytes memory signature) public view returns(bool) {
         PaymentChannel storage channel = channels[channelId];
         bool isReceiver = origin == channel.receiver;
         bytes32 hash = recoveryPaymentDigest(channelId, payment, channel.tokenContract);
-        bool isSigned = channel.sender == ECRecovery.recover(hash, signature);
+        bool isSigned = channel.sender == ECDSA.recover(hash, signature);
 
         return isReceiver && isSigned;
     }
@@ -145,17 +143,17 @@ contract TokenUnidirectional {
     /// @param channelId Identifier of the channel.
     /// @param payment Amount claimed.
     /// @param signature Signature for the payment promise.
-    function claim(bytes32 channelId, uint256 payment, bytes signature) public {
+    function claim(bytes32 channelId, uint256 payment, bytes memory signature) public {
         require(canClaim(channelId, payment, msg.sender, signature), "canClaim returned false");
 
         PaymentChannel storage channel = channels[channelId];
-        StandardToken token = StandardToken(channel.tokenContract);
+        ERC20 token = ERC20(channel.tokenContract);
 
         if (payment >= channel.value) {
             require(token.transfer(channel.receiver, channel.value), "Unable to transfer token to channel receiver");
         } else {
             require(token.transfer(channel.receiver, payment), "Unable to transfer token to channel receiver");
-            uint256 change = channel.value.sub(payment);
+            uint256 change = channel.value - payment;
             require(token.transfer(channel.sender, change), "Unable to transfer token to channel sender");
         }
 
@@ -170,7 +168,7 @@ contract TokenUnidirectional {
     /// @param channelId Identifier of the channel.
     function isAbsent(bytes32 channelId) public view returns(bool) {
         PaymentChannel storage channel = channels[channelId];
-        return channel.sender == 0;
+        return channel.sender == address(0x0);
     }
 
     /// @notice Check if the channel is present: in open or settling state.

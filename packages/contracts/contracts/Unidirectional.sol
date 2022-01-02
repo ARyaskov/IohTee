@@ -1,16 +1,14 @@
-pragma solidity ^0.4.24;
+// SPDX-License-Identifier: Apache-2.0
+pragma solidity 0.8.11;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ECRecovery.sol";
+import "openzeppelin-solidity/contracts/utils/cryptography/ECDSA.sol";
 
 
 /// @title Unidirectional Ether payment channels contract.
 contract Unidirectional {
-    using SafeMath for uint256;
-
     struct PaymentChannel {
-        address sender;
-        address receiver;
+        address payable sender;
+        address payable receiver;
         uint256 value; // Total amount of money deposited to the channel.
 
         uint256 settlingPeriod; // How many blocks to wait for the receiver to claim her funds, after sender starts settling.
@@ -36,8 +34,8 @@ contract Unidirectional {
         require(isAbsent(channelId));
 
         channels[channelId] = PaymentChannel({
-            sender: msg.sender,
-            receiver: receiver,
+            sender: payable(msg.sender),
+            receiver: payable(receiver),
             value: msg.value,
             settlingPeriod: settlingPeriod,
             settlingUntil: 0
@@ -115,11 +113,11 @@ contract Unidirectional {
     /// @param payment Amount claimed.
     /// @param origin Caller of `claim` function.
     /// @param signature Signature for the payment promise.
-    function canClaim(bytes32 channelId, uint256 payment, address origin, bytes signature) public view returns(bool) {
+    function canClaim(bytes32 channelId, uint256 payment, address origin, bytes memory signature) public view returns(bool) {
         PaymentChannel memory channel = channels[channelId];
         bool isReceiver = origin == channel.receiver;
         bytes32 hash = recoveryPaymentDigest(channelId, payment);
-        bool isSigned = channel.sender == ECRecovery.recover(hash, signature);
+        bool isSigned = channel.sender == ECDSA.recover(hash, signature);
 
         return isReceiver && isSigned;
     }
@@ -129,7 +127,7 @@ contract Unidirectional {
     /// @param channelId Identifier of the channel.
     /// @param payment Amount claimed.
     /// @param signature Signature for the payment promise.
-    function claim(bytes32 channelId, uint256 payment, bytes signature) public {
+    function claim(bytes32 channelId, uint256 payment, bytes memory signature) public {
         require(canClaim(channelId, payment, msg.sender, signature));
 
         PaymentChannel memory channel = channels[channelId];
@@ -138,7 +136,7 @@ contract Unidirectional {
             channel.receiver.transfer(channel.value);
         } else {
             channel.receiver.transfer(payment);
-            channel.sender.transfer(channel.value.sub(payment));
+            channel.sender.transfer(channel.value - payment);
         }
 
         delete channels[channelId];
@@ -158,7 +156,7 @@ contract Unidirectional {
     /// @param channelId Identifier of the channel.
     function isAbsent(bytes32 channelId) public view returns(bool) {
         PaymentChannel memory channel = channels[channelId];
-        return channel.sender == 0;
+        return channel.sender == address(0x0);
     }
 
     /// @notice Check if the channel is in settling state: waits till the settling period is over.
