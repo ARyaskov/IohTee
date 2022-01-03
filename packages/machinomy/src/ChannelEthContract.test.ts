@@ -7,7 +7,7 @@ import Signature from './Signature'
 import * as expect from 'expect'
 import ChannelId from './ChannelId'
 
-const ID = '0e29e61f256b40b2a6280f8181a1b5ff'
+const ID = '0x0e29e61f256b40b2a6280f8181a1b5ff'
 const RANDOM_ID = 'RANDOM'
 const SETTLEMENT_PERIOD = new BigNumber(1234)
 const RECEIVER = '0xRECEIVER'

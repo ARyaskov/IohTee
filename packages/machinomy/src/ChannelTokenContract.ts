@@ -159,7 +159,7 @@ export default class ChannelTokenContract {
       const exists = await deployed.isPresent(channelId)
       if (!exists) return undefined
 
-      const instance = await deployed.channels(channelId)
+      const instance = await deployed.channels.call(channelId)
       await this.cache.set(channelId, instance)
       return instance
     }
