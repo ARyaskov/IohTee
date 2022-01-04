@@ -16,3 +16,4 @@ packages/contracts/coverageEnv
 packages/contracts/build
 packages/machinomy/coverage
 .nyc_output
+!truffle-config.js
