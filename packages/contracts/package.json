@@ -32,7 +32,7 @@
     "truffle:test": "run-with-testrpc 'truffle test $npm_package_config_truffleTests'",
     "test": "yarn build && yarn truffle:test",
     "prepublish": "yarn support:wrap && yarn build",
-    "coverage": "solidity-coverage",
+    "coverage": "truffle run coverage",
     "mintTestTokens": "yarn build && DEBUG=* node lib/MintTestTokens",
     "deployTestToken": "yarn build && DEBUG=* node lib/DeployTestToken"
   },
@@ -58,6 +58,7 @@
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.1",
     "ethlint": "1.2.5",
+    "eth-gas-reporter": "0.2.23",
     "mocha": "7.2.0",
     "nyc": "^11.8.0",
     "openzeppelin-solidity": "4.4.1",
