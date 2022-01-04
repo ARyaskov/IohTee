@@ -95,17 +95,17 @@ contract('TokenUnidirectional', accounts => {
     })
 
     specify('increase contract balance', async () => {
-      let before = await token.balanceOf(instance.address)
+      let before = await token.balanceOf.call(instance.address)
       await createChannel()
-      let after = await token.balanceOf(instance.address)
+      let after = await token.balanceOf.call(instance.address)
       let delta = new BigNumber.BigNumber(after).minus(new BigNumber.BigNumber(before))
       assert.equal(delta.toString(), channelValue.toString())
     })
 
     specify('decrease sender balance', async () => {
-      let before = await token.balanceOf(sender)
+      let before = await token.balanceOf.call(sender)
       await createChannel()
-      let after = await token.balanceOf(sender)
+      let after = await token.balanceOf.call(sender)
       let delta = new BigNumber.BigNumber(before).minus(new BigNumber.BigNumber(after))
       assert.equal(delta.toString(), channelValue.toString())
     })
@@ -163,10 +163,10 @@ contract('TokenUnidirectional', accounts => {
 
     specify('decrease contract balance', async () => {
       let didOpenEvent = await createChannel()
-      let before = await token.balanceOf(instance.address)
+      let before = await token.balanceOf.call(instance.address)
       let signature = await paymentSignature(sender, didOpenEvent.channelId, payment)
       await instance.claim(didOpenEvent.channelId, payment, signature, { from: receiver })
-      let after = await token.balanceOf(instance.address)
+      let after = await token.balanceOf.call(instance.address)
       let delta = new BigNumber.BigNumber(before).minus(new BigNumber.BigNumber(after))
       assert.equal(delta.toString(), channelValue.toString())
     })
@@ -175,9 +175,9 @@ contract('TokenUnidirectional', accounts => {
       let didOpenEvent = await createChannel()
       let signature = await paymentSignature(sender, didOpenEvent.channelId, payment)
 
-      let before = await token.balanceOf(receiver)
+      let before = await token.balanceOf.call(receiver)
       await instance.claim(didOpenEvent.channelId, payment, signature, { from: receiver })
-      let after = await token.balanceOf(receiver)
+      let after = await token.balanceOf.call(receiver)
       let delta = new BigNumber.BigNumber(after).minus(new BigNumber.BigNumber(before))
       assert.equal(delta.toString(), payment.toString())
     })
@@ -186,9 +186,9 @@ contract('TokenUnidirectional', accounts => {
       let didOpenEvent = await createChannel()
       let _payment = channelValue.plus(payment)
       let signature = await paymentSignature(sender, didOpenEvent.channelId, _payment)
-      let before = await token.balanceOf(receiver)
+      let before = await token.balanceOf.call(receiver)
       await instance.claim(didOpenEvent.channelId, _payment, signature, { from: receiver })
-      let after = await token.balanceOf(receiver)
+      let after = await token.balanceOf.call(receiver)
       let delta = new BigNumber.BigNumber(after).minus(new BigNumber.BigNumber(before))
       assert.equal(delta.toString(), channelValue.toString())
     })
@@ -196,9 +196,9 @@ contract('TokenUnidirectional', accounts => {
     specify('send change to sender', async () => {
       let didOpenEvent = await createChannel()
       let signature = await paymentSignature(sender, didOpenEvent.channelId, payment)
-      let before = await token.balanceOf(sender)
+      let before = await token.balanceOf.call(sender)
       await instance.claim(didOpenEvent.channelId, payment, signature, { from: receiver })
-      let after = await token.balanceOf(sender)
+      let after = await token.balanceOf.call(sender)
       let delta = new BigNumber.BigNumber(after).minus(new BigNumber.BigNumber(before))
       assert.equal(delta.toString(), channelValue.minus(payment).toString())
     })
@@ -315,9 +315,9 @@ contract('TokenUnidirectional', accounts => {
     specify('send money to sender', async () => {
       let didOpenEvent = await createChannel()
       await instance.startSettling(didOpenEvent.channelId, { from: sender })
-      let before = await token.balanceOf(sender)
+      let before = await token.balanceOf.call(sender)
       await instance.settle(didOpenEvent.channelId)
-      let after = await token.balanceOf(sender)
+      let after = await token.balanceOf.call(sender)
       let actual = new BigNumber.BigNumber(after).minus(new BigNumber.BigNumber(before))
       assert.equal(actual.toString(), channelValue.toString())
     })
@@ -353,11 +353,11 @@ contract('TokenUnidirectional', accounts => {
     })
 
     specify('increase contract balance', async () => {
-      let before = await token.balanceOf(instance.address)
+      let before = await token.balanceOf.call(instance.address)
       let channelId = (await createChannel()).channelId
       await token.approve(instance.address, payment)
       await instance.deposit(channelId, payment, { from: sender })
-      let after = await token.balanceOf(instance.address)
+      let after = await token.balanceOf.call(instance.address)
       let delta = new BigNumber.BigNumber(after).minus(new BigNumber.BigNumber(before))
       assert.equal(delta.toString(), channelValue.plus(payment).toString())
     })
@@ -374,11 +374,11 @@ contract('TokenUnidirectional', accounts => {
 
     specify('decrease sender balance', async () => {
       let channelId = (await createChannel()).channelId
-      let before = await token.balanceOf(sender)
+      let before = await token.balanceOf.call(sender)
       let options = { from: sender }
       await token.approve(instance.address, payment, options)
       await instance.deposit(channelId, payment, options)
-      let after = await token.balanceOf(sender)
+      let after = await token.balanceOf.call(sender)
       let actual = new BigNumber.BigNumber(before).minus(new BigNumber.BigNumber(after))
       assert.equal(actual.toString(), payment.toString())
     })
