@@ -1,13 +1,12 @@
-# Machinomy Monorepo [![Build Status][travis-img]][travis] [![Coverage Status][codecov-img]][codecov] [![Greenkeeper badge](https://badges.greenkeeper.io/machinomy/machinomy.svg)](https://greenkeeper.io/) [![Chat][gitter-img]][gitter]
+# Machinomy Berry (v2) Monorepo 
+[![Coverage Status][codecov-img]][codecov]
+[![Greenkeeper badge](https://badges.greenkeeper.io/machinomy/machinomy.svg)](https://greenkeeper.io/)
 
-[travis]: https://travis-ci.org/machinomy/machinomy
-[travis-img]: https://travis-ci.org/machinomy/machinomy.svg?branch=master
 [codecov]: https://codecov.io/gh/machinomy/machinomy
-[codecov-img]: https://codecov.io/gh/machinomy/machinomy/branch/master/graph/badge.svg 
-[gitter]: https://gitter.im/machinomy/machinomy
-[gitter-img]: https://img.shields.io/gitter/room/machinomy/machinomy.js.svg
+[codecov-img]: https://codecov.io/gh/machinomy/machinomy/branch/master/graph/badge.svg
 
-Machinomy Lerna Monorepo repository.
+Machinomy Berry (v2) Monorepo repository. The second life of [original Machinomy library](https://github.com/machinomy/machinomy).
+We're upgrading it to contemporary standards (TypeScript 5, Node.js 22+, ES2020) and adding new features.
 
 Available sub-projects:
 - [Machinomy](packages/machinomy) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
@@ -21,12 +20,11 @@ Available sub-projects:
 
 Web site: [machinomy.com](http://machinomy.com).
 Twitter: [@machinomy](http://twitter.com/machinomy).
-Support/Discussion: [Gitter](https://gitter.im/machinomy/machinomy).
 FAQ: [GitHub Wiki Page](https://github.com/machinomy/machinomy/wiki/Frequently-Asked-Questions).
 
 ## Installation
 
-Using [yarn](https://yarnpkg.com/lang/en/) and Node.js **v14** is mandatory (**don't use npm!**)
+Using [yarn](https://yarnpkg.com/lang/en/) and Node.js **v18** is mandatory (**don't use npm!**)
 
     $ yarn add machinomy
 
@@ -35,7 +33,7 @@ The library supports mainnet, Ropsten, and [Rinkeby](https://www.rinkeby.io/) ne
 ## Tinkering
 
 First of all, please check your Node's arch -- it should not be arm64 (for M1 chip) otherwise node-gyp will fail. 
-It works fine with Node.js v14.18 x64.
+It works fine with Node.js v22 x64.
 
 
 It takes two to tango: a seller and a buyer. Seller is `packages/examples/src/server.ts` script. Build it or run through node-ts.

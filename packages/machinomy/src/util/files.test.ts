@@ -1,12 +1,12 @@
 import * as files from './files'
-import * as asPromised from 'chai-as-promised'
-import * as chai from 'chai'
-import * as path from 'path'
-import * as fs from 'fs'
+import asPromised from 'chai-as-promised'
+import chai from 'chai'
+import path from 'path'
+import fs from 'fs'
 
 chai.use(asPromised)
 
-const assert = chai.assert
+const assert: any = chai.assert
 
 const ABSENT_DIR = '/really-absent-dir'
 

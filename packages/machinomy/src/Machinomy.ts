@@ -1,7 +1,7 @@
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import { MigrateOption } from './MigrateOption'
 import { PaymentChannel } from './PaymentChannel'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import Payment, { PaymentSerde } from './payment'
 import { TransactionResult } from 'truffle-contract'
 import ChannelId from './ChannelId'
@@ -112,18 +112,18 @@ export default class Machinomy {
    * @param channelId - Channel id.
    * @param value - Size of deposit in Wei.
    */
-  async deposit (channelId: string, value: BigNumber.BigNumber | number): Promise<TransactionResult> {
+  async deposit (channelId: string, value: BigNumber | number): Promise<TransactionResult> {
     await this.checkMigrationsState()
-    const _value = new BigNumber.BigNumber(value)
+    const _value = new BigNumber(value)
     let channelManager = await this.registry.channelManager()
     return channelManager.deposit(channelId, _value)
   }
 
-  async open (receiver: string, value: BigNumber.BigNumber | number, channelId?: ChannelId | string, tokenContract?: string): Promise<PaymentChannel> {
+  async open (receiver: string, value: BigNumber | number, channelId?: ChannelId | string, tokenContract?: string): Promise<PaymentChannel> {
     await this.checkMigrationsState()
-    const _value = new BigNumber.BigNumber(value)
+    const _value = new BigNumber(value)
     let channelManager = await this.registry.channelManager()
-    return channelManager.openChannel(this.account, receiver, _value, new BigNumber.BigNumber(0), channelId, tokenContract)
+    return channelManager.openChannel(this.account, receiver, _value, new BigNumber(0), channelId, tokenContract)
   }
 
   /**
@@ -203,7 +203,7 @@ export default class Machinomy {
 
   private async nextPayment (options: BuyOptions): Promise<Payment> {
     await this.checkMigrationsState()
-    const price = new BigNumber.BigNumber(options.price)
+    const price = new BigNumber(options.price)
 
     let channelManager = await this.registry.channelManager()
     const channel = await channelManager.requireOpenChannel(this.account, options.receiver, price, undefined, options.tokenContract)

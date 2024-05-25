@@ -1,5 +1,5 @@
 import Mutex from './Mutex'
-import * as expect from 'expect'
+import expect from 'expect'
 
 describe('Mutex', () => {
   function wait (time: number): Promise<number> {

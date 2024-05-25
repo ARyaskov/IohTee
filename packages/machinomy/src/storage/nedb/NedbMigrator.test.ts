@@ -1,5 +1,5 @@
-import NedbMigrator from './NedbMigrator'
-import * as asPromised from 'chai-as-promised'
+import { NedbMigrator } from './NedbMigrator'
+import asPromised from 'chai-as-promised'
 import { assert, use } from 'chai'
 
 use(asPromised)

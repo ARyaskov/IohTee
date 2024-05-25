@@ -1,10 +1,10 @@
-import * as debug from 'debug'
-import * as dotenv from 'dotenv'
-import * as express from 'express'
+import debug from 'debug'
+import dotenv from 'dotenv'
+import express from 'express'
 import { URL } from 'url'
 import urljoin from 'url-join'
 import fetcher from 'machinomy/lib/util/fetcher'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 const log = debug('paywall')
 
@@ -24,7 +24,7 @@ function isAcceptUrl (url: string) {
   return url === PREFIX + '/accept'
 }
 
-function paywallHeaders (receiverAccount: string, gatewayUri: string, price: BigNumber.BigNumber) {
+function paywallHeaders (receiverAccount: string, gatewayUri: string, price: BigNumber) {
   let headers = {} as any
   headers['paywall-version'] = '0.1'
   headers['paywall-price'] = price.toString()
@@ -33,7 +33,7 @@ function paywallHeaders (receiverAccount: string, gatewayUri: string, price: Big
   return headers
 }
 
-function paywallHeadersToken (receiverAccount: string, gatewayUri: string, price: BigNumber.BigNumber, tokenContract: string) {
+function paywallHeadersToken (receiverAccount: string, gatewayUri: string, price: BigNumber, tokenContract: string) {
   let headers = {} as any
   headers['paywall-version'] = '0.1'
   headers['paywall-price'] = price.toString()
@@ -43,14 +43,14 @@ function paywallHeadersToken (receiverAccount: string, gatewayUri: string, price
   return headers
 }
 
-function parseToken (req: express.Request, callback: (error: string | null, token?: string, meta?: string, price?: BigNumber.BigNumber) => void) {
+function parseToken (req: express.Request, callback: (error: string | null, token?: string, meta?: string, price?: BigNumber) => void) {
   let content = req.get(HEADER_NAME)
   if (content) {
     let authorization = content.split(' ')
     let type = authorization[0].toLowerCase()
     let token = authorization[1]
     let meta = authorization[2]
-    let price = new BigNumber.BigNumber(authorization[3])
+    let price = new BigNumber(authorization[3])
     if (type === TOKEN_NAME) {
       callback(null, token, meta, price)
     } else {
@@ -70,7 +70,7 @@ export default class Paywall {
     this.base = base
   }
 
-  paymentRequired (price: BigNumber.BigNumber, req: express.Request, res: express.Response): void {
+  paymentRequired (price: BigNumber, req: express.Request, res: express.Response): void {
     log('Require payment ' + price.toString() + ' for ' + req.path)
     res.status(402)
       .set(paywallHeaders(this.receiverAccount, acceptUrl(this.base), price))
@@ -78,8 +78,8 @@ export default class Paywall {
       .end()
   }
 
-  guard (price: BigNumber.BigNumber, callback: express.RequestHandler): express.RequestHandler {
-    let _guard = async (fixedPrice: BigNumber.BigNumber, req: express.Request, res: express.Response, next: express.NextFunction, error: any, token?: string, meta?: string) => {
+  guard (price: BigNumber, callback: express.RequestHandler): express.RequestHandler {
+    let _guard = async (fixedPrice: BigNumber, req: express.Request, res: express.Response, next: express.NextFunction, error: any, token?: string, meta?: string) => {
       if (error || !token) {
         log(error)
         this.paymentRequired(fixedPrice, req, res)
@@ -110,7 +110,7 @@ export default class Paywall {
     }
   }
 
-  paymentInvalid (price: BigNumber.BigNumber, req: express.Request, res: express.Response) {
+  paymentInvalid (price: BigNumber, req: express.Request, res: express.Response) {
     res.status(409) // Conflict
       .set(paywallHeaders(this.receiverAccount, acceptUrl(this.base), price))
       .send('Payment Invalid')
@@ -147,7 +147,7 @@ export default class Paywall {
     }
   }
 
-  paymentRequiredToken (price: BigNumber.BigNumber, tokenContract: string, req: express.Request, res: express.Response): void {
+  paymentRequiredToken (price: BigNumber, tokenContract: string, req: express.Request, res: express.Response): void {
     log('Require payment ' + price.toString() + ' for ' + req.path)
     res.status(402)
       .set(paywallHeadersToken(this.receiverAccount, acceptUrl(this.base), price, tokenContract))
@@ -155,15 +155,15 @@ export default class Paywall {
       .end()
   }
 
-  paymentInvalidToken (price: BigNumber.BigNumber, tokenContract: string, req: express.Request, res: express.Response) {
+  paymentInvalidToken (price: BigNumber, tokenContract: string, req: express.Request, res: express.Response) {
     res.status(409) // Conflict
       .set(paywallHeadersToken(this.receiverAccount, acceptUrl(this.base), price, tokenContract))
       .send('Payment Invalid')
       .end()
   }
 
-  guardToken (price: BigNumber.BigNumber, tokenContract: string, callback: express.RequestHandler): express.RequestHandler {
-    let _guard = async (fixedPrice: BigNumber.BigNumber, req: express.Request, res: express.Response, next: express.NextFunction, error: any, _tokenContract: string, token?: string, meta?: string) => {
+  guardToken (price: BigNumber, tokenContract: string, callback: express.RequestHandler): express.RequestHandler {
+    let _guard = async (fixedPrice: BigNumber, req: express.Request, res: express.Response, next: express.NextFunction, error: any, _tokenContract: string, token?: string, meta?: string) => {
       if (error || !token) {
         log(error)
         this.paymentRequiredToken(fixedPrice, _tokenContract, req, res)

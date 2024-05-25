@@ -2,7 +2,7 @@ import nock = require('nock')
 import * as transport from './transport'
 import { randomInteger } from './support'
 import Payment from './payment'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import Signature from './Signature'
 import ChannelId from './ChannelId'
 import { PaymentRequiredResponseSerializer, TRANSPORT_VERSION } from './PaymentRequiredResponse'
@@ -59,9 +59,9 @@ describe('transport', () => {
         channelId: channelId.toString(),
         sender: 'sender',
         receiver: 'receiver',
-        price: new BigNumber.BigNumber(10),
-        value: new BigNumber.BigNumber(12),
-        channelValue: new BigNumber.BigNumber(10),
+        price: new BigNumber(10),
+        value: new BigNumber(12),
+        channelValue: new BigNumber(10),
         meta: 'metaexample',
         signature: Signature.fromParts({
           v: 27,

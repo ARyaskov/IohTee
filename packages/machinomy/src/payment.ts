@@ -1,4 +1,4 @@
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import Serde from './Serde'
 import Signature from './Signature'
 
@@ -6,9 +6,9 @@ export interface PaymentJSON {
   channelId: string
   sender: string
   receiver: string
-  price: BigNumber.BigNumber
-  value: BigNumber.BigNumber
-  channelValue: BigNumber.BigNumber
+  price: BigNumber
+  value: BigNumber
+  channelValue: BigNumber
   v: number | string
   r: string
   s: string
@@ -38,9 +38,9 @@ export default class Payment {
   channelId: string
   sender: string
   receiver: string
-  price: BigNumber.BigNumber
-  value: BigNumber.BigNumber
-  channelValue: BigNumber.BigNumber
+  price: BigNumber
+  value: BigNumber
+  channelValue: BigNumber
   signature: Signature
   meta: string
   token: string | undefined
@@ -106,11 +106,11 @@ export class PaymentSerde implements Serde<Payment> {
 
     return new Payment({
       channelId: data.channelId,
-      value: new BigNumber.BigNumber(String(data.value)),
+      value: new BigNumber(String(data.value)),
       sender: data.sender,
       receiver: data.receiver,
-      price: new BigNumber.BigNumber(String(data.price)),
-      channelValue: new BigNumber.BigNumber(String(data.channelValue)),
+      price: new BigNumber(String(data.price)),
+      channelValue: new BigNumber(String(data.channelValue)),
       signature: Signature.fromParts({
         v: Number(data.v),
         r: data.r,

@@ -1,6 +1,6 @@
 import IMigrator from '../IMigrator'
 
-export default class NedbMigrator implements IMigrator {
+export class NedbMigrator implements IMigrator {
   async isLatest (): Promise<boolean> {
     return true
   }

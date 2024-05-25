@@ -1,5 +1,5 @@
 import AbstractTokensDatabase from '../AbstractTokensDatabase'
-import EngineSqlite from './EngineSqlite'
+import { EngineSqlite } from './EngineSqlite'
 import ChannelId from '../../ChannelId'
 import SqliteDatastore from './SqliteDatastore'
 
@@ -7,7 +7,7 @@ async function createTable (client: SqliteDatastore) {
   await client.run('CREATE TABLE IF NOT EXISTS token (token TEXT, "channelId" TEXT, kind TEXT)')
 }
 
-export default class SqliteTokensDatabase extends AbstractTokensDatabase<EngineSqlite> {
+export class SqliteTokensDatabase extends AbstractTokensDatabase<EngineSqlite> {
   async save (token: string, channelId: ChannelId | string): Promise<void> {
     return this.engine.exec(async client => {
       await createTable(client)

@@ -1,18 +1,18 @@
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import { TransportVersionNotSupportError } from './Exceptions'
 import { RemoteChannelInfos, RemoteChannelInfosSerde } from './RemoteChannelInfo'
 
 export const TRANSPORT_VERSION = '0.0.4'
 
 export class PaymentRequiredResponse {
-  price: BigNumber.BigNumber
+  price: BigNumber
   receiver: string
   gateway: string
   tokenContract: string
   meta: any
   remoteChannelInfo: RemoteChannelInfos
 
-  constructor (price: BigNumber.BigNumber, receiver: string, gateway: string, tokenContract: string, meta: any, remoteChannelInfo: RemoteChannelInfos) {
+  constructor (price: BigNumber, receiver: string, gateway: string, tokenContract: string, meta: any, remoteChannelInfo: RemoteChannelInfos) {
     this.price = price
     this.receiver = receiver
     this.gateway = gateway
@@ -41,7 +41,7 @@ export class PaymentRequiredResponseSerializer {
       throw new TransportVersionNotSupportError()
     }
     return {
-      price: new BigNumber.BigNumber(headers['paywall-price']),
+      price: new BigNumber(headers['paywall-price']),
       receiver: headers['paywall-address'],
       gateway: headers['paywall-gateway'],
       tokenContract: headers['paywall-token-contract'],

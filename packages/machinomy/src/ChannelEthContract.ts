@@ -1,11 +1,11 @@
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import { BigNumber } from 'bignumber.js'
 import { TransactionResult } from 'truffle-contract'
 import Logger from '@machinomy/logger'
 import ChannelManager from './ChannelManager'
 import { ChannelState } from './ChannelState'
 import Signature from './Signature'
-import { Unidirectional } from '@machinomy/contracts'
+const contracts = require('@machinomy/contracts')
 import ChannelId from './ChannelId'
 import * as abi from 'ethereumjs-abi'
 import * as sigUtil from 'eth-sig-util'
@@ -24,14 +24,14 @@ type Raw = [
 ]
 
 export default class ChannelEthContract {
-  contract: Promise<Unidirectional.Contract>
+  contract: Promise<any>
 
   private web3: Web3
   private cache: MemoryCache<Raw>
 
   constructor (web3: Web3, ttl: number) {
     this.web3 = web3
-    this.contract = Unidirectional.contract(this.web3.currentProvider).deployed()
+    this.contract = contracts.Unidirectional.contract(this.web3.currentProvider).deployed()
     this.cache = new MemoryCache(ttl)
   }
 

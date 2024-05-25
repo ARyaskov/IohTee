@@ -1,10 +1,10 @@
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import { BigNumber } from 'bignumber.js'
-import * as sinon from 'sinon'
-import * as contracts from '@machinomy/contracts'
+import sinon from 'sinon'
+const contracts = require('@machinomy/contracts')
 import ChannelEthContract from './ChannelEthContract'
 import Signature from './Signature'
-import * as expect from 'expect'
+import expect from 'expect'
 import ChannelId from './ChannelId'
 
 const ID = '0x0e29e61f256b40b2a6280f8181a1b5ff'

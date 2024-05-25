@@ -1,6 +1,6 @@
 import * as sinon from 'sinon'
 import { assert } from 'chai'
-import SqliteMigrator from './SqliteMigrator'
+import { SqliteMigrator } from './SqliteMigrator'
 
 describe('SqliteMigrator', () => {
   let migrator = new SqliteMigrator('sqlite://./example')

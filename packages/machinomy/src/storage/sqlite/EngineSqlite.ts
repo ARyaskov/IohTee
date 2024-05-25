@@ -1,12 +1,12 @@
 import IExec from '../IExec'
 import IEngine from '../IEngine'
-import * as fs from 'fs'
-import * as sqlite from 'sqlite3'
+import fs from 'fs'
+import sqlite from 'sqlite3'
 import SqliteDatastore from './SqliteDatastore'
 
 let db = new Map<string, SqliteDatastore>()
 
-export default class EngineSqlite implements IEngine, IExec<SqliteDatastore> {
+export class EngineSqlite implements IEngine, IExec<SqliteDatastore> {
   private readonly datastore: SqliteDatastore
 
   constructor (url: string) {

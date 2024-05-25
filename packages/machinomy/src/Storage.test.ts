@@ -1,21 +1,21 @@
-import * as Web3 from 'web3'
-import * as expect from 'expect'
+import Web3 from 'web3'
+import expect from 'expect'
 import ChannelInflator from './ChannelInflator'
 import Storage from './Storage'
-import EngineNedb from './storage/nedb/EngineNedb'
-import NedbChannelsDatabase from './storage/nedb/NedbChannelsDatabase'
-import NedbTokensDatabase from './storage/nedb/NedbTokensDatabase'
-import NedbPaymentsDatabase from './storage/nedb/NedbPaymentsDatabase'
+import { EngineNedb } from './storage/nedb/EngineNedb'
+import { NedbChannelsDatabase } from './storage/nedb/NedbChannelsDatabase'
+import { NedbTokensDatabase } from './storage/nedb/NedbTokensDatabase'
+import { NedbPaymentsDatabase } from './storage/nedb/NedbPaymentsDatabase'
 import EnginePostgres from './storage/postgresql/EnginePostgres'
 import PostgresChannelsDatabase from './storage/postgresql/PostgresChannelsDatabase'
 import PostgresTokensDatabase from './storage/postgresql/PostgresTokensDatabase'
 import PostgresPaymentsDatabase from './storage/postgresql/PostgresPaymentsDatabase'
-import { Unidirectional } from '@machinomy/contracts'
+import contracts from '@machinomy/contracts'
 import * as sinon from 'sinon'
-import EngineSqlite from './storage/sqlite/EngineSqlite'
-import SqliteChannelsDatabase from './storage/sqlite/SqliteChannelsDatabase'
-import SqliteTokensDatabase from './storage/sqlite/SqliteTokensDatabase'
-import SqlitePaymentsDatabase from './storage/sqlite/SqlitePaymentsDatabase'
+import { EngineSqlite } from './storage/sqlite/EngineSqlite'
+import { SqliteChannelsDatabase } from './storage/sqlite/SqliteChannelsDatabase'
+import { SqliteTokensDatabase } from './storage/sqlite/SqliteTokensDatabase'
+import { SqlitePaymentsDatabase } from './storage/sqlite/SqlitePaymentsDatabase'
 
 describe('Storage', () => {
   let web3: Web3
@@ -29,7 +29,7 @@ describe('Storage', () => {
     } as Web3
 
     deployed = {} as any
-    contractStub = sinon.stub(Unidirectional, 'contract')
+    contractStub = sinon.stub(contracts.Unidirectional, 'contract')
     contractStub.withArgs(web3.currentProvider).returns({
       deployed: sinon.stub().resolves(Promise.resolve(deployed))
     })

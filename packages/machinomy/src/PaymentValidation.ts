@@ -1,4 +1,4 @@
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 
 import { PaymentChannel } from './PaymentChannel'
 import Payment from './payment'
@@ -40,7 +40,7 @@ export default class PaymentValidation {
   }
 
   private async isValidChannelValue (): Promise<boolean> {
-    const isValidChannelValue = this.paymentChannel.value.equals(this.payment.channelValue)
+    const isValidChannelValue = this.paymentChannel.value.isEqualTo(this.payment.channelValue)
     if (!isValidChannelValue) {
       error(`Payment value does not match payment channel value. payment channel value: ${this.paymentChannel.value}, payment: %o`, this.payment)
     }
@@ -56,7 +56,7 @@ export default class PaymentValidation {
   }
 
   private async isValidPaymentValue (): Promise<boolean> {
-    const isValidPaymentValue = this.payment.value.lessThanOrEqualTo(this.payment.channelValue)
+    const isValidPaymentValue = this.payment.value.isLessThanOrEqualTo(this.payment.channelValue)
     if (!isValidPaymentValue) {
       error(`Payment value exceeds the channel value. Channel value: ${this.paymentChannel.value}, payment: %o`, this.payment)
     }
@@ -72,7 +72,7 @@ export default class PaymentValidation {
   }
 
   private async isPositive (): Promise<boolean> {
-    const isPositive = this.payment.value.greaterThanOrEqualTo(0) && this.payment.price.greaterThanOrEqualTo(0)
+    const isPositive = this.payment.value.isGreaterThanOrEqualTo(0) && this.payment.price.isGreaterThanOrEqualTo(0)
     if (!isPositive) {
       error(`payment is invalid because the price or value is negative. payment: %o`, this.payment)
     }
@@ -90,8 +90,8 @@ export default class PaymentValidation {
 
   private async isAboveMinSettlementPeriod (): Promise<boolean> {
     let settlementPeriod = await this.channelContract.getSettlementPeriod(this.payment.channelId)
-    const minSettlementPeriod = new BigNumber.BigNumber(this.options.minimumSettlementPeriod || ChannelManager.DEFAULT_SETTLEMENT_PERIOD)
-    const isAboveMinSettlementPeriod = minSettlementPeriod.lessThanOrEqualTo(settlementPeriod)
+    const minSettlementPeriod = new BigNumber(this.options.minimumSettlementPeriod || ChannelManager.DEFAULT_SETTLEMENT_PERIOD)
+    const isAboveMinSettlementPeriod = minSettlementPeriod.isLessThanOrEqualTo(settlementPeriod)
     if (!isAboveMinSettlementPeriod) {
       LOG.warn(`Settlement period for channel ${this.payment.channelId} is not ok: ${settlementPeriod} while min is ${minSettlementPeriod}`)
       error(`Settlement period is too short. settlement period: ${settlementPeriod}, minimum: ${minSettlementPeriod}. payment: %o`, this.payment)

@@ -18,15 +18,14 @@
     "build/"
   ],
   "config": {
-    "truffleTests": "lib/*.test.js",
-    "wrappedArtifacts": "build/contracts/@(Unidirectional|TokenUnidirectional|TestToken).json"
+    "truffleTests": "lib/*.test.js"
   },
   "scripts": {
     "build": "yarn support:wrap && tsc --project tsconfig.json && tsc --project tsconfig.migrations.json",
     "lint": "yarn lint:solidity && yarn lint:typescript",
     "lint:solidity": "solium -d contracts/",
     "lint:typescript": "tslint --format stylish --project .",
-    "support:wrap": "yarn truffle:compile && wraptso $npm_package_config_wrappedArtifacts --output ./src/wrappers",
+    "support:wrap": "yarn truffle:compile && wraptso \"build/contracts/@(Unidirectional|TokenUnidirectional|TestToken).json\" --output ./src/wrappers",
     "support:build": "tsc --project support/tsconfig.json",
     "truffle:compile": "truffle compile",
     "truffle:test": "run-with-testrpc 'truffle test $npm_package_config_truffleTests'",
@@ -35,6 +34,17 @@
     "coverage": "truffle run coverage",
     "mintTestTokens": "yarn build && DEBUG=* node lib/MintTestTokens",
     "deployTestToken": "yarn build && DEBUG=* node lib/DeployTestToken"
+  },
+  "dependencies": {
+    "@ethereumjs/util": "^9.0.3",
+    "@machinomy/hdwallet-provider": "^2.0.8",
+    "@machinomy/logger": "^0.2.5",
+    "@openzeppelin/contracts": "5.0.2",
+    "dotenv": "*",
+    "ethereumjs-units": "^0.2.0",
+    "solidity-coverage": "0.8.12",
+    "truffle-contract": "4.0.31",
+    "web3": "1.10.4"
   },
   "devDependencies": {
     "@machinomy/types-eth-sig-util": "0.0.8",
@@ -46,43 +56,24 @@
     "@machinomy/types-truffle-contract-sources": "^0.0.1",
     "@machinomy/types-truffle-deployer": "0.2.0",
     "@machinomy/types-truffle-resolver": "0.2.0",
-    "@machinomy/wraptso":"file:../wraptso",
-    "@metamask/eth-sig-util": "4.0.0",
-    "@truffle/hdwallet-provider": "2.0.0",
-    "@types/bignumber.js": "^4.0.2",
-    "@types/chai": "4.3.0",
-    "@types/chai-as-promised": "7.1.4",
-    "@types/mocha": "7.0.2",
-    "@types/node": "14.18.3",
-    "chai": "4.3.4",
-    "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.0.1",
+    "@machinomy/wraptso": "file:../wraptso",
+    "@metamask/eth-sig-util": "7.0.2",
+    "@truffle/hdwallet-provider": "2.1.15",
+    "@types/chai": "4.3.16",
+    "@types/chai-as-promised": "7.1.8",
+    "@types/mocha": "10.0.6",
+    "@types/node": "^20.12.12",
+    "@types/web3": "^1.2.2",
+    "chai": "4.4.1",
+    "chai-as-promised": "^7.1.2",
+    "coveralls": "^3.1.1",
+    "eth-gas-reporter": "0.2.27",
     "ethlint": "1.2.5",
-    "eth-gas-reporter": "0.2.23",
-    "mocha": "7.2.0",
-    "nyc": "^11.8.0",
-    "openzeppelin-solidity": "4.4.1",
-    "run-with-testrpc": "0.3.0",
-    "truffle": "5.4.26",
-    "tslint": "^5.10.0",
-    "tslint-config-standard":"^9.0.0"
-  },
-  "dependencies": {
-    "@machinomy/hdwallet-provider": "^2.0.8",
-    "bignumber.js": "4.1.0",
-    "dotenv": "^4.0.0",
-    "ethereumjs-units": "^0.2.0",
-    "ethereumjs-util": "^5.2.0",
-    "solidity-coverage":"0.8.0-beta.0",
-    "truffle-contract":"4.0.31",
-    "web3": "1.6.1"
-  },
-  "resolutions": {
-    "natives": "^1.1.3",
-    "upath": "^1.0.5",
-    "nan": "^2.15.0",
-    "scrypt.js": "0.3.0",
-    "sha3": "^2.1.4",
-    "sqlite3": "^5.0.2"
+    "mocha": "10.4.0",
+    "nyc": "^15.1.0",
+    "run-with-testrpc": "0.3.1",
+    "truffle": "5.11.5",
+    "tslint": "^5.20.1",
+    "tslint-config-standard": "^9.0.0"
   }
 }

@@ -1,7 +1,7 @@
-import * as path from 'path'
-import * as fs from 'fs-extra'
-import BigNumber from 'bignumber.js'
-import * as Web3 from 'web3'
+import path from 'path'
+import fs from 'fs-extra'
+import { BigNumber } from 'bignumber.js'
+import Web3 from 'web3'
 import Machinomy from 'machinomy'
 import HDWalletProvider from '@machinomy/hdwallet-provider'
 import Logger from '@machinomy/logger'
@@ -24,7 +24,7 @@ async function run () {
   })
   const receiverAccount = (await provider.getAddresses())[0]
   const receiverWeb3 = new Web3(provider)
-  const minimumChannelAmount = new BigNumber(1).shift(4)
+  const minimumChannelAmount = new BigNumber(1).shiftedBy(4)
   const receiverMachinomy = new Machinomy(
     receiverAccount,
     receiverWeb3, {

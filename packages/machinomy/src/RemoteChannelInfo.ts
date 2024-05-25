@@ -1,14 +1,14 @@
 import Serde from './Serde'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import { IvalidTypeError } from './Exceptions'
 import Signature from './Signature'
 
 export class RemoteChannelInfo {
   channelId: string
-  spent: BigNumber.BigNumber
+  spent: BigNumber
   sign: Signature
 
-  constructor (channelId: string, spent: BigNumber.BigNumber, sign: Signature) {
+  constructor (channelId: string, spent: BigNumber, sign: Signature) {
     this.channelId = channelId
     this.spent = spent
     this.sign = sign
@@ -39,7 +39,7 @@ export class RemoteChannelInfoSerde implements Serde<RemoteChannelInfo> {
 
     return {
       channelId: data.channelId,
-      spent: new BigNumber.BigNumber(data.spent),
+      spent: new BigNumber(data.spent),
       sign: Signature.fromRpcSig(data.sign)
     }
   }

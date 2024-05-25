@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import fs from 'fs'
 import { URL } from 'url'
 
 export async function readdir (path: string | Buffer | URL): Promise<Array<string>> {

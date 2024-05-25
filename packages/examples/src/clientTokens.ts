@@ -15,7 +15,7 @@
  * The server side for selling the content is provided in `server.ts` file.
  */
 
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import HDWalletProvider from '@machinomy/hdwallet-provider'
 import Machinomy from 'machinomy'
 import fetcher from 'machinomy/lib/util/fetcher'

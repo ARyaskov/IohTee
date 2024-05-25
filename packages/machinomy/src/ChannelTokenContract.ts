@@ -1,8 +1,8 @@
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import { BigNumber } from 'bignumber.js'
 import { TransactionResult } from 'truffle-contract'
 import Logger from '@machinomy/logger'
-import * as contracts from '@machinomy/contracts'
+const contracts = require('@machinomy/contracts')
 import Signature from './Signature'
 import ChannelId from './ChannelId'
 import MemoryCache from './caching/MemoryCache'
@@ -25,7 +25,7 @@ type RawChannel = [
 ]
 
 export default class ChannelTokenContract {
-  contract: Promise<contracts.TokenUnidirectional.Contract>
+  contract: Promise<any>
   private cache: MemoryCache<RawChannel>
 
   private web3: Web3

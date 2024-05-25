@@ -1,10 +1,10 @@
-import * as path from 'path'
-import * as fs from 'fs-extra'
-import * as Web3 from 'web3'
+import path from 'path'
+import fs from 'fs-extra'
+import Web3 from 'web3'
 import Machinomy from 'machinomy'
 import HDWalletProvider from '@machinomy/hdwallet-provider'
 import Logger from '@machinomy/logger'
-import * as contracts from '@machinomy/contracts'
+import contracts from '@machinomy/contracts'
 
 const payment = require(path.resolve('./payment.json'))
 const PROVIDER = process.env.PROVIDER || 'https://rinkeby.infura.io'

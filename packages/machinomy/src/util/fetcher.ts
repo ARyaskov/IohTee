@@ -1,4 +1,4 @@
-import * as ponyFill from 'fetch-ponyfill'
+import ponyFill from 'fetch-ponyfill'
 
 export interface Fetcher {
   fetch: typeof fetch

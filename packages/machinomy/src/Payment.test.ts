@@ -3,7 +3,7 @@ import * as support from './support'
 import Payment from './payment'
 import Signature from './Signature'
 import { PaymentChannel } from './PaymentChannel'
-import * as expect from 'expect'
+import expect from 'expect'
 
 describe('Payment', () => {
   describe('.fromPaymentChannel', () => {

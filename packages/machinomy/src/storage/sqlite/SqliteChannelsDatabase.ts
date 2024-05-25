@@ -1,10 +1,10 @@
 import ChannelId from '../../ChannelId'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import { PaymentChannel, PaymentChannelJSON } from '../../PaymentChannel'
-import EngineSqlite from './EngineSqlite'
+import { EngineSqlite } from './EngineSqlite'
 import AbstractChannelsDatabase from '../AbstractChannelsDatabase'
 
-export default class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlite> {
+export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlite> {
   async save (paymentChannel: PaymentChannel): Promise<void> {
     return this.engine.exec(async client => {
       await client.run(
@@ -37,7 +37,7 @@ export default class SqliteChannelsDatabase extends AbstractChannelsDatabase<Eng
     })
   }
 
-  async spend (channelId: ChannelId | string, spent: BigNumber.BigNumber): Promise<void> {
+  async spend (channelId: ChannelId | string, spent: BigNumber): Promise<void> {
     return this.engine.exec(async client => {
       return client.run(
         'UPDATE channel SET spent = $spent WHERE "channelId" = $channelId',
@@ -48,14 +48,14 @@ export default class SqliteChannelsDatabase extends AbstractChannelsDatabase<Eng
     })
   }
 
-  async deposit (channelId: ChannelId | string, value: BigNumber.BigNumber): Promise<void> {
+  async deposit (channelId: ChannelId | string, value: BigNumber): Promise<void> {
     return this.engine.exec(async client => {
       let channel = await this.firstById(channelId)
       if (!channel) {
         throw new Error('Channel not found.')
       }
 
-      const newValue = channel.value.add(value)
+      const newValue = channel.value.plus(value)
 
       return client.run(
         'UPDATE channel SET value = $value WHERE "channelId" = $channelId',
@@ -82,7 +82,7 @@ export default class SqliteChannelsDatabase extends AbstractChannelsDatabase<Eng
     })
   }
 
-  async findUsable (sender: string, receiver: string, amount: BigNumber.BigNumber): Promise<PaymentChannel | null> {
+  async findUsable (sender: string, receiver: string, amount: BigNumber): Promise<PaymentChannel | null> {
     return this.engine.exec(async client => {
       let raw = await client.get<PaymentChannelJSON>('SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
         'WHERE sender = $sender AND receiver = $receiver AND value >= spent + $amount AND state = 0',
@@ -138,7 +138,7 @@ export default class SqliteChannelsDatabase extends AbstractChannelsDatabase<Eng
     })
   }
 
-  async updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber.BigNumber): Promise<void> {
+  async updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber): Promise<void> {
     return this.engine.exec(async client => {
       return client.run('UPDATE channel SET "settlingUntil" = $settlingUntil WHERE "channelId" = $channelId',
         {

@@ -10,7 +10,7 @@ export function container (): IEnv {
   } else if (typeof window !== 'undefined') {
     return window as IEnv
   } else if (typeof process !== 'undefined' && typeof process.env === 'object') {
-    return process.env
+    return process.env as IEnv
   } else {
     return {}
   }

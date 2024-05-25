@@ -1,5 +1,5 @@
 import Logger from '@machinomy/logger'
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import { BigNumber } from 'bignumber.js'
 import { TransactionResult } from 'truffle-contract'
 import ChannelEthContract from './ChannelEthContract'

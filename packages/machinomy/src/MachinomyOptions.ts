@@ -1,4 +1,4 @@
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import { MigrateOption } from './MigrateOption'
 import { Transport } from './transport'
 
@@ -8,7 +8,7 @@ import { Transport } from './transport'
  */
 export interface MachinomyOptions {
   databaseUrl: string
-  minimumChannelAmount?: number | BigNumber.BigNumber
+  minimumChannelAmount?: number | BigNumber
   minimumSettlementPeriod?: number
   settlementPeriod?: number,
   closeOnInvalidPayment?: boolean

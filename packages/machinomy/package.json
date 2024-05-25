@@ -1,9 +1,14 @@
 {
-  "name": "machinomy",
+  "name": "@riaskov/machinomy",
   "version": "2.0.0",
   "description": "Micropayments powered by Ethereum",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
-  "contributors": ["Andrei Riaskov <mail@riaskov.com>"],
+  "contributors": [
+    {
+      "name": "Andrei Riaskov",
+      "email": "code@riaskov.com"
+    }
+  ],
   "license": "Apache-2.0",
   "keywords": [
     "micropayments",
@@ -12,10 +17,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/machinomy/machinomy.git"
+    "url": "https://github.com/ARyaskov/machinomy.git"
   },
   "scripts": {
-    "build": "rm -rf ./lib/ && tsc --project tsconfig.json && rm -rf lib/storage/*/migrations/*.d.ts",
+    "clean:lib": "rimraf ./lib",
+    "clean:migrations": "rimraf lib/storage/**/migrations/*.d.ts",
+    "build": "yarn clean:lib && tsc --project tsconfig.json",
     "prepublish": "yarn lint && yarn build",
     "lint": "tslint --format stylish --project .",
     "migrate:postgresql": "db-migrate up --migrations-dir='./lib/storage/postgresql/migrations'",
@@ -38,15 +45,13 @@
     "examples/"
   ],
   "dependencies": {
-    "@machinomy/contracts": "file:../contracts",
-    "@machinomy/logger": "0.2.5",
+    "@machinomy/contracts": "^4.1.5",
+    "@machinomy/logger": "^0.2.5",
     "@machinomy/types-bn": "^0.0.3",
     "@machinomy/types-eth-sig-util": "^0.0.8",
     "@machinomy/types-truffle-contract": "^0.0.4",
-    "@metamask/eth-sig-util": "4.0.0",
-    "@types/bignumber.js": "^4.0.2",
+    "@metamask/eth-sig-util": "4.0.1",
     "await-semaphore": "^0.1.3",
-    "bignumber.js": "^4.1.0",
     "browser-or-node": "^1.0.2",
     "commander": "^2.9.0",
     "connection-string": "^0.5.3",
@@ -57,24 +62,27 @@
     "decko": "^1.2.0",
     "ethereumjs-util": "^5.1.5",
     "fetch-ponyfill": "^6.0.0",
-    "homedir": "https://github.com/ukstv/node-homedir",
     "nedb": "^1.8.0",
     "prompt": "^1.0.0",
     "request": "^2.76.0",
     "safe-buffer": "^5.1.2",
     "types-rlp": "^0.0.1",
     "uuid": "^3.2.1",
-    "web3": "1.6.1"
+    "web3": "1.10.4"
   },
   "peerDependencies": {
     "pg": "8.7.1",
-    "sqlite3": "5.0.2"
+    "sqlite3": "5.1.7"
   },
   "devDependencies": {
     "@machinomy/hdwallet-provider": "2.0.8",
     "@machinomy/types-ethereumjs-util": "^0.0.12",
+    "@machinomy/types-web3": "^0.0.12",
+    "@types/bignumber.js": "^5.0.0",
     "@types/bluebird": "3.5.36",
     "@types/body-parser": "^1.16.4",
+    "@types/chai": "*",
+    "@types/chai-as-promised": "*",
     "@types/db-migrate": "https://github.com/machinomy/types-node-db-migrate",
     "@types/db-migrate-base": "0.0.10",
     "@types/debug": "^0.0.30",
@@ -84,15 +92,18 @@
     "@types/mocha": "9.0.0",
     "@types/nedb": "^1.8.3",
     "@types/nock": "^8.2.1",
-    "@types/node": "14.18.3",
+    "@types/node": "^20.12.12",
     "@types/pg": "8.6.3",
     "@types/request": "^2.0.13",
     "@types/sinon": "^4.1.3",
     "@types/sqlite3": "3.1.8",
     "@types/tmp": "^0.0.33",
     "@types/uuid": "^3.4.3",
+    "bignumber.js": "^9.1.2",
     "body-parser": "^1.15.2",
-    "coveralls": "^3.0.0",
+    "chai": "*",
+    "chai-as-promised": "*",
+    "coveralls": "^3.1.1",
     "db-migrate-plugin-typescript": "^2.0.0",
     "expect": "27.4.2",
     "express": "^4.14.0",
@@ -102,21 +113,14 @@
     "nock": "^9.0.9",
     "nyc": "^11.8.0",
     "pg": "8.7.1",
+    "rimraf": "^5.0.7",
     "sinon": "^4.1.5",
     "sqlite3": "^5.0.2",
     "tmp": "0.0.33",
-    "tsconfig-paths": "3.12.0",
     "ts-mocha": "8.0.0",
+    "tsconfig-paths": "3.12.0",
     "tslint": "^5.10.0",
     "tslint-config-standard": "^7.0.0",
-    "typescript": "4.5.4"
-  },
-  "resolutions": {
-    "natives": "^1.1.3",
-    "upath": "^1.0.5",
-    "nan": "^2.15.0",
-    "scrypt.js": "0.3.0",
-    "sha3": "^2.1.4",
-    "sqlite3": "^5.0.2"
+    "typescript": "4.9.5"
   }
 }

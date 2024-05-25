@@ -1,9 +1,9 @@
 import * as configuration from 'machinomy/lib/configuration'
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import Machinomy from 'machinomy'
-import * as express from 'express'
-import * as bodyParser from 'body-parser'
-import * as fs from 'fs'
+import express from 'express'
+import bodyParser from 'body-parser'
+import fs from 'fs'
 
 async function main () {
   let sender = '0x0108d76118d97b88aa40167064cb242fa391effa'

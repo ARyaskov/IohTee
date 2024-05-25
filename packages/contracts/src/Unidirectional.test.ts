@@ -12,7 +12,7 @@ import Gaser from './support/Gaser'
 chai.use(asPromised)
 
 const web3 = (global as any).web3 as Web3
-const assert = chai.assert
+const assert: any = chai.assert
 const gaser = new Gaser(web3)
 
 const Unidirectional = artifacts.require<contracts.Unidirectional.Contract>('Unidirectional.sol')
@@ -100,7 +100,7 @@ contract('Unidirectional', accounts => {
       let after = await web3.eth.getBalance(sender)
       let txCost = await support.txPrice(web3, log)
       let actual = new BigNumber.BigNumber(after).minus(before)
-      let expected = channelValue.plus(txCost).neg()
+      let expected = channelValue.plus(txCost).negated()
       assert.equal(actual.toString(), expected.toString())
     })
 

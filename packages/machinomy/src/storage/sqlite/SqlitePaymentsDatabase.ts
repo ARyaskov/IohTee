@@ -1,5 +1,5 @@
 import AbstractPaymentsDatabase from '../AbstractPaymentsDatabase'
-import EngineSqlite from './EngineSqlite'
+import { EngineSqlite } from './EngineSqlite'
 import ChannelId from '../../ChannelId'
 import Payment, { PaymentJSON, PaymentSerde } from '../../payment'
 import SqliteDatastore from './SqliteDatastore'
@@ -9,7 +9,7 @@ async function createTable (client: SqliteDatastore) {
     ' price INTEGER, value INTEGER, "channelValue" INTEGER, v INTEGER, r TEXT, s TEXT, meta TEXT, "contractAddress" TEXT, createdAt TEXT)')
 }
 
-export default class SqlitePaymentsDatabase extends AbstractPaymentsDatabase<EngineSqlite> {
+export class SqlitePaymentsDatabase extends AbstractPaymentsDatabase<EngineSqlite> {
   async save (token: string, payment: Payment): Promise<void> {
     return this.engine.exec(async client => {
       await createTable(client)

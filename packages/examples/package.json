@@ -31,17 +31,14 @@
     "@machinomy/types-bn": "^0.0.3",
     "@machinomy/types-truffle-contract": "^0.0.4",
     "@machinomy/types-web3": "0.0.12",
-    "@types/bignumber.js": "^4.0.2",
     "@types/express-serve-static-core": "4.17.27",
     "@types/fs-extra": "^5.0.4",
-    "bignumber.js": "^4.1.0",
     "commander": "^2.9.0",
     "debug": "^3.1.0",
     "decko": "^1.2.0",
     "ethereumjs-util": "^5.1.5",
     "fetch-ponyfill": "^6.0.0",
     "fs-extra": "^7.0.0",
-    "homedir": "https://github.com/ukstv/node-homedir",
     "machinomy": "^1.13.32",
     "nedb": "^1.8.0",
     "prompt": "^1.0.0",
@@ -62,6 +59,6 @@
     "nan": "^2.15.0",
     "scrypt.js": "0.3.0",
     "sha3": "^2.1.4",
-    "sqlite3": "^5.0.2"
+    "sqlite3": "^5.1.7"
   }
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Source: OpenZeppelin Solidity v2 code, MIT
-pragma solidity 0.8.11;
+pragma solidity 0.8.20;
 
 import "./Roles.sol";
 
@@ -10,7 +10,7 @@ contract MinterRole {
 
     Roles.Role private minters;
 
-    constructor() public {
+    constructor() {
         minters.add(msg.sender);
     }
 

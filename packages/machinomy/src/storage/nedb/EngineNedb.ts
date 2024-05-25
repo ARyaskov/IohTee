@@ -1,11 +1,11 @@
-import * as Datastore from 'nedb'
+import Datastore from 'nedb'
 import IEngine from '../IEngine'
 import IExec from '../IExec'
 import NedbDatastore from './NedbDatastore'
 
 let db = new Map<string, NedbDatastore>()
 
-export default class EngineNedb implements IEngine, IExec<NedbDatastore> {
+export class EngineNedb implements IEngine, IExec<NedbDatastore> {
   datastore: NedbDatastore
 
   constructor (path: string, inMemoryOnly: boolean = false) {

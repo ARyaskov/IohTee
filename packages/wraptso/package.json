@@ -13,9 +13,7 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": {
-    "wraptso": "dist/bin/wraptso.js"
-  },
+  "bin": "dist/bin/wraptso.js",
   "files": [
     "dist/",
     "templates/"
@@ -49,6 +47,6 @@
     "nan": "^2.15.0",
     "scrypt.js": "0.3.0",
     "sha3": "^2.1.4",
-    "sqlite3": "^5.0.2"
+    "sqlite3": "^5.1.7"
   }
 }

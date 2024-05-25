@@ -1,6 +1,6 @@
 import { PaymentChannel } from '../../PaymentChannel'
 import ChannelId from '../../ChannelId'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import EnginePostgres from './EnginePostgres'
 import AbstractChannelsDatabase from '../AbstractChannelsDatabase'
 
@@ -34,7 +34,7 @@ export default class PostgresChannelsDatabase extends AbstractChannelsDatabase<E
     )).then((res: any) => this.inflatePaymentChannel(res.rows[0]))
   }
 
-  spend (channelId: ChannelId | string, spent: BigNumber.BigNumber): Promise<void> {
+  spend (channelId: ChannelId | string, spent: BigNumber): Promise<void> {
     return this.engine.exec((client: any) => client.query(
       'UPDATE channel SET spent = $2 WHERE "channelId" = $1',
       [
@@ -44,7 +44,7 @@ export default class PostgresChannelsDatabase extends AbstractChannelsDatabase<E
     ))
   }
 
-  async deposit (channelId: ChannelId | string, value: BigNumber.BigNumber): Promise<void> {
+  async deposit (channelId: ChannelId | string, value: BigNumber): Promise<void> {
     return this.engine.exec(async (client: any) => {
       const channel = await this.firstById(channelId)
 
@@ -52,7 +52,7 @@ export default class PostgresChannelsDatabase extends AbstractChannelsDatabase<E
         throw new Error('Channel not found.')
       }
 
-      const newValue = channel.value.add(value)
+      const newValue = channel.value.plus(value)
 
       return client.query(
         'UPDATE channel SET value = $2 WHERE "channelId" = $1',
@@ -78,7 +78,7 @@ export default class PostgresChannelsDatabase extends AbstractChannelsDatabase<E
       .then((chans: PaymentChannel[]) => this.filterByState(0, chans))
   }
 
-  async findUsable (sender: string, receiver: string, amount: BigNumber.BigNumber): Promise<PaymentChannel | null> {
+  async findUsable (sender: string, receiver: string, amount: BigNumber): Promise<PaymentChannel | null> {
     const res = await this.engine.exec(client => client.query(
       'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
       'WHERE sender = $1 AND receiver = $2 AND value >= spent + $3 AND state = 0',
@@ -135,7 +135,7 @@ export default class PostgresChannelsDatabase extends AbstractChannelsDatabase<E
     ))
   }
 
-  updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber.BigNumber): Promise<void> {
+  updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber): Promise<void> {
     return this.engine.exec((client: any) => client.query(
       'UPDATE channel SET "settlingUntil" = $1 WHERE "channelId" = $2',
       [

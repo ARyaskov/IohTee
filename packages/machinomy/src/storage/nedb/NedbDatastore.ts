@@ -1,4 +1,4 @@
-import * as Datastore from 'nedb'
+import Datastore from 'nedb'
 
 export default class NedbDatastore {
   datastore: Datastore

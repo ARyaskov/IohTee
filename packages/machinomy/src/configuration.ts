@@ -1,4 +1,4 @@
-import homedir = require('homedir')
+import os from 'os'
 import Logger from '@machinomy/logger'
 import path = require('path')
 import Web3 = require('web3')
@@ -32,7 +32,7 @@ export const contractAddress = (): string => {
 }
 
 export const baseDirPath = (): string => {
-  return path.resolve(path.join(homedir(), BASE_DIR))
+  return path.resolve(path.join(os.homedir(), BASE_DIR))
 }
 
 export const configFilePath = (): string => {

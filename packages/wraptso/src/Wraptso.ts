@@ -19,7 +19,7 @@ export default class Wraptso {
     if (!fs.existsSync(this.outputDir)) {
       mkdirp.sync(this.outputDir)
     }
-
+    console.log(this.pattern)
     let fileNames = glob.sync(this.pattern)
     if (fileNames.length) {
       fileNames.forEach(fileName => {

@@ -24,7 +24,7 @@ export function migrationsConfig (connectionUrl: string) {
 
 const log = new Logger('migrator:sqlite')
 
-export default class SqliteMigrator extends SqlMigrator {
+export class SqliteMigrator extends SqlMigrator {
   constructor (databaseUrl: string) {
     super(log, migrationsConfig(databaseUrl))
   }

@@ -1,12 +1,12 @@
-import * as express from 'express'
-import * as bodyParser from 'body-parser'
-import * as dotenv from 'dotenv'
+import express from 'express'
+import bodyParser from 'body-parser'
+import dotenv from 'dotenv'
 import HDWalletProvider from '@machinomy/hdwallet-provider'
-import * as contracts from '@machinomy/contracts'
+import contracts from '@machinomy/contracts'
 import Paywall from './Paywall'
-import * as morgan from 'morgan'
-import * as url from 'url'
-import * as BigNumber from 'bignumber.js'
+import morgan from 'morgan'
+import url from 'url'
+import { BigNumber } from 'bignumber.js'
 
 async function main () {
   dotenv.config()
@@ -36,11 +36,11 @@ async function main () {
   app.use(paywall.middleware())
   app.use(morgan('combined'))
 
-  app.get('/hello', paywall.guard(new BigNumber.BigNumber(1000), (req, res) => {
+  app.get('/hello', paywall.guard(new BigNumber(1000), (req: express.Request, res: express.Response) => {
     res.end('Thank you for the payment!')
   }))
 
-  app.get('/hello-token', paywall.guardToken(new BigNumber.BigNumber(5), tokenContract, (req, res) => {
+  app.get('/hello-token', paywall.guardToken(new BigNumber(5), tokenContract, (req: express.Request, res: express.Response) => {
     res.end('Thank you for the payment!')
   }))
 

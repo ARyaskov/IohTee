@@ -12,7 +12,7 @@ import * as sigUtil from '@metamask/eth-sig-util'
 chai.use(asPromised)
 
 const web3 = (global as any).web3 as Web3
-const assert = chai.assert
+const assert: any = chai.assert
 const gaser = new Gaser(web3)
 
 const TokenUnidirectional = artifacts.require<contracts.TokenUnidirectional.Contract>('TokenUnidirectional.sol')
@@ -34,7 +34,7 @@ contract('TokenUnidirectional', accounts => {
 
   beforeEach(async () => {
     token = await Token.new()
-    await token.mint(sender, channelValue.mul(100))
+    await token.mint(sender, channelValue.multipliedBy(100))
     await token.finishMinting()
     instance = await TokenUnidirectional.deployed()
   })
@@ -224,7 +224,7 @@ contract('TokenUnidirectional', accounts => {
     })
     specify('if payment > channel then send payment === channel', async () => {
       let didOpenEvent = await createChannel()
-      let _payment = channelValue.plus(payment.mul(100))
+      let _payment = channelValue.plus(payment.multipliedBy(100))
       let signature = await paymentSignature(sender, didOpenEvent.channelId, _payment)
       let r = await instance.claim(didOpenEvent.channelId, _payment, signature, { from: receiver })
 

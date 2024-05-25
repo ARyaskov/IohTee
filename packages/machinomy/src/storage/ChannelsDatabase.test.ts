@@ -2,11 +2,11 @@ import ChannelId from '../ChannelId'
 import { PaymentChannel, PaymentChannelJSON } from '../PaymentChannel'
 import { BigNumber } from 'bignumber.js'
 import expectsRejection from '../util/expects_rejection'
-import * as expect from 'expect'
+import expect from 'expect'
 import IChannelsDatabase from './IChannelsDatabase'
 import { tmpStorage } from '../util/tmpStorage'
 import ChannelInflator from '../ChannelInflator'
-import * as sinon from 'sinon'
+import sinon from 'sinon'
 import ChannelContract from '../ChannelContract'
 
 describe('ChannelsDatabase', () => {

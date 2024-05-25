@@ -1,8 +1,8 @@
 import AbstractTokensDatabase from '../AbstractTokensDatabase'
-import EngineNedb from './EngineNedb'
+import { EngineNedb } from './EngineNedb'
 import ChannelId from '../../ChannelId'
 
-export default class NedbTokensDatabase extends AbstractTokensDatabase<EngineNedb> {
+export class NedbTokensDatabase extends AbstractTokensDatabase<EngineNedb> {
   async save (token: string, channelId: ChannelId | string): Promise<void> {
     const tokenDocument = {
       kind: this.kind,

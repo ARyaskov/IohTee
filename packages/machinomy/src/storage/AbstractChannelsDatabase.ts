@@ -1,5 +1,5 @@
 import { PaymentChannel, PaymentChannelJSON } from '../PaymentChannel'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import { namespaced } from '../util/namespaced'
 import IEngine from './IEngine'
 import ChannelId from '../ChannelId'
@@ -59,11 +59,11 @@ export default abstract class AbstractChannelsDatabase<T extends IEngine> implem
     })
   }
 
-  abstract deposit (channelId: ChannelId | string, value: BigNumber.BigNumber): Promise<void>
+  abstract deposit (channelId: ChannelId | string, value: BigNumber): Promise<void>
 
   abstract firstById (channelId: ChannelId | string): Promise<PaymentChannel | null>
 
-  abstract spend (channelId: ChannelId | string, spent: BigNumber.BigNumber): Promise<void>
+  abstract spend (channelId: ChannelId | string, spent: BigNumber): Promise<void>
 
   abstract all (): Promise<Array<PaymentChannel>>
 
@@ -74,7 +74,7 @@ export default abstract class AbstractChannelsDatabase<T extends IEngine> implem
     return this.filterByState(1, all)
   }
 
-  abstract findUsable (sender: string, receiver: string, amount: BigNumber.BigNumber): Promise<PaymentChannel | null>
+  abstract findUsable (sender: string, receiver: string, amount: BigNumber): Promise<PaymentChannel | null>
 
   abstract findBySenderReceiver (sender: string, receiver: string): Promise<Array<PaymentChannel>>
 
@@ -82,5 +82,5 @@ export default abstract class AbstractChannelsDatabase<T extends IEngine> implem
 
   abstract updateState (channelId: ChannelId | string, state: number): Promise<void>
 
-  abstract updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber.BigNumber): Promise<void>
+  abstract updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber): Promise<void>
 }

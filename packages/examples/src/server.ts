@@ -18,10 +18,10 @@
  * The client side for buying the content is provided in `client.ts` file.
  */
 
-import * as express from 'express'
-import * as Web3 from 'web3'
+import express from 'express'
+import Web3 from 'web3'
 import Machinomy from 'machinomy'
-import * as bodyParser from 'body-parser'
+import bodyParser from 'body-parser'
 import { AcceptTokenRequestSerde } from 'machinomy/lib/accept_token_request'
 import { PaymentChannelSerde } from 'machinomy/lib/PaymentChannel'
 import fetcher from 'machinomy/lib/util/fetcher'

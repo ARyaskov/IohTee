@@ -1,5 +1,5 @@
 import * as configuration from 'machinomy/lib/configuration'
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import Machinomy from 'machinomy'
 
 async function pry (uri: string) {

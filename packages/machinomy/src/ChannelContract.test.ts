@@ -1,11 +1,11 @@
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import { BigNumber } from 'bignumber.js'
-import * as sinon from 'sinon'
+import sinon from 'sinon'
 import ChannelContract from './ChannelContract'
 import Signature from './Signature'
-import * as expect from 'expect'
-import * as asPromised from 'chai-as-promised'
-import * as chai from 'chai'
+import expect from 'expect'
+import asPromised from 'chai-as-promised'
+import chai from 'chai'
 import Payment from './payment'
 
 chai.use(asPromised)

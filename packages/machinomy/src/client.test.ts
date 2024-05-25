@@ -1,5 +1,5 @@
 import * as sinon from 'sinon'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import { Transport } from './transport'
 import { ClientImpl } from './client'
 import expectsRejection from './util/expects_rejection'
@@ -40,13 +40,13 @@ describe('ClientImpl', () => {
 
       return client.doPreflight('0xcafe', 'http://honkhost:1234/site').then((res: PaymentRequiredResponse) => {
         expect(res.receiver).toBe('0x1234')
-        expect(res.price).toEqual(new BigNumber.BigNumber(1000))
+        expect(res.price).toEqual(new BigNumber(1000))
         expect(res.gateway).toBe('http://honkhost:8080/machinomy')
         expect(res.meta).toBe('hello')
         expect(res.tokenContract).toBe('0xbeef')
         expect(res.remoteChannelInfo.channels.length).toBe(1)
         expect(res.remoteChannelInfo.channels[0].channelId).toBe('0x111')
-        expect(res.remoteChannelInfo.channels[0].spent).toEqual(new BigNumber.BigNumber(10))
+        expect(res.remoteChannelInfo.channels[0].spent).toEqual(new BigNumber(10))
         expect(res.remoteChannelInfo.channels[0].sign).toEqual(Signature.fromRpcSig('0xbabe'))
       })
     })

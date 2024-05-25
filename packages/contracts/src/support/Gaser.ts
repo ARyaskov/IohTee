@@ -1,6 +1,7 @@
 import * as Web3 from 'web3'
 import * as truffle from 'truffle-contract'
 import Conversion from './Conversion'
+import {BigNumber} from "bignumber.js";
 
 export default class Gaser {
   web3: Web3
@@ -14,9 +15,9 @@ export default class Gaser {
   }
 
   async diff<A> (name: string, account: string, fn: () => A, forceLog?: boolean): Promise<A> {
-    let before = this.web3.eth.getBalance(account)
+    let before = new BigNumber(await this.web3.eth.getBalance(account))
     let result = fn()
-    let after = this.web3.eth.getBalance(account)
+    let after = new BigNumber(await this.web3.eth.getBalance(account))
     let gasCost = this.conversion.ethToGas(before.minus(after))
     this.log(gasCost, name, forceLog)
     return result

@@ -1,10 +1,10 @@
 import pify from '../../util/pify'
 import Payment, { PaymentJSON, PaymentSerde } from '../../payment'
 import AbstractPaymentsDatabase from '../AbstractPaymentsDatabase'
-import EngineNedb from './EngineNedb'
+import { EngineNedb } from './EngineNedb'
 import ChannelId from '../../ChannelId'
 
-export default class NedbPaymentsDatabase extends AbstractPaymentsDatabase<EngineNedb> {
+export class NedbPaymentsDatabase extends AbstractPaymentsDatabase<EngineNedb> {
   async save (token: string, payment: Payment): Promise<void> {
     const serialized: any = PaymentSerde.instance.serialize(payment)
     serialized.kind = this.kind

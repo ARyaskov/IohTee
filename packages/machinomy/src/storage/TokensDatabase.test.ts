@@ -1,9 +1,9 @@
 import * as support from '../support'
 import ChannelId from '../ChannelId'
 import { PaymentChannel } from '../PaymentChannel'
-import * as BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import ITokensDatabase from './ITokensDatabase'
-import * as expect from 'expect'
+import expect from 'expect'
 import IChannelsDatabase from './IChannelsDatabase'
 import ChannelInflator from '../ChannelInflator'
 import { tmpStorage } from '../util/tmpStorage'
@@ -32,7 +32,7 @@ describe('TokensDatabase', () => {
       const randomToken = support.randomInteger().toString()
       const channelId = ChannelId.random()
 
-      return channels.save(new PaymentChannel('sender', 'receiver', channelId.toString(), new BigNumber.BigNumber(10), new BigNumber.BigNumber(0), undefined, ''))
+      return channels.save(new PaymentChannel('sender', 'receiver', channelId.toString(), new BigNumber(10), new BigNumber(0), undefined, ''))
         .then(() => {
           return tokens.save(randomToken, channelId).then(() => {
             return tokens.isPresent(randomToken)

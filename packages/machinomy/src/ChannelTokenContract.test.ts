@@ -1,13 +1,13 @@
-import * as Web3 from 'web3'
+import Web3 from 'web3'
 import { BigNumber } from 'bignumber.js'
-import * as sinon from 'sinon'
-import * as contracts from '@machinomy/contracts'
+import sinon from 'sinon'
+const contracts = require('@machinomy/contracts')
 import Signature from './Signature'
-import * as expect from 'expect'
+import expect from 'expect'
 import ChannelId from './ChannelId'
 import ChannelTokenContract from './ChannelTokenContract'
-import * as asPromised from 'chai-as-promised'
-import * as chai from 'chai'
+import asPromised from 'chai-as-promised'
+import chai from 'chai'
 
 chai.use(asPromised)
 

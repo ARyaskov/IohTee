@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as commander from 'commander'
-import homedir = require('homedir')
+import os from 'os'
 import setup from './setup'
 import buy from './buy'
 import pry from './pry'
@@ -15,7 +15,7 @@ const BASE_DIR = '.machinomy'
 const CONFIGURATION_FILE = 'config.json'
 
 const baseDirPath = function (): string {
-  return path.resolve(path.join(homedir(), BASE_DIR))
+  return path.resolve(path.join(os.homedir(), BASE_DIR))
 }
 
 const ensureBaseDirPresent = function (): void {

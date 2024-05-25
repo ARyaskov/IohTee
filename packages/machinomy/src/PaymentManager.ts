@@ -1,4 +1,4 @@
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import ChainManager from './ChainManager'
 import { PaymentChannel } from './PaymentChannel'
 import Payment from './payment'
@@ -19,7 +19,7 @@ export default class PaymentManager {
     this.options = options
   }
 
-  async buildPaymentForChannel (channel: PaymentChannel, price: BigNumber.BigNumber, totalValue: BigNumber.BigNumber, meta: string): Promise<Payment> {
+  async buildPaymentForChannel (channel: PaymentChannel, price: BigNumber, totalValue: BigNumber, meta: string): Promise<Payment> {
     const digest = await this.channelContract.paymentDigest(channel.channelId, totalValue)
     const signature = await this.chainManager.sign(channel.sender, digest)
 

@@ -1,14 +1,14 @@
 import AbstractChannelsDatabase from '../AbstractChannelsDatabase'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import IChannelsDatabase from '../IChannelsDatabase'
-import EngineNedb from './EngineNedb'
+import { EngineNedb } from './EngineNedb'
 import ChannelId from '../../ChannelId'
 import { PaymentChannel, PaymentChannelJSON } from '../../PaymentChannel'
 
 /**
  * Database layer for {PaymentChannel}
  */
-export default class NedbChannelsDatabase extends AbstractChannelsDatabase<EngineNedb> implements IChannelsDatabase {
+export class NedbChannelsDatabase extends AbstractChannelsDatabase<EngineNedb> implements IChannelsDatabase {
   async save (paymentChannel: PaymentChannel): Promise<void> {
     const document = {
       kind: this.kind,
@@ -43,7 +43,7 @@ export default class NedbChannelsDatabase extends AbstractChannelsDatabase<Engin
   /**
    * Set amount of money spent on the channel.
    */
-  async spend (channelId: ChannelId | string, spent: BigNumber.BigNumber): Promise<void> {
+  async spend (channelId: ChannelId | string, spent: BigNumber): Promise<void> {
     const query = {
       kind: this.kind,
       channelId: channelId.toString()
@@ -59,13 +59,13 @@ export default class NedbChannelsDatabase extends AbstractChannelsDatabase<Engin
     })
   }
 
-  async deposit (channelId: ChannelId | string, value: BigNumber.BigNumber): Promise<void> {
+  async deposit (channelId: ChannelId | string, value: BigNumber): Promise<void> {
     const channel = await this.firstById(channelId)
     if (!channel) {
       throw new Error('Channel not found.')
     }
     const query = { kind: this.kind, channelId: channelId.toString() }
-    const newValue = channel.value.add(value)
+    const newValue = channel.value.plus(value)
     const update = {
       $set: {
         value: newValue.toString()
@@ -96,7 +96,7 @@ export default class NedbChannelsDatabase extends AbstractChannelsDatabase<Engin
     return this.filterByState(0, channels)
   }
 
-  async findUsable (sender: string, receiver: string, amount: BigNumber.BigNumber): Promise<PaymentChannel | null> {
+  async findUsable (sender: string, receiver: string, amount: BigNumber): Promise<PaymentChannel | null> {
     const query = {
       kind: this.kind,
       state: 0,
@@ -108,7 +108,7 @@ export default class NedbChannelsDatabase extends AbstractChannelsDatabase<Engin
     })
     let channels = await this.inflatePaymentChannels(raw)
     let filtered = this.filterByState(0, channels)
-    return filtered.find((chan: PaymentChannel) => chan.value.greaterThanOrEqualTo(chan.spent.add(amount))) || null
+    return filtered.find((chan: PaymentChannel) => chan.value.isGreaterThanOrEqualTo(chan.spent.plus(amount))) || null
   }
 
   async findBySenderReceiver (sender: string, receiver: string): Promise<Array<PaymentChannel>> {
@@ -146,7 +146,7 @@ export default class NedbChannelsDatabase extends AbstractChannelsDatabase<Engin
     })
   }
 
-  async updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber.BigNumber): Promise<void> {
+  async updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber): Promise<void> {
     const query = {
       kind: this.kind,
       channelId: channelId.toString()
