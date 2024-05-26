@@ -13,7 +13,6 @@ lerna-debug.log
 packages/contracts/coverage.json
 packages/contracts/coverage
 packages/contracts/coverageEnv
-packages/contracts/build
 packages/machinomy/coverage
 .nyc_output
 !truffle-config.js
