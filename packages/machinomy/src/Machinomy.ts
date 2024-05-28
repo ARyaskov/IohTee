@@ -1,4 +1,4 @@
-import Web3 from 'web3'
+import { Web3 } from 'web3'
 import { MigrateOption } from './MigrateOption'
 import { PaymentChannel } from './PaymentChannel'
 import { BigNumber } from 'bignumber.js'
@@ -23,7 +23,7 @@ import { PaymentRequiredResponse } from './PaymentRequiredResponse'
  * Core method is [buy]{@link Machinomy.buy}. The method does all the heavy lifting providing an easy interface
  * for micropayments.
  *
- * See [examples](https://github.com/machinomy/machinomy/tree/master/examples) directory for both client and server sides.
+ * See [examples](https://github.com/ARyaskov/machinomy/tree/master/packages/examples) directory for both client and server sides.
  *
  * NB. All monetary values below are denominated in Wei, including: [buy]{@link Machinomy.buy} and
  * [deposit]{@link Machinomy.deposit} methods.

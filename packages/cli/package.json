@@ -32,5 +32,8 @@
     "tslint-config-standard": "^7.1.0",
     "typescript": "^4.5.4",
     "typescript-logger": "^1.1.1"
+  },
+  "resolutions": {
+    "sqlite3": "^5.1.7"
   }
 }

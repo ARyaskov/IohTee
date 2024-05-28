@@ -1,17 +1,21 @@
-import * as Web3 from 'web3'
+import { Web3 } from 'web3'
 import * as chai from 'chai'
-import * as BigNumber from 'bignumber.js'
+import { BigNumber } from 'bignumber.js'
 import asPromised from 'chai-as-promised'
 import * as contracts from './index'
 import * as support from './support'
 import * as abi from 'ethereumjs-abi'
 import * as sigUtil from 'eth-sig-util'
-import Units from './Units'
 import Gaser from './support/Gaser'
+import {FMT_BYTES, FMT_NUMBER} from "web3-types/src/data_format_types";
 
 chai.use(asPromised)
 
 const web3 = (global as any).web3 as Web3
+web3.setConfig({defaultReturnFormat: {
+  number: FMT_NUMBER.STR,
+  bytes: FMT_BYTES.UINT8ARRAY
+}})
 const assert: any = chai.assert
 const gaser = new Gaser(web3)
 
@@ -24,15 +28,15 @@ contract('Unidirectional', accounts => {
   const sender = accounts[0]
   const receiver = accounts[1]
   const alien = accounts[2]
-  const channelValue = Units.convert(1, 'eth', 'wei')
+  const channelValue = Web3.utils.toWei(1, 'ether')
   const settlingPeriod = 0
-  let payment = Units.convert(0.1, 'eth', 'wei')
+  let payment = Web3.utils.toWei(0.1, 'ether')
   let instance: contracts.Unidirectional.Contract
 
   async function createChannelRaw (channelId: string, _settlingPeriod: number = settlingPeriod) {
     let options = {
       from: sender,
-      value: Units.convert(1, 'eth', 'wei')
+      value: Web3.utils.toWei(1, 'ether')
     }
     return instance.open(channelId, receiver, _settlingPeriod, options)
   }
@@ -43,12 +47,12 @@ contract('Unidirectional', accounts => {
     return log.logs[0].args
   }
 
-  async function paymentSignature (sender: string, channelId: string, payment: BigNumber.BigNumber): Promise<string> {
+  async function paymentSignature (sender: string, channelId: string, payment: BigNumber): Promise<string> {
     let digest = await instance.paymentDigest.call(channelId, payment)
-    let alternative = abi.soliditySHA3(['address', 'bytes32', 'uint256'],
-      [instance.address, channelId, payment.toString()])
-    assert(digest === '0x' + alternative.toString('hex'))
-    let signature = await web3.eth.sign(digest, sender)
+    let alternative = Web3.utils.soliditySha3(['address', 'bytes32', 'uint256'],
+      [instance.address, channelId, payment.toString()])!
+    assert(digest === '0x' + alternative.toString(16))
+    let signature = (await web3.eth.sign(digest, sender)) as string
     let recovered = web3.eth.accounts.recover(digest, signature)
     assert(recovered === sender)
     return signature.slice(0, -2) + (parseInt(signature.slice(-2), 10) + 27).toString(16)

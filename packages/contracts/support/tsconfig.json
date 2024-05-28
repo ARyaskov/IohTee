@@ -15,7 +15,6 @@
       "@machinomy/types-truffle-config",
       "@machinomy/types-truffle-resolver",
       "@machinomy/types-ethereumjs-units",
-      "@machinomy/types-web3",
       "@types/node"
     ]
   },

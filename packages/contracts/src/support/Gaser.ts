@@ -1,7 +1,7 @@
-import * as Web3 from 'web3'
+import { Web3 } from 'web3'
 import * as truffle from 'truffle-contract'
 import Conversion from './Conversion'
-import {BigNumber} from "bignumber.js";
+import { BigNumber } from 'bignumber.js'
 
 export default class Gaser {
   web3: Web3

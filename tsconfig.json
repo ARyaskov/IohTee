@@ -3,6 +3,7 @@
     "target": "esnext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
     "lib": ["esnext", "dom"],
     "sourceMap": true,
     "declaration": true,
@@ -11,6 +12,6 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "experimentalDecorators": true,
+    "experimentalDecorators": true
   }
 }

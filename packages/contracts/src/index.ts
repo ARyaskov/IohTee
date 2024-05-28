@@ -1,14 +1,13 @@
 import { Unidirectional } from './wrappers/Unidirectional'
 import { TokenUnidirectional } from './wrappers/TokenUnidirectional'
 import { TestToken } from './wrappers/TestToken'
-import * as ethUtil from 'ethereumjs-util'
-import Units from './Units'
+import { bufferToHex } from '@ethereumjs/util'
+import { Web3 } from 'web3'
 
 export {
   Unidirectional,
   TokenUnidirectional,
-  TestToken,
-  Units
+  TestToken
 }
 
 export function randomId (digits: number = 3) {
@@ -19,6 +18,6 @@ export function randomId (digits: number = 3) {
 
 export function channelId (sender: string, receiver: string): string {
   let random = randomId()
-  let buffer = ethUtil.sha3(sender + receiver + random)
-  return ethUtil.bufferToHex(buffer)
+  let buffer = Web3.utils.soliditySha3(sender + receiver + random)
+  return bufferToHex(buffer)
 }

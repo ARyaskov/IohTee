@@ -102,3 +102,6 @@ or an elaborate analysis of machine economy implications. Do not hesitate to sha
 ## License
 
 Licensed under [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+This project includes web3.js, which is licensed under the LGPL license.
+You can find the source code and license at https://github.com/web3/web3.js.

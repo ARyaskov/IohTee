@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js'
-import * as Web3 from 'web3'
+import { Web3 } from 'web3';
 import Units from '../Units'
 
 const GANACHE_GAS_PRICE = new BigNumber(20000000000) // wei

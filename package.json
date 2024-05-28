@@ -35,5 +35,8 @@
     "ts-node": "^7.0.x",
     "typescript": "5.4.5"
   },
+  "resolutions": {
+    "sqlite3": "^5.1.7"
+  },
   "packageManager": "yarn@4.2.2"
 }

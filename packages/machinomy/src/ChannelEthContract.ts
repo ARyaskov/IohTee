@@ -31,7 +31,8 @@ export default class ChannelEthContract {
 
   constructor (web3: Web3, ttl: number) {
     this.web3 = web3
-    this.contract = contracts.Unidirectional.contract(this.web3.currentProvider).deployed()
+    this.contract = new web3.eth.Contract(abi, contractAddress);
+    //contracts.Unidirectional.contract(this.web3.currentProvider).deployed()
     this.cache = new MemoryCache(ttl)
   }
 

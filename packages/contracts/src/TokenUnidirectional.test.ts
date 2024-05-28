@@ -1,11 +1,12 @@
-import * as Web3 from 'web3'
-import * as chai from 'chai'
-import * as BigNumber from 'bignumber.js'
+import { Web3 } from 'web3'
+import chai from 'chai'
+import { BigNumber } from 'bignumber.js'
 import asPromised from 'chai-as-promised'
 import * as contracts from './index'
 import Units from './Units'
 import Gaser from './support/Gaser'
-import TestToken from './wrappers/TestToken'
+import { TestToken } from './wrappers/TestToken'
+
 import * as abi from 'ethereumjs-abi'
 import * as sigUtil from '@metamask/eth-sig-util'
 
@@ -54,7 +55,7 @@ contract('TokenUnidirectional', accounts => {
     return log.logs[0].args
   }
 
-  async function paymentSignature (sender: string, channelId: string, payment: BigNumber.BigNumber): Promise<string> {
+  async function paymentSignature (sender: string, channelId: string, payment: BigNumber): Promise<string> {
     let digest = await instance.paymentDigest.call(channelId, payment, token.address)
     let alternative = abi.soliditySHA3(['address', 'bytes32', 'uint256', 'address'],
       [instance.address, channelId, payment.toString(), token.address])

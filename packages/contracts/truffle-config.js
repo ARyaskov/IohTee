@@ -1,5 +1,6 @@
 const HDWalletProvider = require("@truffle/hdwallet-provider")
 const MNEMONIC = process.env.MNEMONIC
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 const GAS_LIMIT = 2700000
 
 module.exports = {
@@ -35,6 +36,9 @@ module.exports = {
     }
   },
   plugins: ["solidity-coverage"],
+  api_keys: {
+    etherscan: ETHERSCAN_API_KEY
+  },
   compilers: {
     solc: {
       version: "0.8.20",

@@ -55,7 +55,7 @@
     "browser-or-node": "^1.0.2",
     "commander": "^2.9.0",
     "connection-string": "^0.5.3",
-    "db-migrate": "0.11.13",
+    "db-migrate": "^0.11.14",
     "db-migrate-pg": "1.2.2",
     "db-migrate-sqlite3": "0.4.0",
     "debug": "^3.1.0",
@@ -68,23 +68,22 @@
     "safe-buffer": "^5.1.2",
     "types-rlp": "^0.0.1",
     "uuid": "^3.2.1",
-    "web3": "1.10.4"
+    "web3": "4.9.0"
   },
   "peerDependencies": {
-    "pg": "8.7.1",
+    "pg": "8.11.5",
     "sqlite3": "5.1.7"
   },
   "devDependencies": {
     "@machinomy/hdwallet-provider": "2.0.8",
     "@machinomy/types-ethereumjs-util": "^0.0.12",
-    "@machinomy/types-web3": "^0.0.12",
     "@types/bignumber.js": "^5.0.0",
     "@types/bluebird": "3.5.36",
     "@types/body-parser": "^1.16.4",
     "@types/chai": "*",
     "@types/chai-as-promised": "*",
-    "@types/db-migrate": "https://github.com/machinomy/types-node-db-migrate",
-    "@types/db-migrate-base": "0.0.10",
+    "@types/db-migrate-base": "0.0.14",
+    "@types/db-migrate-pg": "^0.0.13",
     "@types/debug": "^0.0.30",
     "@types/ethereumjs-abi": "0.6.3",
     "@types/expect": "^1.20.3",
@@ -122,5 +121,8 @@
     "tslint": "^5.10.0",
     "tslint-config-standard": "^7.0.0",
     "typescript": "4.9.5"
+  },
+  "resolutions": {
+    "sqlite3": "^5.1.7"
   }
 }
