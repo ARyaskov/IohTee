@@ -6,22 +6,25 @@ import Logger from '@machinomy/logger'
 
 const LOG = new Logger('deploy-test-token')
 
-const KEY = 'peanut giggle name tree canoe tube render ketchup survey segment army will'
+const KEY =
+  'peanut giggle name tree canoe tube render ketchup survey segment army will'
 
-async function run () {
+async function run() {
   const ETH_RPC_URL = process.env.ETH_RPC_URL || 'https://rinkeby.infura.io'
 
   LOG.info(`ETH_RPC_URL = ${ETH_RPC_URL}`)
 
   const provider = HDWalletProvider.mnemonic({
     mnemonic: KEY,
-    rpc: ETH_RPC_URL
+    rpc: ETH_RPC_URL,
   })
 
   LOG.info(`Wait for 30-60 seconds, please.`)
 
   const TestToken = contracts.TestToken.contract(provider)
-  const instanceTestToken = await TestToken.new({ from: (await provider.getAddresses())[0] })
+  const instanceTestToken = await TestToken.new({
+    from: (await provider.getAddresses())[0],
+  })
 
   const address = instanceTestToken.address
   const transactionHash = instanceTestToken.transactionHash
@@ -33,10 +36,13 @@ async function run () {
     events: {},
     links: {},
     address: address,
-    transactionHash: transactionHash
+    transactionHash: transactionHash,
   }
 
-  const ARTIFACT_PATH = path.resolve(__dirname, '../build/contracts/TestToken.json')
+  const ARTIFACT_PATH = path.resolve(
+    __dirname,
+    '../build/contracts/TestToken.json',
+  )
   const testTokenJSON = require(ARTIFACT_PATH)
   testTokenJSON['networks']['4'] = newItemJSON
 
@@ -47,9 +53,11 @@ async function run () {
   process.exit(0)
 }
 
-run().then(() => {
-  // Do Nothing
-}).catch(error => {
-  console.error(error)
-  process.exit(1)
-})
+run()
+  .then(() => {
+    // Do Nothing
+  })
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })

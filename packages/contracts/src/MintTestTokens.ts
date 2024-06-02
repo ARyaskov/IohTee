@@ -11,7 +11,7 @@ const LOG = new Logger('mint-test-tokens')
 
 require('dotenv').config()
 
-function pify<T> (fn: Function): Promise<T> {
+function pify<T>(fn: Function): Promise<T> {
   return new Promise((resolve, reject) => {
     const handler = (err: any, res: T) => {
       if (err) {
@@ -39,45 +39,57 @@ if (!MINT_TO_SEED_PHRASE) {
   process.exit(1)
 }
 
-const args = yargs
-  .option('amount', {
-    describe: 'Amount of tokens to send'
-  })
-  .argv
+const args = yargs.option('amount', {
+  describe: 'Amount of tokens to send',
+}).argv
 
 const MINT_AMOUNT = args['amount'] || 1
 
-async function run (): Promise<void> {
+async function run(): Promise<void> {
   const providerFrom = HDWalletProvider.mnemonic({
     mnemonic: MINT_FROM_SEED_PHRASE!,
-    rpc: ETH_RPC_URL
+    rpc: ETH_RPC_URL,
   })
   const providerTo = HDWalletProvider.mnemonic({
     mnemonic: MINT_TO_SEED_PHRASE!,
-    rpc: ETH_RPC_URL
+    rpc: ETH_RPC_URL,
   })
   const web3From = new Web3(providerFrom)
   const web3To = new Web3(providerTo)
-  const accountsFrom = await pify<string[]>((cb: (error: Error, accounts: string[]) => void) => {
-    web3From.eth.getAccounts(cb)
-  })
-  const accountsTo = await pify<string[]>((cb: (error: Error, accounts: string[]) => void) => {
-    web3To.eth.getAccounts(cb)
-  })
+  const accountsFrom = await pify<string[]>(
+    (cb: (error: Error, accounts: string[]) => void) => {
+      web3From.eth.getAccounts(cb)
+    },
+  )
+  const accountsTo = await pify<string[]>(
+    (cb: (error: Error, accounts: string[]) => void) => {
+      web3To.eth.getAccounts(cb)
+    },
+  )
 
   const TestToken = contracts.TestToken.contract(providerFrom)
   const instanceTestToken = await TestToken.deployed()
-  await instanceTestToken.mint(accountsTo[0], new BigNumber.BigNumber(MINT_AMOUNT), {
-    from: accountsFrom[0]
-  })
+  await instanceTestToken.mint(
+    accountsTo[0],
+    new BigNumber.BigNumber(MINT_AMOUNT),
+    {
+      from: accountsFrom[0],
+    },
+  )
   LOG.info(`${MINT_AMOUNT} test tokens have been minted for ${accountsTo[0]}.`)
-  LOG.info(`Balance of ${accountsTo[0]} is ${await instanceTestToken.balanceOf(accountsTo[0])}.`)
+  LOG.info(
+    `Balance of ${accountsTo[0]} is ${await instanceTestToken.balanceOf(
+      accountsTo[0],
+    )}.`,
+  )
   process.exit(0)
 }
 
-run().then(() => {
-  // Do Nothing
-}).catch(error => {
-  console.error(error)
-  process.exit(1)
-})
+run()
+  .then(() => {
+    // Do Nothing
+  })
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })

@@ -8,13 +8,18 @@ export default class Gaser {
   conversion: Conversion
   isEnabled: boolean
 
-  constructor (_web3: Web3) {
+  constructor(_web3: Web3) {
     this.web3 = _web3
     this.conversion = new Conversion(_web3)
     this.isEnabled = Boolean(process.env.LOG_GAS_COST)
   }
 
-  async diff<A> (name: string, account: string, fn: () => A, forceLog?: boolean): Promise<A> {
+  async diff<A>(
+    name: string,
+    account: string,
+    fn: () => A,
+    forceLog?: boolean,
+  ): Promise<A> {
     let before = new BigNumber(await this.web3.eth.getBalance(account))
     let result = fn()
     let after = new BigNumber(await this.web3.eth.getBalance(account))
@@ -23,13 +28,17 @@ export default class Gaser {
     return result
   }
 
-  async tx (name: string, promisedTx: Promise<truffle.TransactionResult>, forceLog?: boolean): Promise<truffle.TransactionResult> {
+  async tx(
+    name: string,
+    promisedTx: Promise<truffle.TransactionResult>,
+    forceLog?: boolean,
+  ): Promise<truffle.TransactionResult> {
     let tx = await promisedTx
     this.log(tx.receipt.gasUsed, name, forceLog)
     return tx
   }
 
-  private log (gasCost: number, name: string, forceLog: boolean = false) {
+  private log(gasCost: number, name: string, forceLog: boolean = false) {
     if (this.isEnabled || forceLog) {
       let usdCost = this.conversion.gasToUsd(gasCost).toFixed(2)
       console.log(`GAS: ${name}: ${gasCost} ($${usdCost})`)

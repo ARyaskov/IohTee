@@ -1,6 +1,10 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "sourceRoot": "src/",
@@ -10,7 +14,6 @@
       "@machinomy/types-truffle",
       "@machinomy/types-truffle-contract",
       "@machinomy/types-ethereumjs-units",
-      "@machinomy/types-ethereumjs-util",
       "@machinomy/types-eth-sig-util",
       "@types/node",
       "@types/mocha"
@@ -18,5 +21,8 @@
   },
   "include": [
     "src/**/*"
+  ],
+  "files": [
+    "./hardhat.config.ts"
   ]
 }
