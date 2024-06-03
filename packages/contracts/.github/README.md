@@ -6,18 +6,17 @@
 
 Machinomy contracts is a TypeScript interface for Ethereum contracts managed by [Hardhat](https://github.com/NomicFoundation/hardhat) used by [Machinomy Berry](https://github.com/ARyaskov/machinomy/tree/master/packages/machinomy).
 
-## Installation
+:exclamation:
+Please, pay attention, this package is the part of [Machinomy Lerna Monorepo](https://github.com/machinomy/machinomy) 
+and it's intended to use with other monorepo's packages. 
 
-Using [yarn](https://yarnpkg.com/blog/release/4.0) and Node.js **v18** is mandatory (**don't use npm!**)
+:no_entry: You **should not** git clone this repository alone
 
-    $ yarn add @ARyaskov/machinomy-contracts
-
-## Building from sources
-
-```bash
-$ git clone git@github.com:ARyaskov/machinomy.git
-$ cd machinomy/packages/contracts
-$ yarn
-$ yarn build
-$ yarn test
+:white_check_mark: You **should** git clone the main repository via
 ```
+git clone https://github.com/ARyaskov/machinomy.git
+or 
+git clone git@github.com:ARyaskov/machinomy.git
+```
+
+**For documentation, usage and contributing please see [Machinomy Monorepo](https://github.com/ARyaskov/machinomy).**

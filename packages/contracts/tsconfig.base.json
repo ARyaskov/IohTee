@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "sourceRoot": "src/",
+    "outDir": "lib/",
+    "types": [
+      "@machinomy/types-ethereumjs-units",
+      "@types/node",
+      "@types/mocha"
+    ],
+    "esModuleInterop": true,
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "files": [
+    "./hardhat.config.ts"
+  ]
+}

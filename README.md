@@ -1,4 +1,5 @@
 # Machinomy Berry (v2) Monorepo 
+[![Module type: CJS+ESM](https://img.shields.io/badge/module%20type-cjs%2Besm-brightgreen)]()
 [![Coverage Status][codecov-img]][codecov]
 [![Greenkeeper badge](https://badges.greenkeeper.io/machinomy/machinomy.svg)](https://greenkeeper.io/)
 
@@ -6,7 +7,7 @@
 [codecov-img]: https://codecov.io/gh/machinomy/machinomy/branch/master/graph/badge.svg
 
 Machinomy Berry (v2) Monorepo repository. The second life of [original Machinomy library](https://github.com/machinomy/machinomy).
-We're upgrading it to contemporary standards (TypeScript 5, Node.js 22+, ES2020) and adding new features.
+We're upgrading it to contemporary standards (TypeScript 5+, Node.js 18+, ES2023+) and adding new features.
 
 Available sub-projects:
 - [Machinomy](packages/machinomy) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
@@ -14,9 +15,11 @@ Available sub-projects:
 - [Examples](packages/examples) is [Machinomy](packages/machinomy) examples.
 - [Playground](packages/playground) contains code of playground.machinomy.com
 - [cli](packages/cli) is Machinomy Command Line Interface.
-- [logger](packages/logger) is Machinomy Logger. Works in browser and Node.
-- [wraptso](packages/wraptso) is Machinomy Wrapper for Truffle Contract.
 
+
+## Tasks in progress
+
+- support for dual build ESM+CJS
 
 Web site: [machinomy.com](http://machinomy.com).
 Twitter: [@machinomy](http://twitter.com/machinomy).

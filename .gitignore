@@ -14,8 +14,6 @@ packages/contracts/coverage.json
 packages/contracts/coverage
 packages/contracts/coverageEnv
 packages/contracts/build
-!packages/contracts/build/contracts/Unidirectional.json
-!packages/contracts/build/contracts/TokenUdirectional.json
 packages/machinomy/coverage
 .nyc_output
 !truffle-config.js

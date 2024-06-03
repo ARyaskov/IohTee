@@ -11,36 +11,33 @@
     "type": "git",
     "url": "https://github.com/ARyaskov/machinomy.git"
   },
-  "main": "lib/index.js",
+  "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
+  "contributors": [
+    {
+      "name": "Andrei Riaskov",
+      "email": "code@riaskov.com"
+    }
+  ],
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
   "types": "lib/index.d.ts",
   "files": [
-    "lib/",
-    "build/"
+    "lib/"
   ],
-  "config": {
-    "truffleTests": "lib/*.test.js"
-  },
   "scripts": {
-    "build": "yarn support:wrap && tsc --project tsconfig.json && tsc --project tsconfig.migrations.json",
-    "lint": "yarn lint:solidity && yarn lint:typescript",
+    "build": "yarn build:esm && yarn build:cjs",
+    "test": "yarn build && hardhat test",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "coverage": "cross-env SOLIDITY_COVERAGE=true hardhat coverage",
+    "build:esm": "rimraf lib/esm && hardhat compile && tsc --project tsconfig.esm.json",
+    "build:cjs": "rimraf lib/cjs && hardhat compile && tsc --project tsconfig.cjs.json",
+    "hardhat:node": "hardhat node",
+    "deploy:local": "hardhat ignition deploy ignition/modules/Unidirectional.ts --network localhost",
     "lint:solidity": "solium -d contracts/",
-    "lint:typescript": "tslint --format stylish --project .",
-    "support:wrap": "yarn truffle:compile && wraptso \"build/contracts/@(Unidirectional|TokenUnidirectional|TestToken).json\" --output ./src/wrappers",
-    "support:build": "tsc --project support/tsconfig.json",
-    "truffle:compile": "truffle compile",
-    "truffle:test": "run-with-testrpc 'truffle test $npm_package_config_truffleTests'",
-    "test": "yarn build && yarn truffle:test",
-    "prepublish": "yarn support:wrap && yarn build",
-    "coverage": "truffle run coverage",
-    "mintTestTokens": "yarn build && DEBUG=* node lib/MintTestTokens",
-    "deployTestToken": "yarn build && DEBUG=* node lib/DeployTestToken",
-    "test:local": "hardhat test --network localhost",
-    "postinstall": "hardhat compile",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\""
+    "prepublish": "yarn build",
+    "postinstall": "yarn build"
   },
   "dependencies": {
-    "@ethereumjs/util": "^9.0.3",
-    "@machinomy/hdwallet-provider": "2.0.8",
     "@machinomy/logger": "^0.2.5",
     "@nomicfoundation/hardhat-ignition": "0.15.4",
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
@@ -48,34 +45,23 @@
     "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@nomiclabs/hardhat-waffle": "^2.0.6",
     "@openzeppelin/contracts": "5.0.2",
+    "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
     "bignumber.js": "*",
     "dotenv": "*",
-    "ethereumjs-units": "^0.2.0",
-    "ethers": "^6.12.1",
     "hardhat": "2.22.4",
     "humanize-plus": "*",
     "solidity-coverage": "0.8.12",
-    "truffle-contract": "4.0.31",
     "typechain": "8.3.2",
-    "viem": "^2.13.1",
-    "web3": "4.9.0"
+    "viem": "^2.13.1"
   },
   "devDependencies": {
     "@machinomy/types-eth-sig-util": "0.0.8",
     "@machinomy/types-ethereumjs-units": "^0.0.2",
-    "@machinomy/types-truffle": "0.2.0",
-    "@machinomy/types-truffle-compile": "^0.0.2",
-    "@machinomy/types-truffle-config": "^0.0.2",
-    "@machinomy/types-truffle-contract-sources": "^0.0.1",
-    "@machinomy/types-truffle-deployer": "0.2.0",
-    "@machinomy/types-truffle-resolver": "0.2.0",
-    "@machinomy/wraptso": "^1.3.3",
     "@metamask/eth-sig-util": "7.0.2",
     "@nomicfoundation/hardhat-ignition-viem": "^0.15.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
     "@nomicfoundation/hardhat-verify": "^2.0.0",
-    "@truffle/hdwallet-provider": "2.1.15",
     "@types/chai": "4.3.16",
     "@types/chai-as-promised": "7.1.8",
     "@types/humanize-plus": "^1.8.2",
@@ -84,13 +70,9 @@
     "chai": "4.4.1",
     "chai-as-promised": "^7.1.2",
     "coveralls": "^3.1.1",
-    "eth-gas-reporter": "0.2.27",
+    "eth-gas-reporter": "^0.2.27",
     "ethlint": "1.2.5",
     "mocha": "10.4.0",
-    "nyc": "^15.1.0",
-    "run-with-testrpc": "0.3.1",
-    "truffle": "5.11.5",
-    "tslint": "^6.1.3",
-    "tslint-config-standard": "^9.0.0"
+    "nyc": "^15.1.0"
   }
 }

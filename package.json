@@ -2,7 +2,7 @@
   "name": "@machinomy/monorepo",
   "private": true,
   "version": "2.0.0",
-  "repository": "git@github.com:machinomy/machinomy.git",
+  "repository": "git@github.com:ARyaskov/machinomy.git",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
   "contributors": [
     {
@@ -34,8 +34,9 @@
     "chai": "^5.1.1",
     "chai-as-promised": "^7.1.2",
     "coveralls": "^3.0.1",
+    "cross-env": "^7.0.3",
     "ts-node": "^7.0.x",
-    "typescript": "5.4.5"
+    "typescript": "^5.5.0-beta"
   },
   "resolutions": {
     "sqlite3": "^5.1.7"
