@@ -33,6 +33,8 @@
     "build:cjs": "rimraf lib/cjs && hardhat compile && tsc --project tsconfig.cjs.json",
     "hardhat:node": "hardhat node",
     "deploy:local": "hardhat ignition deploy ignition/modules/Unidirectional.ts --network localhost",
+    "deploy:uni:polygon": "hardhat ignition deploy ignition/modules/Unidirectional.ts --network polygon --verify",
+    "deploy:uni:polygonAmoy": "hardhat ignition deploy ignition/modules/Unidirectional.ts --network polygonAmoy",
     "lint:solidity": "solium -d contracts/",
     "prepublish": "yarn build",
     "postinstall": "yarn build"
@@ -49,7 +51,7 @@
     "@typechain/hardhat": "^9.1.0",
     "bignumber.js": "*",
     "dotenv": "*",
-    "hardhat": "2.22.4",
+    "hardhat": "2.23.0-dev.3",
     "humanize-plus": "*",
     "solidity-coverage": "0.8.12",
     "typechain": "8.3.2",
