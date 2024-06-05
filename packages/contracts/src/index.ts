@@ -189,39 +189,39 @@ export class Unidirectional {
     })
   }
 
-  async isPresent(channelId: `0x${string}`): Promise<ReadContractReturnType> {
+  async isPresent(channelId: `0x${string}`): Promise<boolean> {
     return await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
       functionName: 'isPresent',
       args: [channelId],
-    })
+    }) as never as boolean
   }
 
-  async isAbsent(channelId: `0x${string}`): Promise<ReadContractReturnType> {
+  async isAbsent(channelId: `0x${string}`): Promise<boolean> {
     return await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
       functionName: 'isAbsent',
       args: [channelId],
-    })
+    }) as never as boolean
   }
 
-  async isOpen(channelId: `0x${string}`): Promise<ReadContractReturnType> {
+  async isOpen(channelId: `0x${string}`): Promise<boolean> {
     return await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
       functionName: 'isOpen',
       args: [channelId],
-    })
+    }) as never as boolean
   }
 
-  async isSettling(channelId: `0x${string}`): Promise<ReadContractReturnType> {
+  async isSettling(channelId: `0x${string}`): Promise<boolean> {
     return await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
       functionName: 'isSettling',
       args: [channelId],
-    })
+    }) as never as boolean
   }
 }
