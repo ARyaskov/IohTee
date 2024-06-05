@@ -1,35 +1,47 @@
+// @ts-ignore
 // TODO This test suite is in progress guys
 import 'dotenv/config'
 import '@nomicfoundation/hardhat-viem'
 import { assert } from 'chai'
-import hre from 'hardhat'
-import { getAddress, pad, parseEther, parseEventLogs } from 'viem'
+import * as hre from 'hardhat'
+import {
+  getAddress,
+  parseEther,
+  parseEventLogs,
+  ParseEventLogsReturnType,
+  PublicClient,
+  WalletClient,
+} from 'viem'
 import * as contracts from '../src'
-import { GetContractReturnType } from '@nomicfoundation/hardhat-viem/types'
-import { ArtifactsMap } from 'hardhat/types/artifacts'
 import { getTransactionReceipt } from 'viem/actions'
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox-viem/network-helpers'
 import { formatNumber } from 'humanize-plus'
-import { channelId } from '../src/index'
+import { channelId, Unidirectional, hasEvent } from '../src/index'
 
-type Unidirectional = GetContractReturnType<
-  ArtifactsMap['Unidirectional']['abi']
->
+import { extractEventFromLogs, UnidirectionalEventName } from '../src'
 
 describe('Unidirectional', async () => {
-  const settlingPeriod = 0
+  const settlingPeriod = 0n
 
-  let account0: string
-  let account1: string
-  let contract: Unidirectional
-  let client: any
+  let account0: `0x${string}`
+  let account1: `0x${string}`
+  let uni: Unidirectional
+  let publicClient: PublicClient
+  let walletClient: WalletClient
   const channelValue = parseEther('1')
 
   async function deployUnidirectionalFixture() {
     const [ownerWallet, otherWallet] = await hre.viem.getWalletClients()
+    const deployedContract = await hre.viem.deployContract('Unidirectional')
 
-    contract = await hre.viem.deployContract('Unidirectional')
-    client = await hre.viem.getPublicClient()
+    publicClient = await hre.viem.getPublicClient()
+    walletClient = (await hre.viem.getWalletClients())[0]
+    uni = new Unidirectional(
+      publicClient,
+      walletClient,
+      deployedContract.address,
+    )
+
     return {
       ownerWallet,
       otherWallet,
@@ -37,31 +49,32 @@ describe('Unidirectional', async () => {
   }
 
   async function createChannelRaw(
-    channelId: string,
-    _settlingPeriod: number = settlingPeriod,
+    channelId: `0x${string}`,
+    _settlingPeriod = settlingPeriod,
   ) {
-    const txId = await contract.write.open([
-      channelId,
-      account1,
-      _settlingPeriod,
-    ])
+    const txId = await uni.open(channelId, account1, _settlingPeriod, {
+      from: account0,
+      value: channelValue,
+      gas: 1_000_000,
+    })
 
-    const receipt = await getTransactionReceipt(client, {
+    const receipt = await getTransactionReceipt(publicClient as any, {
       hash: txId,
     })
 
     const logs = parseEventLogs({
-      abi: contract.abi,
+      abi: uni.abi(),
       logs: receipt.logs,
     })
     return logs
   }
 
-  async function createChannel(settlingPeriod?: number) {
-    const newChannelId = channelId(account0, account1)
+  async function createChannel(
+    settlingPeriod?: number,
+  ): Promise<ParseEventLogsReturnType> {
+    const newChannelId = channelId()
     const log = await createChannelRaw(newChannelId, settlingPeriod)
-    console.log(log)
-    return log[0].args
+    return log
   }
 
   beforeEach(async () => {
@@ -74,10 +87,10 @@ describe('Unidirectional', async () => {
 
   describe('Unidirectional: Open', () => {
     it('emit DidOpen event', async () => {
-      let channelIdGas = contracts.channelId(account0, account1)
-      const gas = await client.estimateContractGas({
-        address: contract.address,
-        abi: contract.abi,
+      let channelIdGas = contracts.channelId()
+      const gas = await publicClient.estimateContractGas({
+        address: uni.address(),
+        abi: uni.abi(),
         functionName: 'open',
         args: [channelIdGas, account1, settlingPeriod],
         account0,
@@ -85,31 +98,36 @@ describe('Unidirectional', async () => {
 
       console.log(`Gas for "open" method: ${formatNumber(Number(gas))}`)
 
-      let channelId = contracts.channelId(account0, account1)
-      await createChannelRaw(channelId)
-      assert((await contract.getEvents.DidOpen()).length === 1)
-      const didOpenEvent = (await contract.getEvents.DidOpen())[0]
-      assert.equal(
-        (didOpenEvent.args.channelId as string).substring(0, 34),
-        pad(`0x${channelId}`),
+      let channelId = contracts.channelId()
+      const logs = await createChannelRaw(channelId)
+
+      assert(hasEvent(logs, UnidirectionalEventName.DidOpen))
+      const didOpenEvent = extractEventFromLogs(
+        logs,
+        UnidirectionalEventName.DidOpen,
       )
+      assert.equal(didOpenEvent.args.channelId, channelId)
       assert.equal(didOpenEvent.args.sender, account0)
       assert.equal(didOpenEvent.args.receiver, account1)
     })
 
     it('open channel', async () => {
-      const event = await createChannel()
-      const channel = await contract.read.channels(event.channelId)
-      assert.equal(channel[0], account0)
-      assert.equal(channel[1], account1)
-      assert.equal(channel[2].toString(), channelValue.toString())
-      assert.equal(channel[3].toString(), settlingPeriod.toString())
-      assert.equal(channel[4].toString(), '0')
+      const logs = await createChannel()
+      const didOpenEvent = extractEventFromLogs(
+        logs,
+        UnidirectionalEventName.DidOpen,
+      )
+      const channel = await uni.channel(didOpenEvent.args.channelId)
+      assert.equal(channel.sender, account0)
+      assert.equal(channel.receiver, account1)
+      assert.equal(channel.value, channelValue)
+      assert.equal(channel.settlingPeriod, settlingPeriod)
+      assert.equal(channel.settlingUntil, 0n)
 
-      // assert.isTrue(await contract.isPresent(event.channelId))
-      // assert.isTrue(await contract.isOpen(event.channelId))
-      // assert.isFalse(await contract.isSettling(event.channelId))
-      // assert.isFalse(await contract.isAbsent(event.channelId))
+      assert.isTrue(await uni.isPresent(didOpenEvent.args.channelId))
+      assert.isTrue(await uni.isOpen(didOpenEvent.args.channelId))
+      assert.isFalse(await uni.isSettling(didOpenEvent.args.channelId))
+      assert.isFalse(await uni.isAbsent(didOpenEvent.args.channelId))
     })
   })
 })

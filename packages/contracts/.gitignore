@@ -108,3 +108,4 @@ ignition/deployments/chain-31337
 /types
 /typechain-types
 /ignition/deployments
+/lib
