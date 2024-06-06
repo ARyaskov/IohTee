@@ -18,8 +18,7 @@
     "build": "yarn workspaces foreach -A -p -v -i run build",
     "lint": "wsrun lint $PKG",
     "test": "wsrun test $PKG",
-    "coverage": "wsrun coverage $PKG",
-    "bootstrap": "lerna bootstrap"
+    "coverage": "wsrun coverage $PKG"
   },
   "dependencies": {
     "bignumber.js": "^9.1.2",
