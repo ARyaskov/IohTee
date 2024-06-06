@@ -51,7 +51,7 @@ jobs:
 
       - name: Install global dependencies
         run: |
-          yarn dlx add codecov
+          yarn dlx codecov
 
       - name: Install dependencies
         run: |
