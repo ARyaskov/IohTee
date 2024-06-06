@@ -16,7 +16,7 @@ import * as contracts from '../src'
 import { getTransactionReceipt } from 'viem/actions'
 import { loadFixture } from '@nomicfoundation/hardhat-toolbox-viem/network-helpers'
 import { formatNumber } from 'humanize-plus'
-import { channelId, Unidirectional, hasEvent } from '../src/index'
+import { channelId, Unidirectional, hasEvent, Network } from '../src/index'
 
 import { extractEventFromLogs, UnidirectionalEventName } from '../src'
 
@@ -33,14 +33,14 @@ describe('Unidirectional', async () => {
   async function deployUnidirectionalFixture() {
     const [ownerWallet, otherWallet] = await hre.viem.getWalletClients()
     const deployedContract = await hre.viem.deployContract('Unidirectional')
-
     publicClient = await hre.viem.getPublicClient()
     walletClient = (await hre.viem.getWalletClients())[0]
-    uni = new Unidirectional(
+    uni = new Unidirectional({
+      network: Network.Hardhat,
+      deployedContractAddress: deployedContract.address,
       publicClient,
       walletClient,
-      deployedContract.address,
-    )
+    })
 
     return {
       ownerWallet,

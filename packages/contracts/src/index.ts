@@ -3,19 +3,26 @@ import {
   Abi,
   AbiEvent,
   bytesToHex,
+  createPublicClient,
+  createWalletClient,
   getContract,
-  Log,
-  parseAbi,
+  http,
   ParseEventLogsReturnType,
   PublicClient,
-  ReadContractReturnType,
   WalletClient,
   WriteContractReturnType,
 } from 'viem'
 import { GetContractReturnType } from '@nomicfoundation/hardhat-viem/types'
-import { ArtifactsMap } from 'hardhat/types/artifacts'
-import { mainnet } from 'viem/chains'
-import { getContractEvents } from 'viem/actions'
+import {
+  bsc,
+  bscTestnet,
+  hardhat,
+  mainnet,
+  polygon,
+  polygonAmoy,
+  sepolia,
+} from 'viem/chains'
+import { mnemonicToAccount } from 'viem/accounts'
 // require used intentionally here, suddenly json import is not working with TS 5.5 even with resolveJsonModule: true
 const uniArtifact = require('../abi/Unidirectional.json')
 
@@ -47,9 +54,26 @@ export interface Event {
   transactionIndex: number
 }
 
-export enum DefaultUnidirectionalAddress {
-  Polygon = '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
-  PolygonAmoy = '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
+export const Network = {
+  Mainnet: mainnet,
+  Bsc: bsc,
+  Polygon: polygon,
+  Sepolia: sepolia,
+  BscTestnet: bscTestnet,
+  PolygonAmoy: polygonAmoy,
+  Hardhat: hardhat,
+} as const
+
+export type NetworkType = (typeof Network)[keyof typeof Network]
+
+export const DefaultUnidirectionalAddress: Record<string, `0x${string}`> = {
+  Ethereum: '0x',
+  'BNB Smart Chain': '0x',
+  Polygon: '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
+  Sepolia: '0x',
+  'Binance Smart Chain Testnet': '0x',
+  'Polygon Amoy': '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
+  Hardhat: '0x',
 }
 
 export enum UnidirectionalEventName {
@@ -59,6 +83,32 @@ export enum UnidirectionalEventName {
   DidSettle = 'DidSettle',
   DidStartSettling = 'DidStartSettling',
 }
+
+export type CtorBaseParams = {
+  network: NetworkType
+  deployedContractAddress?: `0x${string}`
+}
+
+export type CtorAccountParamPure = CtorBaseParams & {
+  httpRpcUrl: string
+  mnemonic: string
+}
+
+export type CtorAccountParamViem = CtorBaseParams & {
+  publicClient: PublicClient
+  walletClient: WalletClient
+}
+
+function isCtorAccountParamPure(
+  params: CtorBaseParams,
+): params is CtorAccountParamPure {
+  return (
+    (params as CtorAccountParamPure).httpRpcUrl !== undefined &&
+    (params as CtorAccountParamPure).mnemonic !== undefined
+  )
+}
+
+export type CtorParams = CtorAccountParamPure | CtorAccountParamViem
 
 export function channelId(): `0x${string}` {
   const randomBytes = crypto.getRandomValues(new Uint8Array(32))
@@ -106,19 +156,38 @@ export class Unidirectional {
   private readonly _abi: any
 
   constructor(
-    publicClient: PublicClient,
-    walletClient: WalletClient,
-    _address: `0x${string}`,
+    params: CtorParams,
   ) {
-    this._publicClient = publicClient
-    this._walletClient = walletClient
-    this._address = _address
+    if (isCtorAccountParamPure(params)) {
+      // @ts-ignore
+      this._publicClient = createPublicClient({
+        batch: {
+          multicall: true,
+        },
+        chain: params.network,
+        transport: http(params.httpRpcUrl),
+      })
+      this._walletClient = createWalletClient({
+        chain: params.network,
+        transport: http(params.httpRpcUrl),
+        account: mnemonicToAccount(params.mnemonic),
+      })
+    } else {
+      this._publicClient = params.publicClient
+      this._walletClient = params.walletClient
+    }
+    if (!params.deployedContractAddress) {
+      this._address = DefaultUnidirectionalAddress[params.network.name]
+    } else {
+      this._address = params.deployedContractAddress
+    }
+
     this._contract = getContract({
-      address: _address,
+      address: this._address,
       abi: uniArtifact.abi,
       client: {
-        public: publicClient as never,
-        wallet: walletClient as never,
+        public: this._publicClient as never,
+        wallet: this._walletClient as never,
       },
     })
     this._abi = uniArtifact.abi
@@ -190,38 +259,38 @@ export class Unidirectional {
   }
 
   async isPresent(channelId: `0x${string}`): Promise<boolean> {
-    return await this._publicClient.readContract({
+    return (await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
       functionName: 'isPresent',
       args: [channelId],
-    }) as never as boolean
+    })) as never as boolean
   }
 
   async isAbsent(channelId: `0x${string}`): Promise<boolean> {
-    return await this._publicClient.readContract({
+    return (await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
       functionName: 'isAbsent',
       args: [channelId],
-    }) as never as boolean
+    })) as never as boolean
   }
 
   async isOpen(channelId: `0x${string}`): Promise<boolean> {
-    return await this._publicClient.readContract({
+    return (await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
       functionName: 'isOpen',
       args: [channelId],
-    }) as never as boolean
+    })) as never as boolean
   }
 
   async isSettling(channelId: `0x${string}`): Promise<boolean> {
-    return await this._publicClient.readContract({
+    return (await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
       functionName: 'isSettling',
       args: [channelId],
-    }) as never as boolean
+    })) as never as boolean
   }
 }
