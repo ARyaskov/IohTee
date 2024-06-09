@@ -56,7 +56,7 @@
     "dotenv": "*",
     "hardhat": "2.23.0-dev.3",
     "humanize-plus": "*",
-    "solidity-coverage": "0.8.12",
+    "solidity-coverage": "^0.8.12",
     "typechain": "8.3.2",
     "viem": "*"
   },
