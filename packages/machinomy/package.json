@@ -67,7 +67,6 @@
     "decko": "^1.2.0",
     "ethereumjs-util": "^5.1.5",
     "nedb": "^1.8.0",
-    "node-fetch": "^2.7.0",
     "prompt": "^1.0.0",
     "request": "^2.76.0",
     "safe-buffer": "^5.1.2",

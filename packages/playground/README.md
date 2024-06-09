@@ -1,7 +1,7 @@
 # Machinomy Berry Playground
 
 [![Module type: ESM](https://img.shields.io/badge/module%20type-esm-brightgreen)]()
-[![Module type: NodeVersion](https://img.shields.io/badge/Node.js->=21-brightgreen)]()
+[![NodeVersion: NodeVersion](https://img.shields.io/badge/Node.js->=21-brightgreen)]()
 
 [Machinomy](https://github.com/ARyaskov/machinomy/tree/master/packages/machinomy) examples.
 
