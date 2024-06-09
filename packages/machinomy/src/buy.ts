@@ -1,10 +1,9 @@
 import * as configuration from './configuration'
 import Machinomy from './Machinomy'
 import BuyResult from './BuyResult'
-import { httpRpc, mnemonic } from "./configuration"
-import {NetworkType} from "@riaskov/machinomy-contracts"
-import MachinomyOptions from "./MachinomyOptions"
-
+import { httpRpc, mnemonic } from './configuration'
+import { NetworkType } from '@riaskov/machinomy-contracts'
+import MachinomyOptions from './MachinomyOptions'
 
 /**
  * Shortcut for Sender.buy.
@@ -22,7 +21,7 @@ export async function buyContent(
     account: account,
     httpRpcUrl: httpRpc(chain),
     mnemonic: mnemonic(),
-    options: MachinomyOptions.defaults()
+    options: MachinomyOptions.defaults(),
   })
   let pair = await client.buyUrl(uri)
   await client.shutdown()

@@ -43,7 +43,8 @@ export default class PaymentValidation {
   }
 
   private async isValidChannelValue(): Promise<boolean> {
-    const isValidChannelValue = this.paymentChannel.value === this.payment.channelValue
+    const isValidChannelValue =
+      this.paymentChannel.value === this.payment.channelValue
 
     if (!isValidChannelValue) {
       error(
@@ -89,9 +90,7 @@ export default class PaymentValidation {
   }
 
   private async isPositive(): Promise<boolean> {
-    const isPositive =
-      this.payment.value >= 0 &&
-      this.payment.price >= 0
+    const isPositive = this.payment.value >= 0 && this.payment.price >= 0
     if (!isPositive) {
       error(
         `payment is invalid because the price or value is negative. payment: %o`,

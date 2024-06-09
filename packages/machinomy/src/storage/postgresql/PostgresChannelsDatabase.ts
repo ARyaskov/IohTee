@@ -45,10 +45,7 @@ export default class PostgresChannelsDatabase extends AbstractChannelsDatabase<E
     )
   }
 
-  async deposit(
-    channelId: `0x${string}`,
-    value: bigint,
-  ): Promise<void> {
+  async deposit(channelId: `0x${string}`, value: bigint): Promise<void> {
     return this.engine.exec(async (client: any) => {
       const channel = await this.firstById(channelId)
 

@@ -3,7 +3,12 @@ import ChannelInflator from './ChannelInflator'
 import IChannelsDatabase from './storage/IChannelsDatabase'
 import Payment from './payment'
 import { PublicClient, WalletClient, WriteContractReturnType } from 'viem'
-import { Channel, channelId, ChannelState, Unidirectional } from '@riaskov/machinomy-contracts'
+import {
+  Channel,
+  channelId,
+  ChannelState,
+  Unidirectional,
+} from '@riaskov/machinomy-contracts'
 
 const LOG = new Logger('channel-contract')
 
@@ -96,7 +101,7 @@ export default class ChannelContract {
 
   async startSettle(
     channelId: `0x${string}`,
-    account: `0x${string}`
+    account: `0x${string}`,
   ): Promise<WriteContractReturnType> {
     const contract = await this.getContractByChannelId(channelId)
     return contract.startSettling(channelId, account)

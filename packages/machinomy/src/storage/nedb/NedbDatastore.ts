@@ -1,4 +1,4 @@
-import Datastore = require('nedb');
+import Datastore = require('nedb')
 
 export class NedbDatastore {
   datastore: Datastore

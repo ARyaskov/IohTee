@@ -1,6 +1,6 @@
 const DBMigrate = require('db-migrate')
 import Logger from '@machinomy/logger'
-import { readdir } from "node:fs/promises"
+import { readdir } from 'node:fs/promises'
 import IMigrator from './IMigrator'
 import Indexed from '../util/Indexed'
 

@@ -57,12 +57,7 @@ describe('PaymentManager', () => {
       }).toString()
 
       return manager
-        .buildPaymentForChannel(
-          chan,
-          BigInt(5),
-          BigInt(6),
-          'meta',
-        )
+        .buildPaymentForChannel(chan, BigInt(5), BigInt(6), 'meta')
         .then((pmt: Payment) => {
           expect(pmt.channelId).toBe('id')
           expect(pmt.sender).toBe('send')

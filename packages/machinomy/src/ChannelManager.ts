@@ -13,11 +13,19 @@ import Logger from '@machinomy/logger'
 import { PaymentChannel } from './PaymentChannel'
 import ChannelInflator from './ChannelInflator'
 import * as uuid from 'uuid'
-import { keccak256, stringToHex, toHex, WriteContractReturnType, PublicClient, WalletClient, GetBlockNumberReturnType } from 'viem'
+import {
+  keccak256,
+  stringToHex,
+  toHex,
+  WriteContractReturnType,
+  PublicClient,
+  WalletClient,
+  GetBlockNumberReturnType,
+} from 'viem'
 import { PaymentNotValidError, InvalidChannelError } from './Exceptions'
 import { RemoteChannelInfo } from './RemoteChannelInfo'
 import { recoverPersonalSignature } from 'eth-sig-util'
-import { ChannelState } from "@riaskov/machinomy-contracts";
+import { ChannelState } from '@riaskov/machinomy-contracts'
 
 const LOG = new Logger('channel-manager')
 
@@ -35,8 +43,9 @@ export default class ChannelManager
   implements IChannelManager
 {
   /** Default settlement period for a payment channel */
-  static DEFAULT_SETTLEMENT_PERIOD: bigint =
-    BigInt((2 * DAY_IN_SECONDS) / NEW_BLOCK_TIME_IN_SECONDS)
+  static DEFAULT_SETTLEMENT_PERIOD: bigint = BigInt(
+    (2 * DAY_IN_SECONDS) / NEW_BLOCK_TIME_IN_SECONDS,
+  )
 
   private account: `0x${string}`
   private publicClient: PublicClient
@@ -98,7 +107,10 @@ export default class ChannelManager
     )
   }
 
-  deposit(channelId: `0x${string}`, value: bigint): Promise<WriteContractReturnType> {
+  deposit(
+    channelId: `0x${string}`,
+    value: bigint,
+  ): Promise<WriteContractReturnType> {
     return this.mutex.synchronizeOn(channelId, async () => {
       const channel = await this.channelById(channelId)
 
@@ -234,7 +246,6 @@ export default class ChannelManager
         this.machinomyOptions.minimumChannelAmount
       ) {
         minDepositAmount = this.machinomyOptions.minimumChannelAmount
-
       }
       let channel = await this.channelsDao.findUsable(sender, receiver, amount)
       return (
@@ -263,9 +274,7 @@ export default class ChannelManager
     return this.channelsDao.allSettling()
   }
 
-  async channelById(
-    channelId: `0x${string}`,
-  ): Promise<PaymentChannel | null> {
+  async channelById(channelId: `0x${string}`): Promise<PaymentChannel | null> {
     let channel = await this.channelsDao.firstById(channelId)
     let channelC = await this.channelContract.channel(channelId)
     if (channel && channelC) {
@@ -341,18 +350,17 @@ export default class ChannelManager
     channelId?: `0x${string}`,
     tokenContract?: `0x${string}`,
   ): Promise<PaymentChannel> {
-    let depositAmount = amount *  BigInt(10)
+    let depositAmount = amount * BigInt(10)
 
-    if (
-      minDepositAmount > 0 &&
-      minDepositAmount > depositAmount
-    ) {
+    if (minDepositAmount > 0 && minDepositAmount > depositAmount) {
       depositAmount = minDepositAmount
     }
 
     this.emit('willOpenChannel', sender, receiver, depositAmount)
-    let settlementPeriod =
-      BigInt(this.machinomyOptions.settlementPeriod || ChannelManager.DEFAULT_SETTLEMENT_PERIOD)
+    let settlementPeriod = BigInt(
+      this.machinomyOptions.settlementPeriod ||
+        ChannelManager.DEFAULT_SETTLEMENT_PERIOD,
+    )
     let paymentChannel = await this.buildChannel(
       sender,
       receiver,
@@ -392,22 +400,26 @@ export default class ChannelManager
   }
 
   private settle(channel: PaymentChannel): Promise<WriteContractReturnType> {
-    return this.channelContract.channelState(channel.channelId).then(async (state: number) => {
+    return this.channelContract
+      .channelState(channel.channelId)
+      .then(async (state: number) => {
         if (state === ChannelState.Settled) {
-          throw new Error(
-            `Channel ${channel.channelId} is already settled.`,
-          )
+          throw new Error(`Channel ${channel.channelId} is already settled.`)
         }
 
         switch (state) {
           case ChannelState.Open: {
-            const block: GetBlockNumberReturnType = await this.publicClient.getBlockNumber()
+            const block: GetBlockNumberReturnType =
+              await this.publicClient.getBlockNumber()
             const settlingUntil = block + channel.settlementPeriod
             const res = await this.channelContract.startSettle(
               channel.channelId,
-              this.account
+              this.account,
             )
-            await this.channelsDao.updateState(channel.channelId, ChannelState.Settling)
+            await this.channelsDao.updateState(
+              channel.channelId,
+              ChannelState.Settling,
+            )
             await this.channelsDao.updateSettlingUntil(
               channel.channelId,
               settlingUntil,
@@ -428,7 +440,9 @@ export default class ChannelManager
       })
   }
 
-  private async claim(channel: PaymentChannel): Promise<WriteContractReturnType> {
+  private async claim(
+    channel: PaymentChannel,
+  ): Promise<WriteContractReturnType> {
     let payment = await this.lastPayment(channel.channelId)
     if (payment) {
       let result = await this.channelContract.claim(

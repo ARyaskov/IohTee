@@ -25,9 +25,7 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
     })
   }
 
-  async firstById(
-    channelId: `0x${string}`,
-  ): Promise<PaymentChannel | null> {
+  async firstById(channelId: `0x${string}`): Promise<PaymentChannel | null> {
     return this.engine.exec(async (client) => {
       let raw = await client.get<PaymentChannelJSON>(
         'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
@@ -52,10 +50,7 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
     })
   }
 
-  async deposit(
-    channelId: `0x${string}`,
-    value: bigint,
-  ): Promise<void> {
+  async deposit(channelId: `0x${string}`, value: bigint): Promise<void> {
     return this.engine.exec(async (client) => {
       let channel = await this.firstById(channelId)
       if (!channel) {

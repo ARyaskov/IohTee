@@ -29,9 +29,7 @@ export class NedbChannelsDatabase
     })
   }
 
-  async firstById(
-    channelId: `0x${string}`,
-  ): Promise<PaymentChannel | null> {
+  async firstById(channelId: `0x${string}`): Promise<PaymentChannel | null> {
     const query = {
       kind: this.kind,
       channelId: channelId,
@@ -62,10 +60,7 @@ export class NedbChannelsDatabase
     })
   }
 
-  async deposit(
-    channelId: `0x${string}`,
-    value: bigint,
-  ): Promise<void> {
+  async deposit(channelId: `0x${string}`, value: bigint): Promise<void> {
     const channel = await this.firstById(channelId)
     if (!channel) {
       throw new Error('Channel not found.')
@@ -119,8 +114,8 @@ export class NedbChannelsDatabase
     let channels = await this.inflatePaymentChannels(raw)
     let filtered = this.filterByState(0, channels)
     return (
-      filtered.find((chan: PaymentChannel) =>
-        chan.value >= (chan.spent + amount)
+      filtered.find(
+        (chan: PaymentChannel) => chan.value >= chan.spent + amount,
       ) || null
     )
   }
@@ -156,10 +151,7 @@ export class NedbChannelsDatabase
     return this.inflatePaymentChannel(res[0])
   }
 
-  async updateState(
-    channelId: `0x${string}`,
-    state: number,
-  ): Promise<void> {
+  async updateState(channelId: `0x${string}`, state: number): Promise<void> {
     const query = {
       kind: this.kind,
       channelId: channelId,

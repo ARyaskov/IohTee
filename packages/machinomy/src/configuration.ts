@@ -1,10 +1,20 @@
 import { homedir } from 'node:os'
 import Logger from '@machinomy/logger'
 import { resolve, join } from 'node:path'
-import { createPublicClient, http, createWalletClient, PublicClient, WalletClient, Chain } from 'viem'
-import { polygon, polygonAmoy} from 'viem/chains'
+import {
+  createPublicClient,
+  http,
+  createWalletClient,
+  PublicClient,
+  WalletClient,
+  Chain,
+} from 'viem'
+import { polygon, polygonAmoy } from 'viem/chains'
 import * as env from './env'
-import {NetworkType} from "@riaskov/machinomy-contracts";
+import {
+  DefaultUnidirectionalAddress,
+  NetworkType,
+} from '@riaskov/machinomy-contracts'
 
 const BASE_DIR = '.machinomy'
 const CONFIGURATION_FILE = 'config.json'
@@ -17,8 +27,8 @@ const log = new Logger('configuration')
 
 const CONTRACTS = {
   development: '0x',
-  polygon: '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
-  polygonAmoy: '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
+  polygon: DefaultUnidirectionalAddress.Polygon,
+  polygonAmoy: DefaultUnidirectionalAddress.PolygonAmoy,
 }
 
 export const contractAddress = (): string => {
@@ -110,7 +120,8 @@ export const receiver = (): Configuration => {
 }
 
 export function publicClient(): PublicClient {
-  const defaultRpcUrl = process.env.MACHINOMY_GETH_ADDR || 'http://localhost:8545'
+  const defaultRpcUrl =
+    process.env.MACHINOMY_GETH_ADDR || 'http://localhost:8545'
 
   if (typeof window !== 'undefined' && (window as any).ethereum) {
     const publicClient = createPublicClient({
@@ -128,14 +139,15 @@ export function publicClient(): PublicClient {
 }
 
 export function walletClient(chain: Chain = polygonAmoy): WalletClient {
-  const defaultRpcUrl = process.env.MACHINOMY_GETH_ADDR || 'http://localhost:8545';
+  const defaultRpcUrl =
+    process.env.MACHINOMY_GETH_ADDR || 'http://localhost:8545'
 
   if (typeof window !== 'undefined' && (window as any).ethereum) {
     const walletClient = createWalletClient({
       chain: chain,
       transport: (window as any).ethereum,
-    });
-    return walletClient as WalletClient;
+    })
+    return walletClient as WalletClient
   } else {
     const walletClient = createWalletClient({
       chain: chain,
@@ -146,7 +158,8 @@ export function walletClient(chain: Chain = polygonAmoy): WalletClient {
 }
 
 export function httpRpc(chain: NetworkType): string {
-  const defaultRpcUrl = process.env.MACHINOMY_HTTP_RPC || 'http://localhost:8545';
+  const defaultRpcUrl =
+    process.env.MACHINOMY_HTTP_RPC || 'http://localhost:8545'
   let result = defaultRpcUrl
   if (chain === polygon) {
     result = process.env.POLYGON_RPC_URL!

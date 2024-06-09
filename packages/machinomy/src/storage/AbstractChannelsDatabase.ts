@@ -81,14 +81,9 @@ export default abstract class AbstractChannelsDatabase<T extends IEngine>
     )
   }
 
-  abstract deposit(
-    channelId: `0x${string}`,
-    value: bigint,
-  ): Promise<void>
+  abstract deposit(channelId: `0x${string}`, value: bigint): Promise<void>
 
-  abstract firstById(
-    channelId: `0x${string}`,
-  ): Promise<PaymentChannel | null>
+  abstract firstById(channelId: `0x${string}`): Promise<PaymentChannel | null>
 
   abstract spend(channelId: `0x${string}`, spent: bigint): Promise<void>
 
@@ -118,10 +113,7 @@ export default abstract class AbstractChannelsDatabase<T extends IEngine>
     channelId: `0x${string}`,
   ): Promise<PaymentChannel | null>
 
-  abstract updateState(
-    channelId: `0x${string}`,
-    state: number,
-  ): Promise<void>
+  abstract updateState(channelId: `0x${string}`, state: number): Promise<void>
 
   abstract updateSettlingUntil(
     channelId: `0x${string}`,

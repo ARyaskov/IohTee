@@ -68,7 +68,8 @@ export class PaymentChannel {
     this.spent = BigInt(spent.toString())
     this.state = Number(state)
     this.tokenContract = tokenContract || '0x'
-    this.settlementPeriod = settlementPeriod || ChannelManager.DEFAULT_SETTLEMENT_PERIOD
+    this.settlementPeriod =
+      settlementPeriod || ChannelManager.DEFAULT_SETTLEMENT_PERIOD
     this.settlingUntil = settlingUntil || BigInt(0)
   }
 

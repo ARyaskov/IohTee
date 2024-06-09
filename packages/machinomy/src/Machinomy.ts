@@ -13,7 +13,12 @@ import NextPaymentResult from './NextPaymentResult'
 import BuyResult from './BuyResult'
 import { memoize } from 'decko'
 import { PaymentRequiredResponse } from './PaymentRequiredResponse'
-import {createPublicClient, createWalletClient, http, WriteContractReturnType} from 'viem'
+import {
+  createPublicClient,
+  createWalletClient,
+  http,
+  WriteContractReturnType,
+} from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
 
 export interface MathinomyCtorParams {
