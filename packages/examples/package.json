@@ -36,7 +36,6 @@
     "debug": "^3.1.0",
     "decko": "^1.2.0",
     "ethereumjs-util": "^5.1.5",
-    "fetch-ponyfill": "^6.0.0",
     "fs-extra": "^7.0.0",
     "machinomy": "^1.13.32",
     "nedb": "^1.8.0",
@@ -44,8 +43,7 @@
     "request": "^2.76.0",
     "safe-buffer": "^5.1.2",
     "types-rlp": "^0.0.1",
-    "uuid": "^3.2.1",
-    "web3": "^0.20.1"
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "tslint": "^5.10.0",

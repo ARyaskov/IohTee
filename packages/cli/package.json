@@ -21,17 +21,15 @@
     "coverage": "exit 0"
   },
   "dependencies": {
-    "@types/express-serve-static-core": "4.17.27",
-    "commander": "^2.9.0",
-    "machinomy": "^1.13.32",
+    "@types/express-serve-static-core": "4.19.3",
+    "commander": "^12.1.0",
+    "machinomy": "*",
     "prompt": "^1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.12.12",
-    "tslint": "^6.1.3",
-    "tslint-config-standard": "^7.1.0",
-    "typescript": "^4.5.4",
-    "typescript-logger": "^1.1.1"
+    "@types/node": "*",
+    "typescript": "*",
+    "typescript-logger": "^5.0.1"
   },
   "resolutions": {
     "sqlite3": "^5.1.7"
