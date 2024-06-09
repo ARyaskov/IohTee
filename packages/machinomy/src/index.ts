@@ -14,6 +14,8 @@ export * from './RemoteChannelInfo'
 import NextPaymentResult from './NextPaymentResult'
 import ChannelId from './ChannelId'
 import MachinomyOptions from './MachinomyOptions'
+import { AcceptTokenRequestSerde } from './accept_token_request'
+import { PaymentChannelSerde } from './PaymentChannel'
 
 export {
   Payment,
@@ -25,6 +27,8 @@ export {
   ChannelId,
   MachinomyOptions,
   Transport,
+  AcceptTokenRequestSerde,
+  PaymentChannelSerde,
 }
 
 export * from './Exceptions'

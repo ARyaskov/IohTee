@@ -21,7 +21,7 @@ import {
 } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
 
-export interface MathinomyCtorParams {
+export interface MachinomyCtorParams {
   network: NetworkType
   account: `0x${string}`
   httpRpcUrl: string
@@ -48,7 +48,7 @@ export default class Machinomy {
 
   private migrated: boolean = false
 
-  constructor(params: MathinomyCtorParams) {
+  constructor(params: MachinomyCtorParams) {
     this.account = params.account
     let _options = MachinomyOptions.defaults(params.options)
     const publicClient = createPublicClient({
