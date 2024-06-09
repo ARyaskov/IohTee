@@ -6,6 +6,8 @@
 [codecov]: https://codecov.io/gh/machinomy/machinomy
 [codecov-img]: https://codecov.io/gh/machinomy/machinomy/branch/master/graph/badge.svg
 
+### ! Upgrading to v2 is in progress! Expect bugs !
+
 Machinomy Berry (v2) Monorepo repository. The second life of [original Machinomy library](https://github.com/machinomy/machinomy).
 We're upgrading it to contemporary standards (TypeScript 5+, Node.js 18+, ES2023+) and adding new features.
 
