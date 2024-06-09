@@ -3,8 +3,6 @@ import dotenv from 'dotenv'
 import express from 'express'
 import { URL } from 'url'
 import urljoin from 'url-join'
-import fetcher from 'machinomy/lib/util/fetcher'
-import { BigNumber } from 'bignumber.js'
 
 const log = debug('paywall')
 
@@ -16,26 +14,35 @@ dotenv.config()
 
 const GATEWAY_URL = process.env.GATEWAY_URL
 
-function acceptUrl (base: URL) {
+function acceptUrl(base: URL) {
   return urljoin(base.toString(), PREFIX, 'accept')
 }
 
-function isAcceptUrl (url: string) {
+function isAcceptUrl(url: string) {
   return url === PREFIX + '/accept'
 }
 
-function paywallHeaders (receiverAccount: string, gatewayUri: string, price: BigNumber) {
+function paywallHeaders(
+  receiverAccount: `0x${string}`,
+  gatewayUri: string,
+  price: bigint,
+) {
   let headers = {} as any
-  headers['paywall-version'] = '0.1'
+  headers['paywall-version'] = '1.0'
   headers['paywall-price'] = price.toString()
   headers['paywall-address'] = receiverAccount
   headers['paywall-gateway'] = gatewayUri
   return headers
 }
 
-function paywallHeadersToken (receiverAccount: string, gatewayUri: string, price: BigNumber, tokenContract: string) {
+function paywallHeadersToken(
+  receiverAccount: `0x${string}`,
+  gatewayUri: string,
+  price: bigint,
+  tokenContract: `0x${string}`,
+) {
   let headers = {} as any
-  headers['paywall-version'] = '0.1'
+  headers['paywall-version'] = '1.0'
   headers['paywall-price'] = price.toString()
   headers['paywall-address'] = receiverAccount
   headers['paywall-gateway'] = gatewayUri
@@ -43,18 +50,28 @@ function paywallHeadersToken (receiverAccount: string, gatewayUri: string, price
   return headers
 }
 
-function parseToken (req: express.Request, callback: (error: string | null, token?: string, meta?: string, price?: BigNumber) => void) {
+function parseToken(
+  req: express.Request,
+  callback: (
+    error: string | null,
+    token?: string,
+    meta?: string,
+    price?: bigint,
+  ) => void,
+) {
   let content = req.get(HEADER_NAME)
   if (content) {
     let authorization = content.split(' ')
     let type = authorization[0].toLowerCase()
     let token = authorization[1]
     let meta = authorization[2]
-    let price = new BigNumber(authorization[3])
+    let price = BigInt(authorization[3])
     if (type === TOKEN_NAME) {
       callback(null, token, meta, price)
     } else {
-      callback(`Invalid ${HEADER_NAME} token name present. Expected ${TOKEN_NAME}, got ${type}`)
+      callback(
+        `Invalid ${HEADER_NAME} token name present. Expected ${TOKEN_NAME}, got ${type}`,
+      )
     }
   } else {
     callback(`No ${HEADER_NAME} header present`)
@@ -62,35 +79,54 @@ function parseToken (req: express.Request, callback: (error: string | null, toke
 }
 
 export default class Paywall {
-  receiverAccount: string
+  receiverAccount: `0x${string}`
   base: URL
 
-  constructor (receiverAccount: string, base: URL) {
+  constructor(receiverAccount: `0x${string}`, base: URL) {
     this.receiverAccount = receiverAccount
     this.base = base
   }
 
-  paymentRequired (price: BigNumber, req: express.Request, res: express.Response): void {
+  paymentRequired(
+    price: bigint,
+    req: express.Request,
+    res: express.Response,
+  ): void {
     log('Require payment ' + price.toString() + ' for ' + req.path)
-    res.status(402)
+    res
+      .status(402)
       .set(paywallHeaders(this.receiverAccount, acceptUrl(this.base), price))
       .send('Payment Required')
       .end()
   }
 
-  guard (price: BigNumber, callback: express.RequestHandler): express.RequestHandler {
-    let _guard = async (fixedPrice: BigNumber, req: express.Request, res: express.Response, next: express.NextFunction, error: any, token?: string, meta?: string) => {
+  guard(
+    price: bigint,
+    callback: express.RequestHandler,
+  ): express.RequestHandler {
+    let _guard = async (
+      fixedPrice: bigint,
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction,
+      error: any,
+      token?: string,
+      meta?: string,
+    ) => {
       if (error || !token) {
         log(error)
         this.paymentRequired(fixedPrice, req, res)
       } else {
-        const response = await fetcher.fetch(`${GATEWAY_URL}${PREFIX}/verify/${token}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
+        const response = await fetch(
+          `${GATEWAY_URL}${PREFIX}/verify/${token}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
           },
-          credentials: 'include'
-        })
+        )
 
         if (response.status >= 200 && response.status < 300) {
           log('Got valid paywall token')
@@ -102,7 +138,11 @@ export default class Paywall {
       }
     }
 
-    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    return (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction,
+    ) => {
       log(`Requested ${req.path}`)
       parseToken(req, (error, token, meta) => {
         return _guard(price, req, res, next, error, token!, meta!)
@@ -110,24 +150,29 @@ export default class Paywall {
     }
   }
 
-  paymentInvalid (price: BigNumber, req: express.Request, res: express.Response) {
-    res.status(409) // Conflict
+  paymentInvalid(price: bigint, req: express.Request, res: express.Response) {
+    res
+      .status(409) // Conflict
       .set(paywallHeaders(this.receiverAccount, acceptUrl(this.base), price))
       .send('Payment Invalid')
       .end()
   }
 
-  middleware () {
-    let handler: express.RequestHandler = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  middleware() {
+    let handler: express.RequestHandler = async (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction,
+    ) => {
       log('Called payment handler')
       try {
-        const response = await fetcher.fetch(`${GATEWAY_URL}${PREFIX}/accept`, {
+        const response = await fetch(`${GATEWAY_URL}${PREFIX}/accept`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           credentials: 'include',
-          body: JSON.stringify(req.body)
+          body: JSON.stringify(req.body),
         })
         log('Accept request')
         const json = await response.json()
@@ -138,7 +183,11 @@ export default class Paywall {
       }
     }
 
-    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    return (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction,
+    ) => {
       if (isAcceptUrl(req.url)) {
         handler(req, res, next)
       } else {
@@ -147,34 +196,76 @@ export default class Paywall {
     }
   }
 
-  paymentRequiredToken (price: BigNumber, tokenContract: string, req: express.Request, res: express.Response): void {
+  paymentRequiredToken(
+    price: bigint,
+    tokenContract: `0x${string}`,
+    req: express.Request,
+    res: express.Response,
+  ): void {
     log('Require payment ' + price.toString() + ' for ' + req.path)
-    res.status(402)
-      .set(paywallHeadersToken(this.receiverAccount, acceptUrl(this.base), price, tokenContract))
+    res
+      .status(402)
+      .set(
+        paywallHeadersToken(
+          this.receiverAccount,
+          acceptUrl(this.base),
+          price,
+          tokenContract,
+        ),
+      )
       .send('Payment Required')
       .end()
   }
 
-  paymentInvalidToken (price: BigNumber, tokenContract: string, req: express.Request, res: express.Response) {
-    res.status(409) // Conflict
-      .set(paywallHeadersToken(this.receiverAccount, acceptUrl(this.base), price, tokenContract))
+  paymentInvalidToken(
+    price: bigint,
+    tokenContract: `0x${string}`,
+    req: express.Request,
+    res: express.Response,
+  ) {
+    res
+      .status(409) // Conflict
+      .set(
+        paywallHeadersToken(
+          this.receiverAccount,
+          acceptUrl(this.base),
+          price,
+          tokenContract,
+        ),
+      )
       .send('Payment Invalid')
       .end()
   }
 
-  guardToken (price: BigNumber, tokenContract: string, callback: express.RequestHandler): express.RequestHandler {
-    let _guard = async (fixedPrice: BigNumber, req: express.Request, res: express.Response, next: express.NextFunction, error: any, _tokenContract: string, token?: string, meta?: string) => {
+  guardToken(
+    price: bigint,
+    tokenContract: `0x${string}`,
+    callback: express.RequestHandler,
+  ): express.RequestHandler {
+    let _guard = async (
+      fixedPrice: bigint,
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction,
+      error: any,
+      _tokenContract: `0x${string}`,
+      token?: string,
+      meta?: string,
+    ) => {
       if (error || !token) {
         log(error)
         this.paymentRequiredToken(fixedPrice, _tokenContract, req, res)
       } else {
-        const response = await fetcher.fetch(`${GATEWAY_URL}${PREFIX}/verify/${token}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
+        const response = await fetch(
+          `${GATEWAY_URL}${PREFIX}/verify/${token}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
           },
-          credentials: 'include'
-        })
+        )
 
         if (response.status >= 200 && response.status < 300) {
           log('Got valid paywall token')
@@ -186,12 +277,24 @@ export default class Paywall {
       }
     }
 
-    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    return (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction,
+    ) => {
       log(`Requested ${req.path}`)
       parseToken(req, (error, token, meta) => {
-        return _guard(price, req, res, next, error, tokenContract, token!, meta!)
+        return _guard(
+          price,
+          req,
+          res,
+          next,
+          error,
+          tokenContract,
+          token!,
+          meta!,
+        )
       })
     }
   }
-
 }

@@ -13,11 +13,12 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "build": "yarn format && tsc --project tsconfig.json",
     "clean": "rm -rf dist/",
-    "lint": "tslint --format stylish --project . --exclude './node_modules/**/*.ts'",
+    "format": "prettier --write \"src/**/*.ts\"",
     "test": "exit 0",
-    "coverage": "exit 0"
+    "coverage": "exit 0",
+    "start": "yarn format && tsx src/index.ts"
   },
   "dependencies": {
     "@machinomy/types-ethereumjs-util": "^0.0.12",
@@ -36,7 +37,11 @@
     "morgan": "^1.10.0",
     "sqlite3": "^5.1.7",
     "typescript": "*",
-    "url-join": "^4.0.1"
+    "url-join": "^4.0.1",
+    "viem": "*"
+  },
+  "devDependencies": {
+    "tsx": "*"
   },
   "resolutions": {
     "sqlite3": "^5.1.7"

@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig",
+  "extends": "../../tsconfig.esm.json",
   "compilerOptions": {
     "sourceRoot": "src/",
     "outDir": "dist/",
