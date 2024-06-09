@@ -26,7 +26,7 @@
     "build:types": "tsc --project tsconfig.types.json",
     "build:esm": "rimraf lib/esm && tsc --project tsconfig.esm.json",
     "build:cjs": "rimraf lib/cjs && tsc --project tsconfig.cjs.json",
-    "tree-shaking:lib": "rimraf lib/cjs/**/*.map && rimraf lib/esm/**/*.map && rimraf lib/types/**/*.map && rimraf lib/cjs/**/*.d.ts && rimraf lib/esm/**/*.d.ts && rimraf lib/types/**/*.d.ts",
+    "tree-shaking:lib": "rimraf lib/cjs/**/*.map && rimraf lib/esm/**/*.map && rimraf lib/types/**/*.map && rimraf lib/cjs/**/*.d.ts && rimraf lib/esm/**/*.d.ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "prepublish": "yarn lint && yarn build",
     "lint": "tslint --format stylish --project .",
