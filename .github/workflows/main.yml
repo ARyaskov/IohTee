@@ -52,6 +52,7 @@ jobs:
       - name: Install global dependencies
         run: |
           yarn dlx codecov
+          yarn dlx node-gyp
 
       - name: Install dependencies
         run: |
