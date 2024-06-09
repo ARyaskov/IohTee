@@ -51,7 +51,6 @@ jobs:
 
       - name: Install global dependencies
         run: |
-          yarn dlx codecov
           yarn dlx node-gyp
           yarn dlx prettier@^4.0.0-alpha.8
 
@@ -76,6 +75,10 @@ jobs:
 
       - name: Generate coverage report
         run: yarn run coverage
+
+      - name: Install global codecov
+        run: |
+          yarn dlx codecov
 
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash) -s packages -t ${{ secrets.CODECOV_TOKEN }}
