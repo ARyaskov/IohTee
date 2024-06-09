@@ -42,8 +42,9 @@
     "test": "yarn test:sqlite && yarn test:nedb && yarn test:postgresql",
     "coverage": "yarn build && nyc --reporter=lcov yarn run test"
   },
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "lib/cjs/src/index.js",
+  "module": "lib/esm/src/index.js",
+  "types": "lib/types/src/index.d.ts",
   "files": [
     "lib/",
     "migrations/",
@@ -53,7 +54,7 @@
     "@machinomy/logger": "^0.2.5",
     "@machinomy/types-bn": "^0.0.3",
     "@machinomy/types-eth-sig-util": "^0.0.8",
-    "@metamask/eth-sig-util": "4.0.1",
+    "@metamask/eth-sig-util": "^7.0.2",
     "@riaskov/machinomy-contracts": "*",
     "await-semaphore": "^0.1.3",
     "browser-or-node": "^1.0.2",

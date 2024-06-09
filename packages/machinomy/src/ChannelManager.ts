@@ -24,7 +24,7 @@ import {
 } from 'viem'
 import { PaymentNotValidError, InvalidChannelError } from './Exceptions'
 import { RemoteChannelInfo } from './RemoteChannelInfo'
-import { recoverPersonalSignature } from 'eth-sig-util'
+import { recoverPersonalSignature } from '@metamask/eth-sig-util'
 import { ChannelState } from '@riaskov/machinomy-contracts'
 
 const LOG = new Logger('channel-manager')
@@ -320,7 +320,7 @@ export default class ChannelManager
       )
       const restored = recoverPersonalSignature({
         data: digest,
-        sig: remoteChan.sign.toString(),
+        signature: remoteChan.sign.toString(),
       })
       if (restored !== sender) {
         throw new InvalidChannelError('signature')

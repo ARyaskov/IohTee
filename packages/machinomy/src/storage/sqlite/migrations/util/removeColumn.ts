@@ -36,8 +36,8 @@ export default function removeColumn(
         DROP TABLE ${tableName};
         CREATE TABLE ${tableName}(${sqlNamesWithTypes});
         INSERT INTO ${tableName} SELECT ${sqlNames} FROM ${
-            tableName + '_backup'
-          };
+          tableName + '_backup'
+        };
         DROP TABLE ${tableName + '_backup'};
        `
           db.runSql(removeColumnSql)
