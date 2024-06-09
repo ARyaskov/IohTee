@@ -24,7 +24,6 @@ import Machinomy from 'machinomy'
 import bodyParser from 'body-parser'
 import { AcceptTokenRequestSerde } from 'machinomy/lib/accept_token_request'
 import { PaymentChannelSerde } from 'machinomy/lib/PaymentChannel'
-import fetcher from 'machinomy/lib/util/fetcher'
 import HDWalletProvider from '@machinomy/hdwallet-provider'
 
 async function main () {
@@ -115,7 +114,7 @@ async function main () {
     let content = req.get('authorization')
     if (content) {
       let token = content.split(' ')[1]
-      let response = await fetcher.fetch(reqUrl + '/' + token)
+      let response = await fetch(reqUrl + '/' + token)
       let json = await response.json()
       let status = json.status
       if (status === 'ok') {

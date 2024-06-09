@@ -15,11 +15,10 @@
  * The server side for selling the content is provided in `server.ts` file.
  */
 
-import Web3 from 'web3'
+
 import HDWalletProvider from '@machinomy/hdwallet-provider'
 import Machinomy from 'machinomy'
 import { BigNumber } from 'bignumber.js'
-import fetcher from 'machinomy/lib/util/fetcher'
 
 async function main (): Promise<string> {
   const PROVIDER_URL = String(process.env.PROVIDER_URL)
@@ -43,7 +42,7 @@ async function main (): Promise<string> {
    */
   let machinomy = new Machinomy(sender, web3, { databaseUrl: 'sqlite://./client' })
 
-  let response = await fetcher.fetch(TARGET)
+  let response = await fetch(TARGET)
   let headers = response.headers
 
   /**
@@ -61,7 +60,7 @@ async function main (): Promise<string> {
   /**
    * Request paid content
    */
-  let content = await fetcher.fetch(TARGET, {
+  let content = await fetch(TARGET, {
     headers: {
       authorization: `paywall ${token} ${'metaidexample'} ${String(headers.get('paywall-price'))}`
     }

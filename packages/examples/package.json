@@ -27,9 +27,9 @@
     "serverTokens": "yarn build && DEBUG=* node ./src/serverTokens.js"
   },
   "dependencies": {
-    "@machinomy/hdwallet-provider": "^2.0.8",
     "@machinomy/types-bn": "^0.0.3",
     "@machinomy/types-truffle-contract": "^0.0.4",
+    "@riaskov/machinomy": "*",
     "@types/express-serve-static-core": "4.17.27",
     "@types/fs-extra": "^5.0.4",
     "commander": "^2.9.0",
@@ -37,7 +37,6 @@
     "decko": "^1.2.0",
     "ethereumjs-util": "^5.1.5",
     "fs-extra": "^7.0.0",
-    "machinomy": "^1.13.32",
     "nedb": "^1.8.0",
     "prompt": "^1.0.0",
     "request": "^2.76.0",

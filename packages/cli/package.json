@@ -21,9 +21,9 @@
     "coverage": "exit 0"
   },
   "dependencies": {
+    "@riaskov/machinomy": "*",
     "@types/express-serve-static-core": "4.19.3",
     "commander": "^12.1.0",
-    "machinomy": "*",
     "prompt": "^1.0.0"
   },
   "devDependencies": {

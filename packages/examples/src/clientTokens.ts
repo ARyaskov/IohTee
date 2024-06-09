@@ -18,7 +18,6 @@
 import Web3 from 'web3'
 import HDWalletProvider from '@machinomy/hdwallet-provider'
 import Machinomy from 'machinomy'
-import fetcher from 'machinomy/lib/util/fetcher'
 import BigNumber from 'bignumber.js'
 
 async function main (): Promise<string> {
@@ -43,7 +42,7 @@ async function main (): Promise<string> {
    */
   const machinomy = new Machinomy(sender, web3, { databaseUrl: 'sqlite://./client-token' })
 
-  const response = await fetcher.fetch(TARGET)
+  const response = await fetch(TARGET)
   const headers = response.headers
 
   /**
@@ -62,7 +61,7 @@ async function main (): Promise<string> {
   /**
    * Request paid content
    */
-  const content = await fetcher.fetch(TARGET, {
+  const content = await fetch(TARGET, {
     headers: {
       authorization: `paywall ${token} ${'metaidexample'} ${String(headers.get('paywall-price'))} ${String(headers.get('paywall-token-contract'))}`
     }
