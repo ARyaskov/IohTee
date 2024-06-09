@@ -31,9 +31,9 @@
     "format": "npx prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "coverage": "cross-env SOLIDITY_COVERAGE=true hardhat coverage",
     "copy-abi:uni": "cpx \"artifacts/contracts/Unidirectional.sol/Unidirectional.json\" lib/esm/abi/ && cpx \"artifacts/contracts/Unidirectional.sol/Unidirectional.json\" lib/cjs/abi/ && cpx \"artifacts/contracts/Unidirectional.sol/Unidirectional.json\" abi/",
-    "build:esm": "rimraf lib/esm && hardhat compile && tsc --project tsconfig.esm.json",
-    "build:cjs": "rimraf lib/cjs && hardhat compile && tsc --project tsconfig.cjs.json",
-    "tree-shaking:lib": "rimraf lib/cjs/hardhat.config.* && rimraf lib/esm/hardhat.config.* && rimraf lib/types/hardhat.config.* && rimraf lib/cjs/**/*.map && rimraf lib/esm/**/*.map && rimraf lib/types/**/*.map && rimraf lib/cjs/**/*.d.ts && rimraf lib/esm/**/*.d.ts",
+    "build:esm": "npx rimraf lib/esm && hardhat compile && tsc --project tsconfig.esm.json",
+    "build:cjs": "npx rimraf lib/cjs && hardhat compile && tsc --project tsconfig.cjs.json",
+    "tree-shaking:lib": "npx rimraf lib/cjs/hardhat.config.* && npx rimraf lib/esm/hardhat.config.* && npx rimraf lib/types/hardhat.config.* && npx rimraf lib/cjs/**/*.map && npx rimraf lib/esm/**/*.map && npx rimraf lib/types/**/*.map && npx rimraf lib/cjs/**/*.d.ts && npx rimraf lib/esm/**/*.d.ts",
     "hardhat:node": "hardhat node",
     "deploy:local": "hardhat ignition deploy ignition/modules/Unidirectional.ts --network localhost",
     "deploy:uni:polygon": "hardhat ignition deploy ignition/modules/Unidirectional.ts --network polygon --verify",
@@ -82,5 +82,8 @@
     "mocha": "10.4.0",
     "nyc": "^15.1.0",
     "prettier": "*"
+  },
+  "resolutions": {
+    "sqlite3": "^5.1.7"
   }
 }
