@@ -1,22 +1,21 @@
 {
-  "name": "@machinomy/cli",
+  "name": "@riaskov/machinomy-cli",
   "version": "2.0.0",
   "description": "Machinomy Command Line Interface",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/machinomy/machinomy#readme",
+  "homepage": "https://github.com/ARyaskov/machinomy#readme",
   "bugs": {
-    "url": "https://github.com/machinomy/machinomy/issues"
+    "url": "https://github.com/ARyaskov/machinomy/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/machinomy/machinomy.git"
+    "url": "https://github.com/ARyaskov/machinomy.git"
   },
   "bin": {
     "machinomy": "./bin/machinomy.js"
   },
   "scripts": {
     "build": "tsc --project tsconfig.json",
-    "lint": "tslint --format stylish --project . --exclude './node_modules/**/*.ts'",
     "test": "exit 0",
     "coverage": "exit 0"
   },
@@ -28,6 +27,7 @@
   },
   "devDependencies": {
     "@types/node": "*",
+    "prettier": "*",
     "typescript": "*",
     "typescript-logger": "^5.0.1"
   },

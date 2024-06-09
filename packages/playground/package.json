@@ -15,7 +15,7 @@
   "scripts": {
     "build": "yarn format && tsc --project tsconfig.json",
     "clean": "rm -rf dist/",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "format": "npx prettier --write \"src/**/*.ts\"",
     "test": "exit 0",
     "coverage": "exit 0",
     "start": "yarn format && tsx src/index.ts"

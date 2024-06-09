@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "@machinomy/examples",
+  "name": "@riaskov/machinomy-examples",
   "version": "2.0.0",
-  "description": "Examples of Machinomy usage",
+  "description": "Examples of Machinomy Berry usage",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
   "license": "Apache-2.0",
   "keywords": [
@@ -12,11 +12,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/machinomy/machinomy.git"
+    "url": "https://github.com/ARyaskov/machinomy.git"
   },
   "scripts": {
     "build": "tsc --project tsconfig.json",
-    "lint": "tslint --format stylish --project . --exclude './node_modules/**/*.ts'",
     "test": "exit 0",
     "coverage": "exit 0",
     "sender": "yarn build && DEBUG=* node ./src/sender.js",

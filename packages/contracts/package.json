@@ -28,7 +28,7 @@
     "build": "yarn format && yarn build:esm && yarn build:cjs && yarn copy-abi:uni && yarn build:types && yarn tree-shaking:lib",
     "build:types": "tsc --project tsconfig.types.json",
     "test": "yarn build && hardhat test",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "npx prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "coverage": "cross-env SOLIDITY_COVERAGE=true hardhat coverage",
     "copy-abi:uni": "cpx \"artifacts/contracts/Unidirectional.sol/Unidirectional.json\" lib/esm/abi/ && cpx \"artifacts/contracts/Unidirectional.sol/Unidirectional.json\" lib/cjs/abi/ && cpx \"artifacts/contracts/Unidirectional.sol/Unidirectional.json\" abi/",
     "build:esm": "rimraf lib/esm && hardhat compile && tsc --project tsconfig.esm.json",
@@ -80,6 +80,7 @@
     "ethlint": "1.2.5",
     "hardhat-gas-reporter": "^2.2.0",
     "mocha": "10.4.0",
-    "nyc": "^15.1.0"
+    "nyc": "^15.1.0",
+    "prettier": "*"
   }
 }
