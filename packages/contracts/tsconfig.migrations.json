@@ -4,7 +4,6 @@
     "types": [
       "@machinomy/types-truffle-deployer",
       "@machinomy/types-truffle",
-      "@machinomy/types-truffle-contract",
       "@machinomy/types-ethereumjs-units",
       "@machinomy/types-ethereumjs-util",
       "@types/node",

@@ -53,7 +53,6 @@
     "@machinomy/logger": "^0.2.5",
     "@machinomy/types-bn": "^0.0.3",
     "@machinomy/types-eth-sig-util": "^0.0.8",
-    "@machinomy/types-truffle-contract": "^0.0.4",
     "@metamask/eth-sig-util": "4.0.1",
     "@riaskov/machinomy-contracts": "*",
     "await-semaphore": "^0.1.3",

@@ -6,7 +6,6 @@
     "types": [
       "@machinomy/types-ethereumjs-util",
       "@machinomy/types-ethereumjs-units",
-      "@machinomy/types-truffle-contract"
     ]
   },
   "include": [
