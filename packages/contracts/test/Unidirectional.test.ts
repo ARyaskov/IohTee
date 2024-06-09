@@ -52,11 +52,13 @@ describe('Unidirectional', async () => {
     channelId: `0x${string}`,
     _settlingPeriod = settlingPeriod,
   ) {
-    const txId = await uni.open(channelId, account1, _settlingPeriod, {
-      from: account0,
-      value: channelValue,
-      gas: 1_000_000,
-    })
+    const txId = await uni.open(
+      channelId,
+      account1,
+      _settlingPeriod,
+      channelValue,
+      account0,
+    )
 
     const receipt = await getTransactionReceipt(publicClient as any, {
       hash: txId,
@@ -66,6 +68,7 @@ describe('Unidirectional', async () => {
       abi: uni.abi(),
       logs: receipt.logs,
     })
+
     return logs
   }
 

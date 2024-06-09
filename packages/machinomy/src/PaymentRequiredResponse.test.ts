@@ -1,4 +1,7 @@
-import { PaymentRequiredResponseSerializer, TRANSPORT_VERSION } from './PaymentRequiredResponse'
+import {
+  PaymentRequiredResponseSerializer,
+  TRANSPORT_VERSION,
+} from './PaymentRequiredResponse'
 import { BigNumber } from 'bignumber.js'
 import Signature from './Signature'
 const expect = require('expect')
@@ -13,7 +16,8 @@ describe('PaymentRequiredResponse', () => {
         'paywall-gateway': 'http://honkhost:8080/machinomy',
         'paywall-meta': 'hello',
         'paywall-token-contract': '0xbeef',
-        'paywall-channels': '[{"channelId": "0x111", "spent": "10", "sign": "0xbabe"}]'
+        'paywall-channels':
+          '[{"channelId": "0x111", "spent": "10", "sign": "0xbabe"}]',
       })
 
       expect(response.receiver).toBe('0x1234')
@@ -23,8 +27,12 @@ describe('PaymentRequiredResponse', () => {
       expect(response.tokenContract).toBe('0xbeef')
       expect(response.remoteChannelInfo.channels.length).toBe(1)
       expect(response.remoteChannelInfo.channels[0].channelId).toBe('0x111')
-      expect(response.remoteChannelInfo.channels[0].spent).toEqual(new BigNumber(10))
-      expect(response.remoteChannelInfo.channels[0].sign).toEqual(Signature.fromRpcSig('0xbabe'))
+      expect(response.remoteChannelInfo.channels[0].spent).toEqual(
+        new BigNumber(10),
+      )
+      expect(response.remoteChannelInfo.channels[0].sign).toEqual(
+        Signature.fromRpcSig('0xbabe'),
+      )
     })
 
     it('wrongversion', () => {
@@ -36,7 +44,8 @@ describe('PaymentRequiredResponse', () => {
           'paywall-gateway': 'http://honkhost:8080/machinomy',
           'paywall-meta': 'hello',
           'paywall-token-contract': '0xbeef',
-          'paywall-channels': '[{"channelId": "0x111", "spent": "10", "sign": "0xbabe"}]'
+          'paywall-channels':
+            '[{"channelId": "0x111", "spent": "10", "sign": "0xbabe"}]',
         })
       }).toThrow()
     })

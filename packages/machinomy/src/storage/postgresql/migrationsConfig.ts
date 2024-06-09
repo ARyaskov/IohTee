@@ -1,10 +1,11 @@
 import { ConnectionString } from 'connection-string'
 
-export default function migrationsConfig (connectionUrl: string) {
+export default function migrationsConfig(connectionUrl: string) {
   let c = new ConnectionString(connectionUrl)
   return {
     cmdOptions: {
-      'migrations-dir': './packages/machinomy/lib/storage/postgresql/migrations/'
+      'migrations-dir':
+        './packages/machinomy/lib/storage/postgresql/migrations/',
     },
     config: {
       defaultEnv: 'defaultPg',
@@ -13,8 +14,8 @@ export default function migrationsConfig (connectionUrl: string) {
         user: `${c.user}`,
         password: `${c.password}`,
         host: `${c.hostname}`,
-        database: `${c.segments![0]}`
-      }
-    }
+        database: `${c.segments![0]}`,
+      },
+    },
   }
 }

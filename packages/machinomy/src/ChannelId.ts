@@ -1,19 +1,20 @@
-import uuid from 'uuid'
+// TODO REMOVE IT
+import * as uuid from 'uuid'
 import { Buffer } from 'safe-buffer'
 
 export default class ChannelId {
   id: Buffer
 
-  constructor (buffer: Buffer) {
+  constructor(buffer: Buffer) {
     this.id = buffer
   }
 
-  static random (): ChannelId {
+  static random(): ChannelId {
     let id = uuid.v4().replace(/-/g, '')
     return this.build(id)
   }
 
-  static build (something: string | Buffer | ChannelId): ChannelId {
+  static build(something: string | Buffer | ChannelId): ChannelId {
     if (typeof something === 'string') {
       const noPrefix = something.replace('0x', '')
       const buffer = Buffer.from(noPrefix, 'HEX')
@@ -27,7 +28,7 @@ export default class ChannelId {
     }
   }
 
-  toString () {
+  toString() {
     return '0x' + this.id.toString('hex')
   }
 }

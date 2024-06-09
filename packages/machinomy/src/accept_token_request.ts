@@ -3,7 +3,7 @@ import Serde from './Serde'
 export class AcceptTokenRequest {
   token: string
 
-  constructor (token: string) {
+  constructor(token: string) {
     this.token = token
   }
 }
@@ -11,13 +11,13 @@ export class AcceptTokenRequest {
 export class AcceptTokenRequestSerde implements Serde<AcceptTokenRequest> {
   static instance: AcceptTokenRequestSerde = new AcceptTokenRequestSerde()
 
-  serialize (obj: AcceptTokenRequest): object {
+  serialize(obj: AcceptTokenRequest): object {
     return {
-      token: obj.token
+      token: obj.token,
     }
   }
 
-  deserialize (data: any): AcceptTokenRequest {
+  deserialize(data: any): AcceptTokenRequest {
     if (!data.token) {
       throw new Error('Cannot deserialize token request. Token is missing.')
     }

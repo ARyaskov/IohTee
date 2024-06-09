@@ -3,12 +3,12 @@ import Logger from '@machinomy/logger'
 import SqlMigrator from '../SqlMigrator'
 import * as path from 'path'
 
-export function migrationsConfig (connectionUrl: string) {
+export function migrationsConfig(connectionUrl: string) {
   let c = new ConnectionString(connectionUrl)
   return {
     cmdOptions: {
       'migrations-dir': path.resolve(__dirname, './migrations/'),
-      'env': 'defaultPg'
+      env: 'defaultPg',
     },
     config: {
       defaultEnv: 'defaultPg',
@@ -17,16 +17,16 @@ export function migrationsConfig (connectionUrl: string) {
         user: `${c.user}`,
         password: `${c.password}`,
         host: `${c.hostname}`,
-        database: `${c.segments![0]}`
-      }
-    }
+        database: `${c.segments![0]}`,
+      },
+    },
   }
 }
 
 const log = new Logger('migrator:postgresql')
 
 export default class PostgresqlMigrator extends SqlMigrator {
-  constructor (databaseUrl: string) {
+  constructor(databaseUrl: string) {
     super(log, migrationsConfig(databaseUrl))
   }
 }

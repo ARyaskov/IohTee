@@ -25,33 +25,56 @@ describe('PaymentManager', () => {
 
   describe('#buildPaymentForChannel', () => {
     it('builds a signed payment', () => {
-      const chan: PaymentChannel = new PaymentChannel('send', 'recv', 'id', new BigNumber(100), new BigNumber(10), 0, '0xcabdab')
+      const chan: PaymentChannel = new PaymentChannel(
+        '0xsend',
+        '0xrecv',
+        '0xid',
+        BigInt(100),
+        BigInt(10),
+        0,
+        '0xcabdab',
+      )
 
-      channelContract.paymentDigest = sinon.stub().withArgs('id', new BigNumber(15)).resolves('digest')
-      chainManager.sign = sinon.stub().withArgs('sender', 'digest').resolves(Signature.fromParts({
-        v: 27,
-        r: '0x01',
-        s: '0x02'
-      }))
+      channelContract.paymentDigest = sinon
+        .stub()
+        .withArgs('id', new BigNumber(15))
+        .resolves('digest')
+      chainManager.sign = sinon
+        .stub()
+        .withArgs('sender', 'digest')
+        .resolves(
+          Signature.fromParts({
+            v: 27,
+            r: '0x01',
+            s: '0x02',
+          }),
+        )
 
       const expSig = Signature.fromParts({
         v: 27,
         r: '0x01',
-        s: '0x02'
-      })
+        s: '0x02',
+      }).toString()
 
-      return manager.buildPaymentForChannel(chan, new BigNumber(5), new BigNumber(6), 'meta').then((pmt: Payment) => {
-        expect(pmt.channelId).toBe('id')
-        expect(pmt.sender).toBe('send')
-        expect(pmt.receiver).toBe('recv')
-        expect(pmt.price).toEqual(new BigNumber(5))
-        expect(pmt.value).toEqual(new BigNumber(6))
-        expect(pmt.channelValue).toEqual(new BigNumber(100))
-        expect(pmt.signature.isEqual(expSig)).toBe(true)
-        expect(pmt.meta).toBe('meta')
-        expect(pmt.tokenContract).toBe('0xcabdab')
-        expect(pmt.token).toBe(undefined)
-      })
+      return manager
+        .buildPaymentForChannel(
+          chan,
+          BigInt(5),
+          BigInt(6),
+          'meta',
+        )
+        .then((pmt: Payment) => {
+          expect(pmt.channelId).toBe('id')
+          expect(pmt.sender).toBe('send')
+          expect(pmt.receiver).toBe('recv')
+          expect(pmt.price).toEqual(new BigNumber(5))
+          expect(pmt.value).toEqual(new BigNumber(6))
+          expect(pmt.channelValue).toEqual(new BigNumber(100))
+          expect(pmt.signature === expSig).toBe(true)
+          expect(pmt.meta).toBe('meta')
+          expect(pmt.tokenContract).toBe('0xcabdab')
+          expect(pmt.token).toBe(undefined)
+        })
     })
   })
 })

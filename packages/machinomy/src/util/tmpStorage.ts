@@ -2,7 +2,7 @@ import Storage from '../Storage'
 import ChannelInflator from '../ChannelInflator'
 // import { tmpFileName } from './tmpFileName'
 
-export async function tmpStorage (inflator: ChannelInflator): Promise<Storage> {
+export async function tmpStorage(inflator: ChannelInflator): Promise<Storage> {
   let connectionUrl = process.env.DB_URL
   if (!connectionUrl) {
     let filename = './tmp' // await tmpFileName()

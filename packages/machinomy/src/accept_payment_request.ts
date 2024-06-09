@@ -7,7 +7,7 @@ export class AcceptPaymentRequest {
 
   purchaseMeta: HasTypeField
 
-  constructor (payment: Payment, purchaseMeta: HasTypeField) {
+  constructor(payment: Payment, purchaseMeta: HasTypeField) {
     this.payment = payment
     this.purchaseMeta = purchaseMeta
   }
@@ -16,14 +16,14 @@ export class AcceptPaymentRequest {
 export class AcceptPaymentRequestSerde implements Serde<AcceptPaymentRequest> {
   static instance: AcceptPaymentRequestSerde = new AcceptPaymentRequestSerde()
 
-  serialize (obj: AcceptPaymentRequest): object {
+  serialize(obj: AcceptPaymentRequest): object {
     return {
       payment: PaymentSerde.instance.serialize(obj.payment),
-      purchaseMeta: obj.purchaseMeta
+      purchaseMeta: obj.purchaseMeta,
     }
   }
 
-  deserialize (data: any): AcceptPaymentRequest {
+  deserialize(data: any): AcceptPaymentRequest {
     if (!data.payment) {
       throw new Error('Cannot deserialize payment request. Payment is missing.')
     }
@@ -34,7 +34,7 @@ export class AcceptPaymentRequestSerde implements Serde<AcceptPaymentRequest> {
 
     return {
       payment: PaymentSerde.instance.deserialize(data.payment),
-      purchaseMeta: data.purchaseMeta
+      purchaseMeta: data.purchaseMeta,
     }
   }
 }

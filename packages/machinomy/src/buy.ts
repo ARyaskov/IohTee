@@ -1,20 +1,29 @@
 import * as configuration from './configuration'
-import Web3 from 'web3'
 import Machinomy from './Machinomy'
 import BuyResult from './BuyResult'
+import { httpRpc, mnemonic } from "./configuration"
+import {NetworkType} from "@riaskov/machinomy-contracts"
+import MachinomyOptions from "./MachinomyOptions"
+
 
 /**
  * Shortcut for Sender.buy.
  */
-export async function buyContent (uri: string, account: string, password: string): Promise<BuyResult> {
+export async function buyContent(
+  uri: string,
+  account: `0x${string}`,
+  chain: NetworkType,
+  password: string,
+): Promise<BuyResult> {
   let settings = configuration.sender()
-  let web3 = new Web3()
-  web3.setProvider(configuration.currentProvider())
-  if (web3.personal) {
-    // web3.personal.unlockAccount(account, password, UNLOCK_PERIOD) // FIXME
-  }
 
-  let client = new Machinomy(account, web3, settings)
+  let client = new Machinomy({
+    network: chain,
+    account: account,
+    httpRpcUrl: httpRpc(chain),
+    mnemonic: mnemonic(),
+    options: MachinomyOptions.defaults()
+  })
   let pair = await client.buyUrl(uri)
   await client.shutdown()
   return pair

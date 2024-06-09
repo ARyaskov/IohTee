@@ -1,15 +1,16 @@
 import AbstractChannelsDatabase from '../AbstractChannelsDatabase'
-import { BigNumber } from 'bignumber.js'
 import IChannelsDatabase from '../IChannelsDatabase'
 import { EngineNedb } from './EngineNedb'
-import ChannelId from '../../ChannelId'
 import { PaymentChannel, PaymentChannelJSON } from '../../PaymentChannel'
 
 /**
  * Database layer for {PaymentChannel}
  */
-export class NedbChannelsDatabase extends AbstractChannelsDatabase<EngineNedb> implements IChannelsDatabase {
-  async save (paymentChannel: PaymentChannel): Promise<void> {
+export class NedbChannelsDatabase
+  extends AbstractChannelsDatabase<EngineNedb>
+  implements IChannelsDatabase
+{
+  async save(paymentChannel: PaymentChannel): Promise<void> {
     const document = {
       kind: this.kind,
       sender: paymentChannel.sender,
@@ -20,21 +21,23 @@ export class NedbChannelsDatabase extends AbstractChannelsDatabase<EngineNedb> i
       state: paymentChannel.state,
       tokenContract: paymentChannel.tokenContract,
       settlementPeriod: paymentChannel.settlementPeriod,
-      settlingUntil: paymentChannel.settlingUntil.toString()
+      settlingUntil: paymentChannel.settlingUntil.toString(),
     }
 
-    await this.engine.exec(client => {
+    await this.engine.exec((client) => {
       return client.insert(document)
     })
   }
 
-  async firstById (channelId: ChannelId | string): Promise<PaymentChannel | null> {
+  async firstById(
+    channelId: `0x${string}`,
+  ): Promise<PaymentChannel | null> {
     const query = {
       kind: this.kind,
-      channelId: channelId.toString()
+      channelId: channelId,
     }
 
-    return this.engine.exec(async client => {
+    return this.engine.exec(async (client) => {
       let doc = await client.find<PaymentChannelJSON>(query)
       return this.inflatePaymentChannel(doc[0])
     })
@@ -43,35 +46,38 @@ export class NedbChannelsDatabase extends AbstractChannelsDatabase<EngineNedb> i
   /**
    * Set amount of money spent on the channel.
    */
-  async spend (channelId: ChannelId | string, spent: BigNumber): Promise<void> {
+  async spend(channelId: `0x${string}`, spent: bigint): Promise<void> {
     const query = {
       kind: this.kind,
-      channelId: channelId.toString()
+      channelId: channelId,
     }
     const update = {
       $set: {
-        spent: spent.toString()
-      }
+        spent: spent.toString(),
+      },
     }
 
-    await this.engine.exec(client => {
+    await this.engine.exec((client) => {
       return client.update(query, update, {})
     })
   }
 
-  async deposit (channelId: ChannelId | string, value: BigNumber): Promise<void> {
+  async deposit(
+    channelId: `0x${string}`,
+    value: bigint,
+  ): Promise<void> {
     const channel = await this.firstById(channelId)
     if (!channel) {
       throw new Error('Channel not found.')
     }
-    const query = { kind: this.kind, channelId: channelId.toString() }
-    const newValue = channel.value.plus(value)
+    const query = { kind: this.kind, channelId: channelId }
+    const newValue = channel.value + value
     const update = {
       $set: {
-        value: newValue.toString()
-      }
+        value: newValue.toString(),
+      },
     }
-    await this.engine.exec(client => {
+    await this.engine.exec((client) => {
       return client.update(query, update, {})
     })
   }
@@ -81,82 +87,107 @@ export class NedbChannelsDatabase extends AbstractChannelsDatabase<EngineNedb> i
    *
    * @return {Promise<PaymentChannel>}
    */
-  async all (): Promise<Array<PaymentChannel>> {
-    let raw = await this.engine.exec(client => {
+  async all(): Promise<Array<PaymentChannel>> {
+    let raw = await this.engine.exec((client) => {
       return client.find<PaymentChannelJSON>({ kind: this.kind })
     })
     return this.inflatePaymentChannels(raw)
   }
 
-  async allOpen (): Promise<PaymentChannel[]> {
-    let raw = await this.engine.exec(client => {
+  async allOpen(): Promise<PaymentChannel[]> {
+    let raw = await this.engine.exec((client) => {
       return client.find<PaymentChannelJSON>({ kind: this.kind, state: 0 })
     })
     let channels = await this.inflatePaymentChannels(raw)
     return this.filterByState(0, channels)
   }
 
-  async findUsable (sender: string, receiver: string, amount: BigNumber): Promise<PaymentChannel | null> {
+  async findUsable(
+    sender: `0x${string}`,
+    receiver: `0x${string}`,
+    amount: bigint,
+  ): Promise<PaymentChannel | null> {
     const query = {
       kind: this.kind,
       state: 0,
       sender,
-      receiver
+      receiver,
     }
-    let raw = await this.engine.exec(client => {
+    let raw = await this.engine.exec((client) => {
       return client.find<PaymentChannelJSON>(query)
     })
     let channels = await this.inflatePaymentChannels(raw)
     let filtered = this.filterByState(0, channels)
-    return filtered.find((chan: PaymentChannel) => chan.value.isGreaterThanOrEqualTo(chan.spent.plus(amount))) || null
+    return (
+      filtered.find((chan: PaymentChannel) =>
+        chan.value >= (chan.spent + amount)
+      ) || null
+    )
   }
 
-  async findBySenderReceiver (sender: string, receiver: string): Promise<Array<PaymentChannel>> {
-    let raw = await this.engine.exec(client => {
-      return client.find<PaymentChannelJSON>({ sender, receiver, kind: this.kind })
+  async findBySenderReceiver(
+    sender: `0x${string}`,
+    receiver: `0x${string}`,
+  ): Promise<Array<PaymentChannel>> {
+    let raw = await this.engine.exec((client) => {
+      return client.find<PaymentChannelJSON>({
+        sender,
+        receiver,
+        kind: this.kind,
+      })
     })
     return this.inflatePaymentChannels(raw)
   }
 
-  async findBySenderReceiverChannelId (sender: string, receiver: string, channelId: ChannelId | string): Promise<PaymentChannel | null> {
+  async findBySenderReceiverChannelId(
+    sender: `0x${string}`,
+    receiver: `0x${string}`,
+    channelId: `0x${string}`,
+  ): Promise<PaymentChannel | null> {
     let query = {
       sender,
       receiver,
-      channelId: channelId.toString(),
-      kind: this.kind
+      channelId: channelId,
+      kind: this.kind,
     }
-    let res = await this.engine.exec(client => {
+    let res = await this.engine.exec((client) => {
       return client.find<PaymentChannelJSON>(query)
     })
     return this.inflatePaymentChannel(res[0])
   }
 
-  async updateState (channelId: ChannelId | string, state: number): Promise<void> {
+  async updateState(
+    channelId: `0x${string}`,
+    state: number,
+  ): Promise<void> {
     const query = {
       kind: this.kind,
-      channelId: channelId.toString()
+      channelId: channelId,
     }
     const update = {
       $set: {
-        state
-      }
+        state,
+      },
     }
-    await this.engine.exec(client => {
+    await this.engine.exec((client) => {
       return client.update(query, update, {})
     })
   }
 
-  async updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber): Promise<void> {
+  async updateSettlingUntil(
+    channelId: `0x${string}`,
+    settlingUntil: bigint,
+  ): Promise<void> {
     const query = {
       kind: this.kind,
-      channelId: channelId.toString()
+      channelId: channelId,
     }
     const update = {
       $set: {
-        settlingUntil: settlingUntil.toString()
-      }
+        settlingUntil: settlingUntil.toString(),
+      },
     }
-    await this.engine.exec(client => {
+    await this.engine.exec((client) => {
       return client.update(query, update, {})
     })
   }

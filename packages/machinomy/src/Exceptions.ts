@@ -1,35 +1,35 @@
 export class PaymentNotValidError extends Error {
-  constructor () {
+  constructor() {
     super('Invalid payment.')
   }
 }
 
 export class TransportVersionNotSupportError extends Error {
-  constructor () {
+  constructor() {
     super('Transport version not supported')
   }
 }
 
 export class InvalidUrlError extends Error {
-  constructor () {
+  constructor() {
     super('Invalid url')
   }
 }
 
 export class BadResponseError extends Error {
-  constructor () {
+  constructor() {
     super('Received bad response from content server.')
   }
 }
 
 export class IvalidTypeError extends Error {
-  constructor (typeName: string, properyName: string) {
+  constructor(typeName: string, properyName: string) {
     super(`Object is not ${typeName}: expected ${properyName}`)
   }
 }
 
 export class InvalidChannelError extends Error {
-  constructor (fieldName: string) {
+  constructor(fieldName: string) {
     super(`Channel is not valid or not owned: wrong field ${fieldName}`)
   }
 }

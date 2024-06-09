@@ -7,19 +7,19 @@ export default class EnginePostgres implements IEngine, IExec<pg.Client> {
   private connectionInProgress?: Promise<pg.Client>
   private _client?: pg.Client
 
-  constructor (url?: string) {
+  constructor(url?: string) {
     this.url = url
   }
 
-  async connect (): Promise<void> {
+  async connect(): Promise<void> {
     await this.ensureConnection()
   }
 
-  isConnected (): boolean {
+  isConnected(): boolean {
     return Boolean(this._client)
   }
 
-  async close (): Promise<void> {
+  async close(): Promise<void> {
     if (!this._client) {
       return Promise.resolve()
     }
@@ -28,22 +28,22 @@ export default class EnginePostgres implements IEngine, IExec<pg.Client> {
     this._client = undefined
   }
 
-  async drop (): Promise<void> {
-    await this.exec(client => {
+  async drop(): Promise<void> {
+    await this.exec((client) => {
       return Promise.all([
         client.query('TRUNCATE channel CASCADE'),
         client.query('TRUNCATE payment CASCADE'),
-        client.query('TRUNCATE token CASCADE')
+        client.query('TRUNCATE token CASCADE'),
       ])
     })
   }
 
-  async exec<B> (fn: (client: pg.Client) => B): Promise<B> {
+  async exec<B>(fn: (client: pg.Client) => B): Promise<B> {
     let client = await this.ensureConnection()
     return fn(client)
   }
 
-  async ensureConnection (): Promise<pg.Client> {
+  async ensureConnection(): Promise<pg.Client> {
     if (this._client) {
       return this._client
     }

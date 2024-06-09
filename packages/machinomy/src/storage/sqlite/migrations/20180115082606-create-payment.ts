@@ -1,7 +1,7 @@
-import Base, { CallbackFunction } from 'db-migrate-base'
+import { CallbackFunction } from 'db-migrate-base'
 import bigNumberColumn from './util/bigNumberColumn'
 
-export function up (db: Base, callback: CallbackFunction) {
+export function up(db: any, callback: CallbackFunction) {
   const createTableOptions = {
     columns: {
       channelId: {
@@ -12,15 +12,15 @@ export function up (db: Base, callback: CallbackFunction) {
           table: 'channel',
           mapping: 'channelId',
           rules: {
-            onDelete: 'CASCADE'
-          }
-        }
+            onDelete: 'CASCADE',
+          },
+        },
       },
       kind: 'string',
       token: {
         type: 'string',
         notNull: true,
-        unique: true
+        unique: true,
       },
       sender: 'string',
       receiver: 'string',
@@ -31,13 +31,13 @@ export function up (db: Base, callback: CallbackFunction) {
       r: 'string',
       s: 'string',
       meta: 'string',
-      contractAddress: 'string'
+      contractAddress: 'string',
     },
-    ifNotExists: true
+    ifNotExists: true,
   }
   db.createTable('payment', createTableOptions, callback)
 }
 
-export function down (db: Base, callback: CallbackFunction) {
+export function down(db: any, callback: CallbackFunction) {
   db.dropTable('payment', callback)
 }

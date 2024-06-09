@@ -1,4 +1,3 @@
-import { BigNumber } from 'bignumber.js'
 import { MigrateOption } from './MigrateOption'
 import { Transport } from './transport'
 
@@ -8,19 +7,19 @@ import { Transport } from './transport'
  */
 export interface MachinomyOptions {
   databaseUrl: string
-  minimumChannelAmount?: number | BigNumber
+  minimumChannelAmount?: bigint
   minimumSettlementPeriod?: number
-  settlementPeriod?: number,
+  settlementPeriod?: number
   closeOnInvalidPayment?: boolean
-  migrate?: MigrateOption,
-  chainCachePeriod?: number,
+  migrate?: MigrateOption
+  chainCachePeriod?: number
   transport?: Transport
 }
 
 export namespace MachinomyOptions {
-  export function defaults (options?: MachinomyOptions): MachinomyOptions {
+  export function defaults(options?: MachinomyOptions): MachinomyOptions {
     let defaultOptions = {
-      databaseUrl: 'nedb://machinomy'
+      databaseUrl: 'nedb://machinomy',
     }
     return Object.assign({}, defaultOptions, options)
   }

@@ -1,18 +1,24 @@
-import Web3 from 'web3'
 import Signature from './Signature'
+import { WalletClient } from 'viem'
 
 export default class ChainManager {
-  private web3: Web3
+  private _walletClient: WalletClient
 
-  constructor (web3: Web3) {
-    this.web3 = web3
+  constructor(walletClient: WalletClient) {
+    this._walletClient = walletClient
   }
 
-  async sign (address: string, data: string): Promise<Signature> {
-    return new Promise<Signature>((resolve, reject) => {
-      this.web3.eth.sign(address, data, (error, signature) => {
-        error ? reject(error) : resolve(new Signature(signature))
-      })
+  async sign(address: `0x${string}`, data: `0x${string}`): Promise<Signature> {
+    return new Promise<Signature>(async (resolve, reject) => {
+      try {
+        const signature = await this._walletClient.signMessage({
+          message: data,
+          account: address,
+        })
+        resolve(new Signature(signature))
+      } catch (error) {
+        reject(error)
+      }
     })
   }
 }

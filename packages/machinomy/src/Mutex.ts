@@ -7,11 +7,11 @@ export default class Mutex {
 
   private queues = new Map<string, Semaphore>()
 
-  synchronize<T> (task: Task<T>): Promise<T> {
+  synchronize<T>(task: Task<T>): Promise<T> {
     return this.synchronizeOn(Mutex.DEFAULT_QUEUE, task)
   }
 
-  async synchronizeOn<T> (key: string, task: Task<T>): Promise<T> {
+  async synchronizeOn<T>(key: string, task: Task<T>): Promise<T> {
     let semaphore = this.queues.get(key)
     if (!semaphore) {
       semaphore = new Semaphore(1)

@@ -1,23 +1,27 @@
 import { InvalidUrlError } from './Exceptions'
 import { parse } from 'url'
+
 export class PaymentRequiredRequest {
-  sender: string
+  sender: `0x${string}`
   datetime?: number
-  constructor (sender: string, datetime?: number) {
+  constructor(sender: `0x${string}`, datetime?: number) {
     this.sender = sender
     this.datetime = datetime
   }
 }
 
 export class PaymentRequiredRequestSerializer {
-  static instance: PaymentRequiredRequestSerializer = new PaymentRequiredRequestSerializer()
+  static instance: PaymentRequiredRequestSerializer =
+    new PaymentRequiredRequestSerializer()
 
-  serialize (obj: PaymentRequiredRequest, baseurl: string): string {
-    const url = `${baseurl}?sender=${obj.sender}${obj.datetime ? `&timestamp=${obj.datetime}` : ''}`
+  serialize(obj: PaymentRequiredRequest, baseurl: string): string {
+    const url = `${baseurl}?sender=${obj.sender}${
+      obj.datetime ? `&timestamp=${obj.datetime}` : ''
+    }`
     return url
   }
 
-  deserialize (urlString: string): PaymentRequiredRequest {
+  deserialize(urlString: string): PaymentRequiredRequest {
     const url = parse(urlString)
     if (!url.query) {
       throw new InvalidUrlError()
@@ -39,7 +43,7 @@ export class PaymentRequiredRequestSerializer {
     }
     return {
       sender: sender,
-      datetime: datetime
+      datetime: datetime,
     }
   }
 }

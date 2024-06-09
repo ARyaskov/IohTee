@@ -1,6 +1,6 @@
-import Base, { CallbackFunction } from 'db-migrate-base'
+import { CallbackFunction } from 'db-migrate-base'
 
-export function up (db: Base, callback: CallbackFunction) {
+export function up(db: any, callback: CallbackFunction) {
   const createTableOptions = {
     columns: {
       token: 'string',
@@ -13,16 +13,16 @@ export function up (db: Base, callback: CallbackFunction) {
           table: 'channel',
           mapping: 'channelId',
           rules: {
-            onDelete: 'CASCADE'
-          }
-        }
-      }
+            onDelete: 'CASCADE',
+          },
+        },
+      },
     },
-    ifNotExists: true
+    ifNotExists: true,
   }
   db.createTable('token', createTableOptions, callback)
 }
 
-export function down (db: Base, callback: CallbackFunction) {
+export function down(db: any, callback: CallbackFunction) {
   db.dropTable('token', callback)
 }

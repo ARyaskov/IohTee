@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "sourceRoot": "src/",
+    "inlineSourceMap": true,
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "outDir": "lib/types",
+    "types": [
+      "@types/node",
+      "@types/mocha"
+    ],
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

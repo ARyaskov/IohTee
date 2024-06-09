@@ -1,28 +1,29 @@
-import os from 'os'
+import { homedir } from 'node:os'
 import Logger from '@machinomy/logger'
-import path = require('path')
-import Web3 = require('web3')
+import { resolve, join } from 'node:path'
+import { createPublicClient, http, createWalletClient, PublicClient, WalletClient, Chain } from 'viem'
+import { polygon, polygonAmoy} from 'viem/chains'
 import * as env from './env'
-
-declare var web3: Web3 | undefined
+import {NetworkType} from "@riaskov/machinomy-contracts";
 
 const BASE_DIR = '.machinomy'
 const CONFIGURATION_FILE = 'config.json'
 const DATABASE_FILE = 'storage.db'
-export const VERSION = '0.0.3'
+export const VERSION = '2.0.0'
 export const PROTOCOL = 'machinomy/' + VERSION
 export const PAYWALL_PATH = 'api/paywall/' + PROTOCOL
 
 const log = new Logger('configuration')
 
 const CONTRACTS = {
-  development: '0xede26550428812f833ad7a8d1a9019561d243d6c',
-  ropsten: '0xc582877dec917b21fa6b0dc68101b5c01f966325'
+  development: '0x',
+  polygon: '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
+  polygonAmoy: '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
 }
 
 export const contractAddress = (): string => {
   const container = env.container()
-  const network = container.MACHINOMY_NETWORK || 'ropsten'
+  const network = container.MACHINOMY_NETWORK || 'polygonAmoy'
   const address = container.CONTRACT_ADDRESS
   if (address) {
     return address
@@ -32,15 +33,15 @@ export const contractAddress = (): string => {
 }
 
 export const baseDirPath = (): string => {
-  return path.resolve(path.join(os.homedir(), BASE_DIR))
+  return resolve(join(homedir(), BASE_DIR))
 }
 
 export const configFilePath = (): string => {
-  return path.join(baseDirPath(), CONFIGURATION_FILE)
+  return join(baseDirPath(), CONFIGURATION_FILE)
 }
 
 const databaseFilePath = (): string => {
-  return 'nedb://' + path.join(baseDirPath(), DATABASE_FILE)
+  return 'nedb://' + join(baseDirPath(), DATABASE_FILE)
 }
 
 export interface IConfigurationOptions {
@@ -56,7 +57,7 @@ export class Configuration {
   public databaseUrl: string
   public path: string
 
-  constructor (options: IConfigurationOptions) {
+  constructor(options: IConfigurationOptions) {
     this.account = options.account
     this.password = options.password
     this.databaseUrl = options.databaseUrl || databaseFilePath()
@@ -82,8 +83,9 @@ export const sender = (): Configuration => {
     const options = configurationOptions()
     return new Configuration({
       account: process.env.MACHINOMY_SENDER_ACCOUNT || options.sender.account,
-      password: process.env.MACHINOMY_SENDER_PASSWORD || options.sender.password,
-      engine: process.env.MACHINOMY_DATABASE_URL || options.sender.databaseUrl
+      password:
+        process.env.MACHINOMY_SENDER_PASSWORD || options.sender.password,
+      engine: process.env.MACHINOMY_DATABASE_URL || options.sender.databaseUrl,
     })
   } catch (error) {
     return new Configuration({})
@@ -94,9 +96,12 @@ export const receiver = (): Configuration => {
   try {
     const options = configurationOptions()
     return new Configuration({
-      account: process.env.MACHINOMY_RECEIVER_ACCOUNT || options.receiver.account,
-      password: process.env.MACHINOMY_RECEIVER_PASSWORD || options.receiver.password,
-      engine: process.env.MACHINOMY_DATABASE_URL || options.receiver.databaseUrl
+      account:
+        process.env.MACHINOMY_RECEIVER_ACCOUNT || options.receiver.account,
+      password:
+        process.env.MACHINOMY_RECEIVER_PASSWORD || options.receiver.password,
+      engine:
+        process.env.MACHINOMY_DATABASE_URL || options.receiver.databaseUrl,
     })
   } catch (error) {
     log.error(error)
@@ -104,12 +109,54 @@ export const receiver = (): Configuration => {
   }
 }
 
-export function currentProvider (): Web3.Provider {
-  if (typeof web3 !== 'undefined') {
-    // Use Mist/MetaMask's provider
-    return web3.currentProvider
+export function publicClient(): PublicClient {
+  const defaultRpcUrl = process.env.MACHINOMY_GETH_ADDR || 'http://localhost:8545'
+
+  if (typeof window !== 'undefined' && (window as any).ethereum) {
+    const publicClient = createPublicClient({
+      chain: polygonAmoy, // TODO make a multiple chains
+      transport: (window as any).ethereum,
+    })
+    return publicClient as any
   } else {
-    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-    return new Web3.providers.HttpProvider(process.env.MACHINOMY_GETH_ADDR || 'http://localhost:8545')
+    const publicClient = createPublicClient({
+      chain: polygonAmoy, // TODO make a multiple chains
+      transport: http(defaultRpcUrl),
+    })
+    return publicClient as any
   }
+}
+
+export function walletClient(chain: Chain = polygonAmoy): WalletClient {
+  const defaultRpcUrl = process.env.MACHINOMY_GETH_ADDR || 'http://localhost:8545';
+
+  if (typeof window !== 'undefined' && (window as any).ethereum) {
+    const walletClient = createWalletClient({
+      chain: chain,
+      transport: (window as any).ethereum,
+    });
+    return walletClient as WalletClient;
+  } else {
+    const walletClient = createWalletClient({
+      chain: chain,
+      transport: http(defaultRpcUrl),
+    })
+    return walletClient as WalletClient
+  }
+}
+
+export function httpRpc(chain: NetworkType): string {
+  const defaultRpcUrl = process.env.MACHINOMY_HTTP_RPC || 'http://localhost:8545';
+  let result = defaultRpcUrl
+  if (chain === polygon) {
+    result = process.env.POLYGON_RPC_URL!
+  } else if (chain === polygonAmoy) {
+    result = process.env.POLYGON_AMOY_RPC_URL!
+  }
+
+  return result
+}
+
+export function mnemonic(): string {
+  return process.env.ACCOUNT_MNEMONIC!
 }

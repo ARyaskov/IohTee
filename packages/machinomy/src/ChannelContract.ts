@@ -1,110 +1,169 @@
 import Logger from '@machinomy/logger'
-import Web3 from 'web3'
-import { BigNumber } from 'bignumber.js'
-import { TransactionResult } from 'truffle-contract'
-import ChannelEthContract from './ChannelEthContract'
 import ChannelInflator from './ChannelInflator'
-import ChannelTokenContract from './ChannelTokenContract'
-import Signature from './Signature'
-import ChannelId from './ChannelId'
 import IChannelsDatabase from './storage/IChannelsDatabase'
 import Payment from './payment'
-
-export type Channel = [string, string, BigNumber, BigNumber, BigNumber]
-export type ChannelWithTokenContract = [string, string, BigNumber, BigNumber, BigNumber, string]
-export type ChannelFromContract = Channel | ChannelWithTokenContract | undefined
+import { PublicClient, WalletClient, WriteContractReturnType } from 'viem'
+import { Channel, channelId, ChannelState, Unidirectional } from '@riaskov/machinomy-contracts'
 
 const LOG = new Logger('channel-contract')
 
 export default class ChannelContract {
-  channelEthContract: ChannelEthContract
-  channelTokenContract: ChannelTokenContract
+  publicClient: PublicClient
+  walletClient: WalletClient
+  channelEthContract: Unidirectional
+  // channelTokenContract: ChannelTokenContract
   channelsDao: IChannelsDatabase
 
-  constructor (web3: Web3, channelsDao: IChannelsDatabase, channelEthContract: ChannelEthContract, channelTokenContract: ChannelTokenContract) {
+  constructor(
+    publicClient: PublicClient,
+    walletClient: WalletClient,
+    channelsDao: IChannelsDatabase,
+    channelEthContract: Unidirectional,
+    // channelTokenContract: ChannelTokenContract,
+  ) {
+    this.publicClient = publicClient
+    this.walletClient = walletClient
     this.channelEthContract = channelEthContract
-    this.channelTokenContract = channelTokenContract
+    // this.channelTokenContract = channelTokenContract
     this.channelsDao = channelsDao
   }
 
-  async open (sender: string, receiver: string, value: BigNumber, settlementPeriod: number | BigNumber, channelId?: ChannelId | string, tokenContract?: string): Promise<TransactionResult> {
+  async open(
+    sender: `0x${string}`,
+    receiver: `0x${string}`,
+    value: bigint,
+    settlementPeriod: bigint,
+    channelIdentifier?: `0x${string}`,
+    tokenContract?: string,
+  ): Promise<Channel> {
+    if (!channelIdentifier) {
+      channelIdentifier = channelId()
+    }
+
     if (ChannelInflator.isTokenContractDefined(tokenContract)) {
-      return this.channelTokenContract.open(sender, receiver, value, settlementPeriod, tokenContract!, channelId)
+      // TODO FIXME return this.channelTokenContract.open(sender, receiver, value, settlementPeriod, tokenContract!, channelId)
+      return this.channelEthContract.open(
+        channelIdentifier,
+        receiver,
+        settlementPeriod,
+        value,
+        sender,
+      )
     } else {
-      return this.channelEthContract.open(sender, receiver, value, settlementPeriod, channelId)
+      return this.channelEthContract.open(
+        channelIdentifier,
+        receiver,
+        settlementPeriod,
+        value,
+        sender,
+      )
     }
   }
 
-  async claim (receiver: string, channelId: string, value: BigNumber, signature: Signature): Promise<TransactionResult> {
+  async claim(
+    channelId: `0x${string}`,
+    value: bigint,
+    signature: `0x${string}`,
+    receiver: `0x${string}`,
+  ): Promise<WriteContractReturnType> {
     const contract = await this.getContractByChannelId(channelId)
-    return contract.claim(receiver, channelId, value, signature)
+    return contract.claim(channelId, value, signature, receiver)
   }
 
-  async deposit (sender: string, channelId: string, value: BigNumber, tokenContract?: string): Promise<TransactionResult> {
+  async deposit(
+    sender: `0x${string}`,
+    channelId: `0x${string}`,
+    value: bigint,
+    tokenContract?: `0x${string}`,
+  ): Promise<WriteContractReturnType> {
     if (ChannelInflator.isTokenContractDefined(tokenContract)) {
-      return this.channelTokenContract.deposit(sender, channelId, value, tokenContract!)
+      // TODO FIXME return this.channelTokenContract.deposit(sender, channelId, value, tokenContract!)
+      return this.channelEthContract.deposit(channelId, value, sender)
     } else {
-      return this.channelEthContract.deposit(sender, channelId, value)
+      return this.channelEthContract.deposit(channelId, value, sender)
     }
   }
 
-  async getState (channelId: string): Promise<number> {
+  async channelState(channelId: `0x${string}`): Promise<ChannelState> {
     const contract = await this.getContractByChannelId(channelId)
-    return contract.getState(channelId)
+    return contract.channelState(channelId)
   }
 
-  async getSettlementPeriod (channelId: string): Promise<BigNumber> {
+  async getSettlementPeriod(channelId: `0x${string}`): Promise<bigint> {
     const contract = await this.getContractByChannelId(channelId)
     return contract.getSettlementPeriod(channelId)
   }
 
-  async startSettle (account: string, channelId: string): Promise<TransactionResult> {
+  async startSettle(
+    channelId: `0x${string}`,
+    account: `0x${string}`
+  ): Promise<WriteContractReturnType> {
     const contract = await this.getContractByChannelId(channelId)
-    return contract.startSettle(account, channelId)
+    return contract.startSettling(channelId, account)
   }
 
-  async finishSettle (account: string, channelId: string): Promise<TransactionResult> {
+  async finishSettle(
+    channelId: `0x${string}`,
+    account: `0x${string}`,
+  ): Promise<WriteContractReturnType> {
     const contract = await this.getContractByChannelId(channelId)
-    return contract.finishSettle(account, channelId)
+    return contract.settle(channelId, account)
   }
 
-  async paymentDigest (channelId: string, value: BigNumber): Promise<string> {
+  async paymentDigest(
+    channelId: `0x${string}`,
+    value: bigint,
+  ): Promise<`0x${string}`> {
     const channel = await this.channelsDao.firstById(channelId)
     if (channel) {
       const tokenContract = channel.tokenContract
       if (ChannelInflator.isTokenContractDefined(tokenContract)) {
-        return this.channelTokenContract.paymentDigest(channelId, value, tokenContract)
+        // TODO FIXME return this.channelTokenContract.paymentDigest(channelId, value, tokenContract)
+        return this.channelEthContract.paymentDigest(channelId, value)
       } else {
         return this.channelEthContract.paymentDigest(channelId, value)
       }
     } else {
       throw new Error(`Channel ${channelId} is not found`)
     }
-
   }
 
-  async canClaim (payment: Payment): Promise<boolean> {
-    const channelId: string = payment.channelId
-    const value: BigNumber = payment.value
-    const receiver: string = payment.receiver
-    const signature: Signature = payment.signature
+  async canClaim(payment: Payment): Promise<boolean> {
+    const channelId: `0x${string}` = payment.channelId
+    const value: bigint = payment.value
+    const receiver: `0x${string}` = payment.receiver
+    const signature: `0x${string}` = payment.signature
     if (ChannelInflator.isTokenContractDefined(payment.tokenContract)) {
-      return this.channelTokenContract.canClaim(channelId, value, receiver, signature)
+      // TODO FIXME return this.channelTokenContract.canClaim(channelId, value, receiver, signature)
+      return this.channelEthContract.canClaim(
+        channelId,
+        value,
+        receiver,
+        signature,
+      )
     } else {
-      return this.channelEthContract.canClaim(channelId, value, receiver, signature)
+      return this.channelEthContract.canClaim(
+        channelId,
+        value,
+        receiver,
+        signature,
+      )
     }
   }
 
-  async channelById (channelId: string): Promise<ChannelFromContract> {
+  async channel(channelId: `0x${string}`): Promise<Channel> {
     const contract = await this.getContractByChannelId(channelId)
-    return contract.channelById(channelId)
+    return contract.channel(channelId)
   }
 
-  async getContractByChannelId (channelId: string): Promise<ChannelEthContract | ChannelTokenContract> {
+  async getContractByChannelId(
+    channelId: `0x${string}`,
+  ): Promise<Unidirectional> {
     const channel = await this.channelsDao.firstById(channelId)
     if (channel) {
-      const tokenContract = channel.tokenContract
-      return ChannelInflator.isTokenContractDefined(tokenContract) ? this.channelTokenContract : this.channelEthContract
+      // const tokenContract = channel.tokenContract
+      // TODO FIXME return ChannelInflator.isTokenContractDefined(tokenContract) ? this.channelTokenContract : this.channelEthContract
+      return this.channelEthContract
     } else {
       LOG.info(`getContractByChannelId(): Channel ${channelId} is undefined`)
       return this.channelEthContract

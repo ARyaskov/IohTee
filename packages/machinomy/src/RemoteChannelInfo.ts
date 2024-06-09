@@ -1,14 +1,13 @@
 import Serde from './Serde'
-import { BigNumber } from 'bignumber.js'
 import { IvalidTypeError } from './Exceptions'
 import Signature from './Signature'
 
 export class RemoteChannelInfo {
-  channelId: string
-  spent: BigNumber
+  channelId: `0x${string}`
+  spent: bigint
   sign: Signature
 
-  constructor (channelId: string, spent: BigNumber, sign: Signature) {
+  constructor(channelId: `0x${string}`, spent: bigint, sign: Signature) {
     this.channelId = channelId
     this.spent = spent
     this.sign = sign
@@ -18,15 +17,15 @@ export class RemoteChannelInfo {
 export class RemoteChannelInfoSerde implements Serde<RemoteChannelInfo> {
   static instance: RemoteChannelInfoSerde = new RemoteChannelInfoSerde()
 
-  serialize (obj: RemoteChannelInfo): object {
+  serialize(obj: RemoteChannelInfo): object {
     return {
       channelId: obj.channelId,
       spent: obj.spent.toString(),
-      sign: obj.sign.toString()
+      sign: obj.sign.toString(),
     }
   }
 
-  deserialize (data: any): RemoteChannelInfo {
+  deserialize(data: any): RemoteChannelInfo {
     if (!data.channelId) {
       throw new IvalidTypeError(RemoteChannelInfo.name, 'channelId')
     }
@@ -39,15 +38,15 @@ export class RemoteChannelInfoSerde implements Serde<RemoteChannelInfo> {
 
     return {
       channelId: data.channelId,
-      spent: new BigNumber(data.spent),
-      sign: Signature.fromRpcSig(data.sign)
+      spent: BigInt(data.spent),
+      sign: Signature.fromRpcSig(data.sign),
     }
   }
 }
 
 export class RemoteChannelInfos {
   channels: RemoteChannelInfo[]
-  constructor (channels: RemoteChannelInfo[]) {
+  constructor(channels: RemoteChannelInfo[]) {
     this.channels = channels
   }
 }
@@ -55,16 +54,20 @@ export class RemoteChannelInfos {
 export class RemoteChannelInfosSerde implements Serde<RemoteChannelInfos> {
   static instance: RemoteChannelInfosSerde = new RemoteChannelInfosSerde()
 
-  serialize (obj: RemoteChannelInfos): object {
-    return obj.channels.map(channel => RemoteChannelInfoSerde.instance.serialize(channel))
+  serialize(obj: RemoteChannelInfos): object {
+    return obj.channels.map((channel) =>
+      RemoteChannelInfoSerde.instance.serialize(channel),
+    )
   }
 
-  deserialize (data: any): RemoteChannelInfos {
+  deserialize(data: any): RemoteChannelInfos {
     if (!data.map) {
       throw new IvalidTypeError(RemoteChannelInfosSerde.name, 'map')
     }
     return {
-      channels: data.map((channel: any) => RemoteChannelInfoSerde.instance.deserialize(channel))
+      channels: data.map((channel: any) =>
+        RemoteChannelInfoSerde.instance.deserialize(channel),
+      ),
     }
   }
 }

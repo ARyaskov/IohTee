@@ -22,11 +22,10 @@ describe('EnginePostgres', () => {
     it('connects to the database', () => {
       const stub = sinon.stub(PGClient.prototype, 'connect').resolves()
 
-      return engine.connect()
-        .then(() => {
-          expect(stub.callCount).toBe(1)
-          stub.restore()
-        })
+      return engine.connect().then(() => {
+        expect(stub.callCount).toBe(1)
+        stub.restore()
+      })
     })
 
     it('prevents multiple concurrent connections', () => {
@@ -35,7 +34,7 @@ describe('EnginePostgres', () => {
       return Promise.all([
         engine.connect(),
         engine.connect(),
-        engine.connect()
+        engine.connect(),
       ]).then(() => {
         expect(stub.callCount).toBe(1)
         stub.restore()
@@ -45,11 +44,10 @@ describe('EnginePostgres', () => {
     it('marks isConnected as true', () => {
       const stub = sinon.stub(PGClient.prototype, 'connect').resolves()
 
-      return engine.connect()
-        .then(() => {
-          expect(engine.isConnected()).toBe(true)
-          stub.restore()
-        })
+      return engine.connect().then(() => {
+        expect(engine.isConnected()).toBe(true)
+        stub.restore()
+      })
     })
   })
 
@@ -58,7 +56,8 @@ describe('EnginePostgres', () => {
       const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
       const endStub = sinon.stub(PGClient.prototype, 'end').resolves()
 
-      return engine.connect()
+      return engine
+        .connect()
         .then(() => engine.close())
         .then(() => expect(endStub.callCount).toBe(1))
         .then(() => {
@@ -71,7 +70,8 @@ describe('EnginePostgres', () => {
       const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
       const endStub = sinon.stub(PGClient.prototype, 'end').resolves()
 
-      return engine.connect()
+      return engine
+        .connect()
         .then(() => engine.close())
         .then(() => {
           expect(engine.isConnected()).toBe(false)
@@ -86,7 +86,8 @@ describe('EnginePostgres', () => {
       const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
       const queryStub = sinon.stub(PGClient.prototype, 'query').resolves()
 
-      return engine.connect()
+      return engine
+        .connect()
         .then(() => engine.drop())
         .then(() => {
           expect(queryStub.callCount).toBe(3)
@@ -102,12 +103,11 @@ describe('EnginePostgres', () => {
       const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
       const queryStub = sinon.stub(PGClient.prototype, 'query').resolves()
 
-      return engine.drop()
-        .then(() => {
-          expect(connectStub.callCount).toBe(1)
-          connectStub.restore()
-          queryStub.restore()
-        })
+      return engine.drop().then(() => {
+        expect(connectStub.callCount).toBe(1)
+        connectStub.restore()
+        queryStub.restore()
+      })
     })
   })
 
@@ -115,15 +115,21 @@ describe('EnginePostgres', () => {
     it('returns an instance of the client', () => {
       const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
 
-      return engine.connect()
-        .then(() => engine.exec((client: any) => expect(client instanceof PGClient).toBe(true)))
+      return engine
+        .connect()
+        .then(() =>
+          engine.exec((client: any) =>
+            expect(client instanceof PGClient).toBe(true),
+          ),
+        )
         .then(() => connectStub.restore())
     })
 
     it('lazily connects to the database', () => {
       const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
 
-      return engine.exec(() => 'beep')
+      return engine
+        .exec(() => 'beep')
         .then(() => expect(connectStub.callCount).toBe(1))
         .then(() => connectStub.restore())
     })

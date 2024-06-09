@@ -1,7 +1,5 @@
-import { Web3 } from 'web3'
-import { memoize } from 'decko'
-import ChannelEthContract from './ChannelEthContract'
-import ChannelTokenContract from './ChannelTokenContract'
+// import { memoize } from 'decko'
+import { PublicClient, WalletClient } from 'viem'
 import ChannelInflator from './ChannelInflator'
 import Storage from './Storage'
 import MachinomyOptions from './MachinomyOptions'
@@ -12,77 +10,108 @@ import PaymentManager from './PaymentManager'
 import ChainManager from './ChainManager'
 import Client, { ClientImpl } from './client'
 import { Transport } from './transport'
+import { Unidirectional } from '@riaskov/machinomy-contracts'
 
 export default class Registry {
-  account: string
-  web3: Web3
+  account: `0x${string}`
+  publicClient: PublicClient
+  walletClient: WalletClient
   options: MachinomyOptions
 
-  constructor (account: string, web3: Web3, options: MachinomyOptions) {
+  constructor(
+    account: `0x${string}`,
+    publicClient: PublicClient,
+    walletClient: WalletClient,
+    options: MachinomyOptions,
+  ) {
     this.account = account
-    this.web3 = web3
+    this.publicClient = publicClient
+    this.walletClient = walletClient
     this.options = options
   }
 
-  @memoize
-  async inflator (): Promise<ChannelInflator> {
+  // @memoize
+  async inflator(): Promise<ChannelInflator> {
     const channelEthContract = await this.channelEthContract()
-    const channelTokenContract = await this.channelTokenContract()
-    return new ChannelInflator(channelEthContract, channelTokenContract)
+    // const channelTokenContract = await this.channelTokenContract()
+    return new ChannelInflator(channelEthContract)
   }
 
-  @memoize
-  async channelEthContract (): Promise<ChannelEthContract> {
-    return new ChannelEthContract(this.web3, this.options.chainCachePeriod || 0)
+  // @memoize
+  async channelEthContract(): Promise<Unidirectional> {
+    return new Unidirectional({
+      publicClient: this.publicClient as any,
+      walletClient: this.walletClient as any,
+      cachePeriod: this.options.chainCachePeriod || 0,
+      network: this.publicClient.chain as any,
+    })
   }
 
-  @memoize
-  async channelTokenContract (): Promise<ChannelTokenContract> {
-    return new ChannelTokenContract(this.web3, this.options.chainCachePeriod || 0)
-  }
+  // @memoize
+  // async channelTokenContract (): Promise<ChannelTokenContract> {
+  //   return new ChannelTokenContract(this.web3, this.options.chainCachePeriod || 0)
+  // }
 
-  @memoize
-  async channelContract (): Promise<ChannelContract> {
+  // @memoize
+  async channelContract(): Promise<ChannelContract> {
     const channelEthContract = await this.channelEthContract()
-    const channelTokenContract = await this.channelTokenContract()
+    // const channelTokenContract = await this.channelTokenContract()
     const storage = await this.storage()
     const channelsDatabase = storage.channelsDatabase
-    return new ChannelContract(this.web3, channelsDatabase, channelEthContract, channelTokenContract)
+    return new ChannelContract(
+      this.publicClient,
+      this.walletClient,
+      channelsDatabase,
+      channelEthContract,
+      // channelTokenContract,
+    )
   }
 
-  @memoize
-  async storage (): Promise<Storage> {
+  // @memoize
+  async storage(): Promise<Storage> {
     const inflator = await this.inflator()
     return Storage.build(this.options.databaseUrl, inflator)
   }
 
-  @memoize
-  async chainManager (): Promise<ChainManager> {
-    return new ChainManager(this.web3)
+  // @memoize
+  async chainManager(): Promise<ChainManager> {
+    return new ChainManager(this.walletClient)
   }
 
-  @memoize
-  async paymentManager (): Promise<PaymentManager> {
+  // @memoize
+  async paymentManager(): Promise<PaymentManager> {
     let chainManager = await this.chainManager()
     let channelContract = await this.channelContract()
     return new PaymentManager(chainManager, channelContract, this.options)
   }
 
-  @memoize
-  async client (): Promise<Client> {
-    let transport = this.options.transport ? this.options.transport : new Transport()
+  // @memoize
+  async client(): Promise<Client> {
+    let transport = this.options.transport
+      ? this.options.transport
+      : new Transport()
     let channelManager = await this.channelManager()
     return new ClientImpl(transport, channelManager)
   }
 
-  @memoize
-  async channelManager (): Promise<IChannelManager> {
+  // @memoize
+  async channelManager(): Promise<IChannelManager> {
     let storage = await this.storage()
     let payments = storage.paymentsDatabase
     let channels = storage.channelsDatabase
     let tokens = storage.tokensDatabase
     let channelContract = await this.channelContract()
     let paymentManager = await this.paymentManager()
-    return new ChannelManager(this.account, this.web3, channels, payments, tokens, channelContract, paymentManager, this.options)
+    return new ChannelManager(
+      this.account,
+      this.publicClient,
+      this.walletClient,
+      channels,
+      payments,
+      tokens,
+      channelContract,
+      paymentManager,
+      this.options,
+    )
   }
 }

@@ -1,13 +1,13 @@
 {
-  "extends": "../../tsconfig",
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "sourceRoot": "src/",
     "outDir": "lib/",
     "types": [
       "@machinomy/types-ethereumjs-util",
       "@machinomy/types-eth-sig-util",
-      "@machinomy/types-truffle-contract",
+      "@types/db-migrate-base",
       "@types/mocha",
       "@types/node"
     ]

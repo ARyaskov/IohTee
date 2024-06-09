@@ -1,32 +1,39 @@
-import ChannelEthContract from './ChannelEthContract'
-import ChannelTokenContract from './ChannelTokenContract'
 import { PaymentChannel, PaymentChannelJSON } from './PaymentChannel'
-import { ChannelState } from './ChannelState'
-import { BigNumber } from 'bignumber.js'
+import { Unidirectional, ChannelState } from '@riaskov/machinomy-contracts'
 
 export default class ChannelInflator {
-  channelEthContract: ChannelEthContract
-  channelTokenContract: ChannelTokenContract
+  channelEthContract: Unidirectional
+  // channelTokenContract: ChannelTokenContract
 
-  constructor (channelEthContract: ChannelEthContract, channelTokenContract: ChannelTokenContract) {
+  constructor(
+    channelEthContract: Unidirectional,
+    // channelTokenContract: ChannelTokenContract,
+  ) {
     this.channelEthContract = channelEthContract
-    this.channelTokenContract = channelTokenContract
+    // this.channelTokenContract = channelTokenContract
   }
 
-  static isTokenContractDefined (tokenContract: string | undefined): boolean {
+  static isTokenContractDefined(tokenContract: string | undefined): boolean {
     // tslint:disable-next-line:strict-type-predicates
-    return tokenContract !== undefined && tokenContract !== null && tokenContract.startsWith('0x') && parseInt(tokenContract, 16) !== 0
+    return (
+      tokenContract !== undefined &&
+      tokenContract !== null &&
+      tokenContract.startsWith('0x') &&
+      parseInt(tokenContract, 16) !== 0
+    )
   }
 
-  async inflate (paymentChannelJSON: PaymentChannelJSON): Promise<PaymentChannel | null> {
+  async inflate(
+    paymentChannelJSON: PaymentChannelJSON,
+  ): Promise<PaymentChannel | null> {
     const tokenContract = paymentChannelJSON.tokenContract
     const channelId = paymentChannelJSON.channelId
     const contract = this.actualContract(tokenContract)
-    const state = await contract.getState(channelId)
-    const channel = await contract.channelById(channelId)
+    const state = await contract.channelState(channelId)
+    const channel = await contract.channel(channelId)
     if (channel) {
-      const value = channel[2]
-      const settlingUntil = new BigNumber(channel[4])
+      const value = channel.value
+      const settlingUntil = BigInt(channel.settlingUntil)
 
       return new PaymentChannel(
         paymentChannelJSON.sender,
@@ -37,16 +44,19 @@ export default class ChannelInflator {
         state === ChannelState.Impossible ? ChannelState.Settled : state,
         paymentChannelJSON.tokenContract,
         paymentChannelJSON.settlementPeriod,
-        settlingUntil
+        settlingUntil,
       )
     } else {
       return null
     }
   }
 
-  actualContract (tokenContract?: string): ChannelEthContract | ChannelTokenContract {
+  actualContract(
+    tokenContract?: string,
+  ): Unidirectional /* TODO FIXME | ChannelTokenContract instead of undefined */ {
     if (ChannelInflator.isTokenContractDefined(tokenContract)) {
-      return this.channelTokenContract
+      // return this.channelTokenContract
+      return this.channelEthContract
     } else {
       return this.channelEthContract
     }

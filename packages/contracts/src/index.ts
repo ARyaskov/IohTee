@@ -7,6 +7,7 @@ import {
   createWalletClient,
   getContract,
   http,
+  parseEventLogs,
   ParseEventLogsReturnType,
   PublicClient,
   WalletClient,
@@ -23,16 +24,18 @@ import {
   sepolia,
 } from 'viem/chains'
 import { mnemonicToAccount } from 'viem/accounts'
+import MemoryCache from './caching/MemoryCache'
+import { getTransactionReceipt } from 'viem/actions'
+
 // require used intentionally here, suddenly json import is not working with TS 5.5 even with resolveJsonModule: true
 const uniArtifact = require('../abi/Unidirectional.json')
 
 export interface OpenProps {
-  from: `0x${string}`
-  value: bigint
   gas: number
 }
 
 export interface Channel {
+  channelId: `0x${string}`
   sender: `0x${string}`
   receiver: `0x${string}`
   value: bigint
@@ -42,7 +45,7 @@ export interface Channel {
 
 export interface Event {
   eventName: string
-  args: readonly unknown[] | Record<string, unknown>
+  args: any
   address: `0x${string}`
   blockHash: `0x${string}`
   blockNumber: bigint
@@ -87,6 +90,7 @@ export enum UnidirectionalEventName {
 export type CtorBaseParams = {
   network: NetworkType
   deployedContractAddress?: `0x${string}`
+  cachePeriod?: number
 }
 
 export type CtorAccountParamPure = CtorBaseParams & {
@@ -97,6 +101,13 @@ export type CtorAccountParamPure = CtorBaseParams & {
 export type CtorAccountParamViem = CtorBaseParams & {
   publicClient: PublicClient
   walletClient: WalletClient
+}
+
+export enum ChannelState {
+  Impossible = -1,
+  Open = 0,
+  Settling = 1,
+  Settled = 2,
 }
 
 function isCtorAccountParamPure(
@@ -154,10 +165,10 @@ export class Unidirectional {
   private readonly _walletClient: WalletClient
   private readonly _contract: GetContractReturnType
   private readonly _abi: any
+  private readonly cache: MemoryCache<Object>
 
-  constructor(
-    params: CtorParams,
-  ) {
+  constructor(params: CtorParams) {
+    this.cache = new MemoryCache(1000) // 1 sec
     if (isCtorAccountParamPure(params)) {
       // @ts-ignore
       this._publicClient = createPublicClient({
@@ -224,6 +235,20 @@ export class Unidirectional {
   }
 
   async channel(channelId: `0x${string}`): Promise<Channel> {
+    // const cached = await this.cache.get(channelId)
+    // if (cached) {
+    //   return cached
+    // } else {
+    //   const deployed = await this.contract
+    //
+    //   const exists = await deployed.isPresent(channelId)
+    //   if (!exists) return undefined
+    //
+    //   const instance = await deployed.channels.call(channelId)
+    //   await this.cache.set(channelId, instance)
+    //   return instance
+    // }
+
     const readResult: any = await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
@@ -232,6 +257,7 @@ export class Unidirectional {
     })
 
     return {
+      channelId,
       sender: readResult[0] as never as `0x${string}`,
       receiver: readResult[1] as never as `0x${string}`,
       value: readResult[2] as never as bigint,
@@ -240,22 +266,138 @@ export class Unidirectional {
     }
   }
 
+  async channelState(channelId: `0x${string}`): Promise<ChannelState> {
+    const channel = await this.channel(channelId)
+    if (channel) {
+      const settlingPeriod = channel.settlingPeriod
+      const settlingUntil = channel.settlingUntil
+      if (settlingPeriod > 0 && settlingUntil > 0) {
+        return ChannelState.Settling
+      } else if (settlingPeriod > 0 && settlingUntil === BigInt(0)) {
+        return ChannelState.Open
+      } else {
+        return ChannelState.Settled
+      }
+    } else {
+      return ChannelState.Settled
+    }
+  }
+
   async open(
     channelId: `0x${string}`,
     receiver: `0x${string}`,
-    settlingPeriod: number,
-    props: OpenProps,
-  ): Promise<WriteContractReturnType> {
-    return await this._walletClient.writeContract({
+    settlingPeriod: bigint,
+    value: bigint,
+    from?: `0x${string}`,
+  ): Promise<Channel> {
+    let result
+    const txId = await this._walletClient.writeContract({
       chain: this._walletClient.chain,
       address: this._address,
       abi: this.abi(),
       functionName: 'open',
       args: [channelId, receiver, settlingPeriod],
-      account: props.from,
-      value: props.value,
-      gas: props.gas as never as bigint,
+      account: from ?? this._walletClient.account!.address,
+      value: value,
     })
+
+    const receipt = await getTransactionReceipt(this.publicClient() as any, {
+      hash: txId,
+    })
+
+    const logs = parseEventLogs({
+      abi: this.abi(),
+      logs: receipt.logs,
+    })
+
+    if (!hasEvent(logs, UnidirectionalEventName.DidOpen)) {
+      throw new Error(`Unidirectional#open(): Can not open channel`)
+    } else {
+      const didOpenEvent = extractEventFromLogs(
+        logs,
+        UnidirectionalEventName.DidOpen,
+      )
+      if (!didOpenEvent) {
+        throw new Error(
+          `Unidirectional#open(): Can not find DidOpen event in even`,
+        )
+      } else {
+        result = {
+          channelId: didOpenEvent.args.channelId,
+          sender: didOpenEvent.args.sender,
+          receiver: didOpenEvent.args.receiver,
+          value: didOpenEvent.args.value,
+          settlingPeriod: didOpenEvent.args.settlingPeriod,
+          settlingUntil: didOpenEvent.args.settlingUntil,
+        }
+      }
+    }
+
+    return result
+  }
+
+  async deposit(
+    channelId: `0x${string}`,
+    value: bigint,
+    from?: `0x${string}`,
+  ): Promise<WriteContractReturnType> {
+    return await this._walletClient.writeContract({
+      chain: this._walletClient.chain,
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'deposit',
+      args: [channelId],
+      account: from ?? this._walletClient.account!.address,
+      value: value,
+    })
+  }
+
+  async startSettling(
+    channelId: `0x${string}`,
+    from?: `0x${string}`,
+  ): Promise<WriteContractReturnType> {
+    return await this._walletClient.writeContract({
+      chain: this._walletClient.chain,
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'startSettling',
+      args: [channelId],
+      account: from ?? this._walletClient.account!.address,
+    })
+  }
+
+  async settle(
+    channelId: `0x${string}`,
+    from?: `0x${string}`,
+  ): Promise<WriteContractReturnType> {
+    return await this._walletClient.writeContract({
+      chain: this._walletClient.chain,
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'settle',
+      args: [channelId],
+      account: from ?? this._walletClient.account!.address,
+    })
+  }
+
+  async claim(
+    channelId: `0x${string}`,
+    payment: bigint,
+    signature: `0x${string}`,
+    from?: `0x${string}`,
+  ): Promise<WriteContractReturnType> {
+    return await this._walletClient.writeContract({
+      chain: this._walletClient.chain,
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'claim',
+      args: [channelId, payment, signature],
+      account: from ?? this._walletClient.account!.address,
+    })
+  }
+
+  async getSettlementPeriod(channelId: `0x${string}`): Promise<bigint> {
+    return (await this.channel(channelId)).settlingPeriod
   }
 
   async isPresent(channelId: `0x${string}`): Promise<boolean> {
@@ -292,5 +434,61 @@ export class Unidirectional {
       functionName: 'isSettling',
       args: [channelId],
     })) as never as boolean
+  }
+
+  async canSettle(channelId: `0x${string}`): Promise<boolean> {
+    return (await this._publicClient.readContract({
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'canSettle',
+      args: [channelId],
+    })) as never as boolean
+  }
+
+  async canClaim(
+    channelId: `0x${string}`,
+    payment: bigint,
+    origin: string,
+    signature: `0x${string}`,
+  ): Promise<boolean> {
+    return (await this._publicClient.readContract({
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'canClaim',
+      args: [channelId, payment, origin, signature],
+    })) as never as boolean
+  }
+
+  async canDeposit(channelId: `0x${string}`, origin: string): Promise<boolean> {
+    return (await this._publicClient.readContract({
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'canDeposit',
+      args: [channelId, origin],
+    })) as never as boolean
+  }
+
+  async canStartSettling(
+    channelId: `0x${string}`,
+    origin: string,
+  ): Promise<boolean> {
+    return (await this._publicClient.readContract({
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'canStartSettling',
+      args: [channelId, origin],
+    })) as never as boolean
+  }
+
+  async paymentDigest(
+    channelId: `0x${string}`,
+    payment: bigint,
+  ): Promise<`0x${string}`> {
+    return (await this._publicClient.readContract({
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'paymentDigest',
+      args: [channelId, payment],
+    })) as never as `0x${string}`
   }
 }

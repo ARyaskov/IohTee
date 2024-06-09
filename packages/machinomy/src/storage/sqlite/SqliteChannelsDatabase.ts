@@ -1,15 +1,14 @@
 import ChannelId from '../../ChannelId'
-import { BigNumber } from 'bignumber.js'
 import { PaymentChannel, PaymentChannelJSON } from '../../PaymentChannel'
 import { EngineSqlite } from './EngineSqlite'
 import AbstractChannelsDatabase from '../AbstractChannelsDatabase'
 
 export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlite> {
-  async save (paymentChannel: PaymentChannel): Promise<void> {
-    return this.engine.exec(async client => {
+  async save(paymentChannel: PaymentChannel): Promise<void> {
+    return this.engine.exec(async (client) => {
       await client.run(
         'INSERT INTO channel("channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil") ' +
-        'VALUES ($channelId, $kind, $sender, $receiver, $value, $spent, $state, $tokenContract, $settlementPeriod, $settlingUntil)',
+          'VALUES ($channelId, $kind, $sender, $receiver, $value, $spent, $state, $tokenContract, $settlementPeriod, $settlingUntil)',
         {
           $channelId: paymentChannel.channelId,
           $kind: this.kind,
@@ -20,77 +19,96 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
           $state: paymentChannel.state,
           $tokenContract: paymentChannel.tokenContract,
           $settlementPeriod: paymentChannel.settlementPeriod,
-          $settlingUntil: paymentChannel.settlingUntil.toString()
-        })
+          $settlingUntil: paymentChannel.settlingUntil.toString(),
+        },
+      )
     })
   }
 
-  async firstById (channelId: ChannelId | string): Promise<PaymentChannel | null> {
-    return this.engine.exec(async client => {
+  async firstById(
+    channelId: `0x${string}`,
+  ): Promise<PaymentChannel | null> {
+    return this.engine.exec(async (client) => {
       let raw = await client.get<PaymentChannelJSON>(
         'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
-        'WHERE "channelId" = $channelId LIMIT 1',
+          'WHERE "channelId" = $channelId LIMIT 1',
         {
-          $channelId: channelId.toString()
-        })
+          $channelId: channelId,
+        },
+      )
       return raw ? this.inflatePaymentChannel(raw) : null
     })
   }
 
-  async spend (channelId: ChannelId | string, spent: BigNumber): Promise<void> {
-    return this.engine.exec(async client => {
+  async spend(channelId: `0x${string}`, spent: bigint): Promise<void> {
+    return this.engine.exec(async (client) => {
       return client.run(
         'UPDATE channel SET spent = $spent WHERE "channelId" = $channelId',
         {
-          $channelId: channelId.toString(),
-          $spent: spent.toString()
-        })
+          $channelId: channelId,
+          $spent: spent.toString(),
+        },
+      )
     })
   }
 
-  async deposit (channelId: ChannelId | string, value: BigNumber): Promise<void> {
-    return this.engine.exec(async client => {
+  async deposit(
+    channelId: `0x${string}`,
+    value: bigint,
+  ): Promise<void> {
+    return this.engine.exec(async (client) => {
       let channel = await this.firstById(channelId)
       if (!channel) {
         throw new Error('Channel not found.')
       }
 
-      const newValue = channel.value.plus(value)
+      const newValue = channel.value + value
 
       return client.run(
         'UPDATE channel SET value = $value WHERE "channelId" = $channelId',
         {
-          $channelId: channelId.toString(),
-          $value: newValue.toString()
-        })
+          $channelId: channelId,
+          $value: newValue.toString(),
+        },
+      )
     })
   }
 
-  async all (): Promise<Array<PaymentChannel>> {
-    return this.engine.exec(async client => {
-      let raw = await client.all<PaymentChannelJSON>('SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel')
+  async all(): Promise<Array<PaymentChannel>> {
+    return this.engine.exec(async (client) => {
+      let raw = await client.all<PaymentChannelJSON>(
+        'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel',
+      )
       return this.inflatePaymentChannels(raw)
     })
   }
 
-  async allOpen (): Promise<Array<PaymentChannel>> {
-    return this.engine.exec(async client => {
-      let raw = await client.all<PaymentChannelJSON>('SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
-        'WHERE state = 0')
+  async allOpen(): Promise<Array<PaymentChannel>> {
+    return this.engine.exec(async (client) => {
+      let raw = await client.all<PaymentChannelJSON>(
+        'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
+          'WHERE state = 0',
+      )
       let channels = await this.inflatePaymentChannels(raw)
       return this.filterByState(0, channels)
     })
   }
 
-  async findUsable (sender: string, receiver: string, amount: BigNumber): Promise<PaymentChannel | null> {
-    return this.engine.exec(async client => {
-      let raw = await client.get<PaymentChannelJSON>('SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
-        'WHERE sender = $sender AND receiver = $receiver AND value >= spent + $amount AND state = 0',
+  async findUsable(
+    sender: `0x${string}`,
+    receiver: `0x${string}`,
+    amount: bigint,
+  ): Promise<PaymentChannel | null> {
+    return this.engine.exec(async (client) => {
+      let raw = await client.get<PaymentChannelJSON>(
+        'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
+          'WHERE sender = $sender AND receiver = $receiver AND value >= spent + $amount AND state = 0',
         {
           $sender: sender,
           $receiver: receiver,
-          $amount: amount.toString()
-        })
+          $amount: amount.toString(),
+        },
+      )
       if (raw) {
         let channel = await this.inflatePaymentChannel(raw)
         if (channel && channel.state === 0) {
@@ -103,48 +121,69 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
     })
   }
 
-  async findBySenderReceiver (sender: string, receiver: string): Promise<Array<PaymentChannel>> {
-    return this.engine.exec(async client => {
-      let rows = await client.all<PaymentChannelJSON>('SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
-        'WHERE sender = $sender AND receiver = $receiver',
+  async findBySenderReceiver(
+    sender: `0x${string}`,
+    receiver: `0x${string}`,
+  ): Promise<Array<PaymentChannel>> {
+    return this.engine.exec(async (client) => {
+      let rows = await client.all<PaymentChannelJSON>(
+        'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
+          'WHERE sender = $sender AND receiver = $receiver',
         {
           $sender: sender,
-          $receiver: receiver
-        })
+          $receiver: receiver,
+        },
+      )
       return this.inflatePaymentChannels(rows)
     })
   }
 
-  async findBySenderReceiverChannelId (sender: string, receiver: string, channelId: ChannelId | string): Promise<PaymentChannel | null> {
-    return this.engine.exec(async client => {
-      let row = await client.get<PaymentChannelJSON>('SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
-        'WHERE sender = $sender AND receiver = $receiver AND "channelId" = $channelId LIMIT 1',
+  async findBySenderReceiverChannelId(
+    sender: `0x${string}`,
+    receiver: `0x${string}`,
+    channelId: `0x${string}`,
+  ): Promise<PaymentChannel | null> {
+    return this.engine.exec(async (client) => {
+      let row = await client.get<PaymentChannelJSON>(
+        'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
+          'WHERE sender = $sender AND receiver = $receiver AND "channelId" = $channelId LIMIT 1',
         {
           $sender: sender,
           $receiver: receiver,
-          $channelId: channelId.toString()
-        })
+          $channelId: channelId,
+        },
+      )
       return row ? this.inflatePaymentChannel(row) : null
     })
   }
 
-  async updateState (channelId: ChannelId | string, state: number): Promise<void> {
-    return this.engine.exec(async client => {
-      return client.run('UPDATE channel SET state = $state WHERE "channelId" = $channelId',
+  async updateState(
+    channelId: ChannelId | string,
+    state: number,
+  ): Promise<void> {
+    return this.engine.exec(async (client) => {
+      return client.run(
+        'UPDATE channel SET state = $state WHERE "channelId" = $channelId',
         {
           $state: state,
-          $channelId: channelId.toString()
-        })
+          $channelId: channelId.toString(),
+        },
+      )
     })
   }
 
-  async updateSettlingUntil (channelId: ChannelId | string, settlingUntil: BigNumber): Promise<void> {
-    return this.engine.exec(async client => {
-      return client.run('UPDATE channel SET "settlingUntil" = $settlingUntil WHERE "channelId" = $channelId',
+  async updateSettlingUntil(
+    channelId: `0x${string}`,
+    settlingUntil: bigint,
+  ): Promise<void> {
+    return this.engine.exec(async (client) => {
+      return client.run(
+        'UPDATE channel SET "settlingUntil" = $settlingUntil WHERE "channelId" = $channelId',
         {
           $settlingUntil: settlingUntil.toString(),
-          $channelId: channelId.toString()
-        })
+          $channelId: channelId,
+        },
+      )
     })
   }
 }
