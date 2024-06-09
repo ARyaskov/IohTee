@@ -1078,11 +1078,23 @@ __metadata:
     types-rlp: "npm:^0.0.1"
     typescript: "npm:^4.5.4"
     uuid: "npm:^3.2.1"
-    web3: "npm:^0.20.1"
   languageName: unknown
   linkType: soft
 
-"@machinomy/hdwallet-provider@npm:2.0.8, @machinomy/hdwallet-provider@npm:^2.0.8":
+"@machinomy/hdwallet-provider@npm:^1.1.0":
+  version: 1.7.1
+  resolution: "@machinomy/hdwallet-provider@npm:1.7.1"
+  dependencies:
+    bip39: "npm:^3.0.2"
+    eth-hd-keyring: "npm:^2.0.0"
+    ethereumjs-tx: "npm:^2.1.0"
+    ethereumjs-util: "npm:^6.1.0"
+    web3-provider-engine: "npm:^13.8.0"
+  checksum: 10c0/43003a7f6f1e530b2999f92a285f1cf6b49c3eac6b2615de7018d1ee4bf6cadc1775277aa70a727caf1323a757a9b1bd7c64481c841a59e00a49caeba7e300c5
+  languageName: node
+  linkType: hard
+
+"@machinomy/hdwallet-provider@npm:^2.0.8":
   version: 2.0.8
   resolution: "@machinomy/hdwallet-provider@npm:2.0.8"
   dependencies:
@@ -1105,19 +1117,6 @@ __metadata:
     "@ledgerhq/hw-transport-node-hid":
       optional: true
   checksum: 10c0/48813dfc0411d8aa2c3291dcddbe141d1460a5add2194dc25360ea83e148614ab43e52e28a2d5156c5505a4ac58949b6b66a4274fad462586d39525ecc9a3ee2
-  languageName: node
-  linkType: hard
-
-"@machinomy/hdwallet-provider@npm:^1.1.0":
-  version: 1.7.1
-  resolution: "@machinomy/hdwallet-provider@npm:1.7.1"
-  dependencies:
-    bip39: "npm:^3.0.2"
-    eth-hd-keyring: "npm:^2.0.0"
-    ethereumjs-tx: "npm:^2.1.0"
-    ethereumjs-util: "npm:^6.1.0"
-    web3-provider-engine: "npm:^13.8.0"
-  checksum: 10c0/43003a7f6f1e530b2999f92a285f1cf6b49c3eac6b2615de7018d1ee4bf6cadc1775277aa70a727caf1323a757a9b1bd7c64481c841a59e00a49caeba7e300c5
   languageName: node
   linkType: hard
 
@@ -1911,33 +1910,27 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@riaskov/machinomy-playground@workspace:packages/playground"
   dependencies:
-    "@machinomy/contracts": "npm:^4.1.5"
-    "@machinomy/hdwallet-provider": "npm:2.0.8"
-    "@machinomy/types-ethereumjs-units": "npm:^0.0.2"
     "@machinomy/types-ethereumjs-util": "npm:^0.0.12"
-    "@machinomy/types-truffle-contract": "npm:^0.0.4"
+    "@riaskov/machinomy": "npm:*"
+    "@riaskov/machinomy-contracts": "npm:*"
     "@types/body-parser": "npm:^1.19.5"
-    "@types/debug": "npm:^0.0.30"
+    "@types/debug": "npm:^0.0.31"
     "@types/express": "npm:^4.17.21"
-    "@types/express-serve-static-core": "npm:4.17.27"
-    "@types/morgan": "npm:^1.7.35"
-    "@types/url-join": "npm:^0.8.2"
-    bignumber.js: "npm:*"
+    "@types/express-serve-static-core": "npm:^4.19.3"
+    "@types/morgan": "npm:^1.9.9"
+    "@types/url-join": "npm:^0.8.6"
     body-parser: "npm:^1.20.2"
-    db-migrate-sqlite3: "npm:^0.2.1"
+    db-migrate-sqlite3: "npm:^0.5.0"
     dotenv: "npm:*"
-    express: "npm:^4.14.0"
-    machinomy: "npm:^1.13.32"
-    morgan: "npm:^1.9.0"
-    sqlite3: "npm:^5.0.2"
-    tslint: "npm:^5.10.0"
-    tslint-config-standard: "npm:^7.0.0"
-    typescript: "npm:5.4.5"
-    url-join: "npm:^4.0.0"
+    express: "npm:^4.19.2"
+    morgan: "npm:^1.10.0"
+    sqlite3: "npm:^5.1.7"
+    typescript: "npm:^5.5.1-rc"
+    url-join: "npm:^4.0.1"
   languageName: unknown
   linkType: soft
 
-"@riaskov/machinomy@workspace:packages/machinomy":
+"@riaskov/machinomy@npm:*, @riaskov/machinomy@workspace:packages/machinomy":
   version: 0.0.0-use.local
   resolution: "@riaskov/machinomy@workspace:packages/machinomy"
   dependencies:
@@ -2416,6 +2409,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/debug@npm:^0.0.31":
+  version: 0.0.31
+  resolution: "@types/debug@npm:0.0.31"
+  checksum: 10c0/78d6b40801193af246028ce8841c384146b573572dbcec073413188acffa3573f6ce2cc9ecd5e72738467b0d67b6f7fd82b8c110cae861c6d7a9418d1e10d6ba
+  languageName: node
+  linkType: hard
+
 "@types/debug@npm:^4.1.7":
   version: 4.1.12
   resolution: "@types/debug@npm:4.1.12"
@@ -2461,6 +2461,18 @@ __metadata:
     "@types/range-parser": "npm:*"
     "@types/send": "npm:*"
   checksum: 10c0/8e202374a7013fbbc5a3abd5111dd7ab73c4a6e9da4ffc1808d6e68be7a1dbd37e013b74e47aa6febc8efa459120058a1cbde6f2d509b2ad28fac301e1ee353a
+  languageName: node
+  linkType: hard
+
+"@types/express-serve-static-core@npm:^4.19.3":
+  version: 4.19.3
+  resolution: "@types/express-serve-static-core@npm:4.19.3"
+  dependencies:
+    "@types/node": "npm:*"
+    "@types/qs": "npm:*"
+    "@types/range-parser": "npm:*"
+    "@types/send": "npm:*"
+  checksum: 10c0/5d2a1fb96a17a8e0e8c59325dfeb6d454bbc5c9b9b6796eec0397ddf9dbd262892040d5da3d72b5d7148f34bb3fcd438faf1b37fcba8c5a03e75fae491ad1edf
   languageName: node
   linkType: hard
 
@@ -2611,7 +2623,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/morgan@npm:^1.7.35":
+"@types/morgan@npm:^1.9.9":
   version: 1.9.9
   resolution: "@types/morgan@npm:1.9.9"
   dependencies:
@@ -2816,7 +2828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/url-join@npm:^0.8.2":
+"@types/url-join@npm:^0.8.6":
   version: 0.8.6
   resolution: "@types/url-join@npm:0.8.6"
   checksum: 10c0/4ae0340e6da66693c7b3f755bd5dd26f9a8160f341f487ca800fbf9641b2e6e0a8ec099c79dc417b846768e0466c070e5afb8ce72c597743fd6b992e1ffd34cf
@@ -5887,17 +5899,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"db-migrate-sqlite3@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "db-migrate-sqlite3@npm:0.2.1"
-  dependencies:
-    bluebird: "npm:^3.1.1"
-    db-migrate-base: "npm:^1.2.5"
-    sqlite3: "npm:^3.1.4"
-  checksum: 10c0/b8d3cc89cc934651addff4d19bc71f11709cc17d67afaef2682f8b597580920bb863c493dd1cfccf3c06791a5fc2c9d07f6221a5de746caad1df174ed4a46f53
-  languageName: node
-  linkType: hard
-
 "db-migrate-sqlite3@npm:^0.3.x":
   version: 0.3.1
   resolution: "db-migrate-sqlite3@npm:0.3.1"
@@ -5906,6 +5907,17 @@ __metadata:
     db-migrate-base: "npm:^1.2.5"
     sqlite3: "npm:^4.0.1"
   checksum: 10c0/dde43b18c9caeea2cbe6ebfc74f0a127be34ace58ff799f5e61fb12b711f3fa8b4e3bd59039855392fa2a03b2338a577fa5a8556e054a3c0232d7cdffea675b6
+  languageName: node
+  linkType: hard
+
+"db-migrate-sqlite3@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "db-migrate-sqlite3@npm:0.5.0"
+  dependencies:
+    bluebird: "npm:^3.1.1"
+    db-migrate-base: "npm:^1.6.3"
+    sqlite3: "npm:^5.1.6"
+  checksum: 10c0/88d8574aeb5487e0b6b369e7ea36674b372bdcecdcd31772dbb5fb41e74ba47b708ec6c4d09c558f912aaaa0a3c3973e2762b735deea84b5f971dea3c82160eb
   languageName: node
   linkType: hard
 
@@ -7503,7 +7515,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.14.0":
+"express@npm:^4.14.0, express@npm:^4.19.2":
   version: 4.19.2
   resolution: "express@npm:4.19.2"
   dependencies:
@@ -11788,7 +11800,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"morgan@npm:^1.9.0":
+"morgan@npm:^1.10.0":
   version: 1.10.0
   resolution: "morgan@npm:1.10.0"
   dependencies:
@@ -16215,7 +16227,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:*, typescript@npm:5.4.5":
+"typescript@npm:*":
   version: 5.4.5
   resolution: "typescript@npm:5.4.5"
   bin:
@@ -16245,7 +16257,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A*#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A*#optional!builtin<compat/typescript>":
   version: 5.4.5
   resolution: "typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=5adc0c"
   bin:
@@ -16449,7 +16461,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"url-join@npm:^4.0.0":
+"url-join@npm:^4.0.1":
   version: 4.0.1
   resolution: "url-join@npm:4.0.1"
   checksum: 10c0/ac65e2c7c562d7b49b68edddcf55385d3e922bc1dd5d90419ea40b53b6de1607d1e45ceb71efb9d60da02c681d13c6cb3a1aa8b13fc0c989dfc219df97ee992d
