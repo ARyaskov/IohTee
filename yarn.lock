@@ -1066,7 +1066,7 @@ __metadata:
     bignumber.js: "npm:^9.1.2"
     chai: "npm:^5.1.1"
     chai-as-promised: "npm:^7.1.2"
-    coveralls: "npm:^3.0.1"
+    coveralls: "npm:^3.1.1"
     cpx: "npm:^1.5.0"
     cross-env: "npm:^7.0.3"
     dotenv: "npm:^16.4.5"
@@ -4345,7 +4345,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"coveralls@npm:^3.0.1, coveralls@npm:^3.1.1":
+"coveralls@npm:^3.1.1":
   version: 3.1.1
   resolution: "coveralls@npm:3.1.1"
   dependencies:

@@ -120,6 +120,7 @@
     "typescript": "*"
   },
   "resolutions": {
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "underscore": "1.12.0"
   }
 }
