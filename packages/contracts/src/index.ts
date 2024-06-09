@@ -4,6 +4,7 @@ import {
   Channel,
   channelId,
   ChannelState,
+  networkByName,
   DefaultUnidirectionalAddress,
 } from './common'
 import { Unidirectional } from './Unidirectional'
@@ -14,6 +15,7 @@ export {
   Network,
   Channel,
   channelId,
+  networkByName,
   ChannelState,
   DefaultUnidirectionalAddress,
 }

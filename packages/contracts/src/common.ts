@@ -3,6 +3,7 @@ import {
   Abi,
   AbiEvent,
   bytesToHex,
+  Chain,
   createPublicClient,
   createWalletClient,
   getContract,
@@ -86,6 +87,16 @@ export enum ChannelState {
   Open = 0,
   Settling = 1,
   Settled = 2,
+}
+
+export function networkByName(networkName: string): Chain {
+  const network = Object.values(Network).find(
+    (network) => network.name === networkName,
+  )
+  if (!network) {
+    throw new Error(`Network ${networkName} not found`)
+  }
+  return network
 }
 
 export function channelId(): `0x${string}` {
