@@ -1023,7 +1023,6 @@ __metadata:
   resolution: "@machinomy/examples@workspace:packages/examples"
   dependencies:
     "@machinomy/types-bn": "npm:^0.0.3"
-    "@machinomy/types-truffle-contract": "npm:^0.0.4"
     "@riaskov/machinomy": "npm:*"
     "@types/express-serve-static-core": "npm:4.17.27"
     "@types/fs-extra": "npm:^5.0.4"
@@ -1130,26 +1129,6 @@ __metadata:
   version: 0.0.1
   resolution: "@machinomy/types-safe-buffer@npm:0.0.1"
   checksum: 10c0/cdacf7665ed396c58a4424e5bfb170f59109f50aaacf998901bbbc94865424a8e40d6f162e089eb87b81f6cf89dca60982c2a2f1ee74eceb8902a7ca16276941
-  languageName: node
-  linkType: hard
-
-"@machinomy/types-truffle-contract@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "@machinomy/types-truffle-contract@npm:0.0.4"
-  dependencies:
-    "@machinomy/types-web3": "npm:^0.0.4"
-    truffle-contract: "npm:^3.0.0"
-    web3: "npm:^0.20.2"
-  checksum: 10c0/0464af21c3195b9e5148f4ef44e63ff4e5c5de8e0e619b1a30dd35761a100a48881efb1757554e281e2c13d53c975d9b1c8b90fa3fe52740dd9f366fbe707a26
-  languageName: node
-  linkType: hard
-
-"@machinomy/types-web3@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "@machinomy/types-web3@npm:0.0.4"
-  dependencies:
-    bignumber.js: "npm:^4.0.2"
-  checksum: 10c0/4ae0462debd9fabbb07c2588f59d0c835b193c9f231ff77d4a50334c2e8a8ff8b303080a20d5c0abb15fdb59b112fa8c10a9f26af02a191cc79f73835413e514
   languageName: node
   linkType: hard
 
@@ -1817,7 +1796,6 @@ __metadata:
     "@machinomy/types-bn": "npm:^0.0.3"
     "@machinomy/types-eth-sig-util": "npm:^0.0.8"
     "@machinomy/types-ethereumjs-util": "npm:^0.0.12"
-    "@machinomy/types-truffle-contract": "npm:^0.0.4"
     "@metamask/eth-sig-util": "npm:4.0.1"
     "@riaskov/machinomy-contracts": "npm:*"
     "@types/bluebird": "npm:3.5.36"
@@ -2858,7 +2836,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv@npm:^5.1.1, ajv@npm:^5.2.2":
+"ajv@npm:^5.2.2":
   version: 5.5.2
   resolution: "ajv@npm:5.5.2"
   dependencies:
@@ -3476,24 +3454,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bignumber.js@git+https://github.com/frozeman/bignumber.js-nolookahead.git":
-  version: 2.0.7
-  resolution: "bignumber.js@https://github.com/frozeman/bignumber.js-nolookahead.git#commit=57692b3ecfc98bbdd6b3a516cb2353652ea49934"
-  checksum: 10c0/e676e6c7ceb182e49af49ccc25b2125bb0afb8821a8f186635e87655e5b5c5c08a2556df54739d512e7f07827aa1e81ab964eba2ea75c6f51d22c40f5adb62b5
-  languageName: node
-  linkType: hard
-
 "bignumber.js@npm:*, bignumber.js@npm:^9.1.2":
   version: 9.1.2
   resolution: "bignumber.js@npm:9.1.2"
   checksum: 10c0/e17786545433f3110b868725c449fa9625366a6e675cd70eb39b60938d6adbd0158cb4b3ad4f306ce817165d37e63f4aa3098ba4110db1d9a3b9f66abfbaf10d
-  languageName: node
-  linkType: hard
-
-"bignumber.js@npm:^4.0.2":
-  version: 4.1.0
-  resolution: "bignumber.js@npm:4.1.0"
-  checksum: 10c0/cb97804781f85a1c64044c3a2cf63ef90ef75201ca119dbb4cba663b7e5bc5f6e3f1f1d117e6a92e9e84bb0e0138970ebc25c5ec8132e103de66f39fa38af313
   languageName: node
   linkType: hard
 
@@ -4506,13 +4470,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookiejar@npm:^2.1.1":
-  version: 2.1.4
-  resolution: "cookiejar@npm:2.1.4"
-  checksum: 10c0/2dae55611c6e1678f34d93984cbd4bda58f4fe3e5247cc4993f4a305cd19c913bbaf325086ed952e892108115073a747596453d3dc1c34947f47f731818b8ad1
-  languageName: node
-  linkType: hard
-
 "copy-descriptor@npm:^0.1.0":
   version: 0.1.1
   resolution: "copy-descriptor@npm:0.1.1"
@@ -4684,13 +4641,6 @@ __metadata:
   version: 0.0.2
   resolution: "crypt@npm:0.0.2"
   checksum: 10c0/adbf263441dd801665d5425f044647533f39f4612544071b1471962209d235042fb703c27eea2795c7c53e1dfc242405173003f83cf4f4761a633d11f9653f18
-  languageName: node
-  linkType: hard
-
-"crypto-js@npm:^3.1.4, crypto-js@npm:^3.1.9-1":
-  version: 3.3.0
-  resolution: "crypto-js@npm:3.3.0"
-  checksum: 10c0/10b5d91bdc85095df9be01f9d0d954b8a3aba6202f143efa6215b8b3d5dd984e0883e10aeff792ef4a51b77cd4442320242b496acf6dce5069d0e0fc2e1d75d2
   languageName: node
   linkType: hard
 
@@ -5708,17 +5658,6 @@ __metadata:
     tslib: "npm:2.4.0"
     ws: "npm:8.5.0"
   checksum: 10c0/7686e1efdb0a831578f35d69188783c225de5a6fbb1b422327bc45cee04d49a2707e73c9342a6a5eb2870ce35668c71372737439ec3993d31d83f4a0e2446cc7
-  languageName: node
-  linkType: hard
-
-"ethjs-abi@npm:0.1.8":
-  version: 0.1.8
-  resolution: "ethjs-abi@npm:0.1.8"
-  dependencies:
-    bn.js: "npm:4.11.6"
-    js-sha3: "npm:0.5.5"
-    number-to-bn: "npm:1.7.0"
-  checksum: 10c0/82c87c04515ef26a1ac8a1081d4deb34af48bd6ebc768999020ab971e03a7f907c412e1a5596a216a7dfb997e74e2e94c6c4486f5f2f84aa9b40af1003e2fd58
   languageName: node
   linkType: hard
 
@@ -8051,13 +7990,6 @@ __metadata:
     graceful-fs: "npm:^4.2.9"
     picomatch: "npm:^2.2.3"
   checksum: 10c0/bc55a8f49fdbb8f51baf31d2a4f312fb66c9db1483b82f602c9c990e659cdd7ec529c8e916d5a89452ecbcfae4949b21b40a7a59d4ffc0cd813a973ab08c8150
-  languageName: node
-  linkType: hard
-
-"js-sha3@npm:0.5.5":
-  version: 0.5.5
-  resolution: "js-sha3@npm:0.5.5"
-  checksum: 10c0/2222b4e874191e4a3f2a9409a209c1ccfc9b7ea4d3683d2f14baf67613e20fb5039ef0e5137536bfc4b6e3691ad8e7fcca78f87539fb8e75da7ef447f3743d4a
   languageName: node
   linkType: hard
 
@@ -12477,44 +12409,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"truffle-blockchain-utils@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "truffle-blockchain-utils@npm:0.0.5"
-  checksum: 10c0/3b04fd64783a2a209b1c1fdced41275d37ee7b2aeef1953212bf1b9375493641a9a0d1daf6c75a0b15bb93cf4f0be9dbb3cbd174f1951f5154aeb653b363d817
-  languageName: node
-  linkType: hard
-
-"truffle-contract-schema@npm:^2.0.3":
-  version: 2.0.3
-  resolution: "truffle-contract-schema@npm:2.0.3"
-  dependencies:
-    ajv: "npm:^5.1.1"
-    crypto-js: "npm:^3.1.9-1"
-    debug: "npm:^3.1.0"
-  checksum: 10c0/c68ef23d706ebc1b1bd6455ff3b6c4d34489dc8b48554c0324fc42fd97e4b017082cf5958f2c232a11760ac8634ac1b736ab7a503f1aec3833bc6ec1ad520e17
-  languageName: node
-  linkType: hard
-
-"truffle-contract@npm:^3.0.0":
-  version: 3.0.8
-  resolution: "truffle-contract@npm:3.0.8"
-  dependencies:
-    ethjs-abi: "npm:0.1.8"
-    truffle-blockchain-utils: "npm:^0.0.5"
-    truffle-contract-schema: "npm:^2.0.3"
-    truffle-error: "npm:^0.0.3"
-    web3: "npm:0.20.6"
-  checksum: 10c0/2bffdd102a3d130d3175506b28edae7447bace08137e76c5c970a5060992c441db36ff78909dbdb04fd9afcb078d4b625be1c0642ebb581fd54065096903107c
-  languageName: node
-  linkType: hard
-
-"truffle-error@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "truffle-error@npm:0.0.3"
-  checksum: 10c0/2b59774f334fef4c0e6968162801a9f225f161efa8b84a91af1fbbf26943dc3a0d62f0c8c8189906e74a94150f5da08ab3bd50927ca6daa7f2c682c5706050a2
-  languageName: node
-  linkType: hard
-
 "ts-command-line-args@npm:^2.2.0":
   version: 2.5.1
   resolution: "ts-command-line-args@npm:2.5.1"
@@ -13096,13 +12990,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"utf8@npm:^2.1.1":
-  version: 2.1.2
-  resolution: "utf8@npm:2.1.2"
-  checksum: 10c0/1f1d0f1c58e35338c03d377338d28dae8bd66dd6417a428a2e7c83fe87f52339573cd5bf51eb5119451b74b5b66cdc7e6f9e4d6d45f4581fd99c2f07ef118cb3
-  languageName: node
-  linkType: hard
-
 "util-deprecate@npm:^1.0.1, util-deprecate@npm:~1.0.1":
   version: 1.0.2
   resolution: "util-deprecate@npm:1.0.2"
@@ -13243,32 +13130,6 @@ __metadata:
     randombytes: "npm:^2.1.0"
     utf8: "npm:3.0.0"
   checksum: 10c0/fbd5c8ec71e944e9e66e3436dbd4446927c3edc95f81928723f9ac137e0d821c5cbb92dba0ed5bbac766f919f919c9d8e316e459c51d876d5188321642676677
-  languageName: node
-  linkType: hard
-
-"web3@npm:0.20.6":
-  version: 0.20.6
-  resolution: "web3@npm:0.20.6"
-  dependencies:
-    bignumber.js: "git+https://github.com/frozeman/bignumber.js-nolookahead.git"
-    crypto-js: "npm:^3.1.4"
-    utf8: "npm:^2.1.1"
-    xhr2: "npm:*"
-    xmlhttprequest: "npm:*"
-  checksum: 10c0/95875cefc32576de2c035a239aba82a868be74e4ad9a50997c977c7bd1f57fd176b4c7d47ba689eb2636d969b13277c313dfb34e4de4110a2fbb579162ba4394
-  languageName: node
-  linkType: hard
-
-"web3@npm:^0.20.2":
-  version: 0.20.7
-  resolution: "web3@npm:0.20.7"
-  dependencies:
-    bignumber.js: "git+https://github.com/frozeman/bignumber.js-nolookahead.git"
-    crypto-js: "npm:^3.1.4"
-    utf8: "npm:^2.1.1"
-    xhr2-cookies: "npm:^1.1.0"
-    xmlhttprequest: "npm:*"
-  checksum: 10c0/407d5248ecf9aeb9c5c1cc8787f531615fc6dc6c08b4e58fefd5120ba376bbc948264f2c4d2e862b19874f43785ed63eda6e4d7695336eca28b101980b28d608
   languageName: node
   linkType: hard
 
@@ -13519,29 +13380,6 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10c0/aec4ef4eb65821a7dde7b44790f8699cfafb7978c9b080f6d7a98a7f8fc0ce674c027073a78574c94786ba7112cc90fa2cc94fc224ceba4d4b1030cff9662494
-  languageName: node
-  linkType: hard
-
-"xhr2-cookies@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "xhr2-cookies@npm:1.1.0"
-  dependencies:
-    cookiejar: "npm:^2.1.1"
-  checksum: 10c0/38faf4ebecdc003559c58a19e389b51ea227c92d0d38f385e9b43f75df675eae9b7ac6335ecba813990af804d448f69109806e76b07eaf689ad863b303222a6c
-  languageName: node
-  linkType: hard
-
-"xhr2@npm:*":
-  version: 0.2.1
-  resolution: "xhr2@npm:0.2.1"
-  checksum: 10c0/eebe95bd0ae9087da9b4dda636abee1f30cf9b424fbe8ebd0c7dcfd9be5db3e4aa634cf1837fa3e82b486aace9396a2dbf6be2dc8084862c8239dccec4e16dca
-  languageName: node
-  linkType: hard
-
-"xmlhttprequest@npm:*":
-  version: 1.8.0
-  resolution: "xmlhttprequest@npm:1.8.0"
-  checksum: 10c0/c890661562e4cb6c36a126071e956047164296f58b0058ab28a9c9f1c3b46a65bf421a242d3449363a2aadc3d9769146160b10a501710d476a17d77d41a5c99e
   languageName: node
   linkType: hard
 
