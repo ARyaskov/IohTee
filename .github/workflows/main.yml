@@ -53,6 +53,7 @@ jobs:
         run: |
           yarn dlx codecov
           yarn dlx node-gyp
+          yarn dlx prettier
 
       - name: Install dependencies
         run: |
