@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@machinomy/types-bn": "^0.0.3",
-    "@machinomy/types-truffle-contract": "^0.0.4",
+    "@machinomy/types-truffle-contract": "^0.1.1",
     "@riaskov/machinomy": "*",
     "@types/express-serve-static-core": "4.17.27",
     "@types/fs-extra": "^5.0.4",
