@@ -171,5 +171,5 @@ export function httpRpc(chain: NetworkType): string {
 }
 
 export function mnemonic(): string {
-  return process.env.ACCOUNT_MNEMONIC!
+  return String(process.env.ACCOUNT_MNEMONIC!).trim()
 }
