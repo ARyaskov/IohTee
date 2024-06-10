@@ -19,36 +19,45 @@
  */
 
 import express from 'express'
-import Web3 from 'web3'
-import Machinomy from 'machinomy'
+import { Machinomy, AcceptTokenRequestSerde, PaymentChannelSerde } from '@riaskov/machinomy'
 import bodyParser from 'body-parser'
-import { AcceptTokenRequestSerde } from 'machinomy/lib/accept_token_request'
-import { PaymentChannelSerde } from 'machinomy/lib/PaymentChannel'
-import HDWalletProvider from '@machinomy/hdwallet-provider'
+import {createWalletClient, http} from "viem"
+import {networkByName, NetworkType} from "@riaskov/machinomy-contracts"
 
 async function main () {
-  const PROVIDER_URL = String(process.env.PROVIDER_URL)
-  const MNEMONIC = String(process.env.MNEMONIC)
+  const RPC_URL = String(process.env.RPC_URL).trim()
+  const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
+  const NETWORK = String(process.env.NETWORK).trim()
 
-  const HOST = 'localhost'
+  const HOST = '127.0.0.1'
   const APP_PORT = 3000
   const HUB_PORT = 3001
+  const chain: any = networkByName(NETWORK) as NetworkType
 
-  const provider = HDWalletProvider.mnemonic({
-    mnemonic: MNEMONIC!,
-    rpc: PROVIDER_URL
+  const walletClient = createWalletClient({
+    chain: chain,
+    transport: http(RPC_URL),
   })
-  const web3 = new Web3(provider)
 
+  const addresses = await walletClient.getAddresses()
   /**
    * Account that receives payments.
    */
-  let receiver = (await provider.getAddresses())[0]
+  let receiver = addresses[0]
 
   /**
    * Create machinomy instance that provides API for accepting payments.
    */
-  let machinomy = new Machinomy(receiver, web3, { databaseUrl: 'nedb://./server' })
+  let machinomy = new Machinomy(
+    {
+      network: chain,
+      account: receiver,
+      httpRpcUrl: RPC_URL,
+      mnemonic: MNEMONIC,
+      options: {
+        databaseUrl: 'nedb://./server'
+      }
+    })
 
   let hub = express()
   hub.use(bodyParser.json())
@@ -83,7 +92,7 @@ async function main () {
 
   hub.get('/claim/:channelid', async (req, res) => {
     try {
-      let channelId = req.params.channelid
+      let channelId = req.params.channelid as `0x${string}`
       await machinomy.close(channelId)
       res.status(200).send('Claimed')
     } catch (error) {
@@ -99,7 +108,7 @@ async function main () {
   let app = express()
   let paywallHeaders = () => {
     let headers: { [index: string]: string } = {}
-    headers['Paywall-Version'] = '0.0.3'
+    headers['Paywall-Version'] = '1.0.0'
     headers['Paywall-Price'] = '1000'
     headers['Paywall-Address'] = receiver
     headers['Paywall-Gateway'] = `http://${HOST}:${HUB_PORT}/accept`
@@ -128,7 +137,7 @@ async function main () {
   })
 
   app.listen(APP_PORT, function () {
-    console.log('Content proveder is ready on ' + APP_PORT)
+    console.log('Content provider is ready on ' + APP_PORT)
   })
 }
 

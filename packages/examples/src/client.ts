@@ -21,10 +21,11 @@ import Machinomy from 'machinomy'
 import { BigNumber } from 'bignumber.js'
 
 async function main (): Promise<string> {
-  const PROVIDER_URL = String(process.env.PROVIDER_URL)
-  const MNEMONIC = String(process.env.MNEMONIC).trim()
+  const RPC_URL = String(process.env.RPC_URL).trim()
+  const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
+  const NETWORK = String(process.env.NETWORK).trim()
 
-  const TARGET = 'https://playground.machinomy.com/hello'
+  const TARGET = 'https://play.machinomy.toivo.tech/hello'
   const provider = HDWalletProvider.mnemonic({
     mnemonic: MNEMONIC!,
     rpc: PROVIDER_URL
@@ -49,7 +50,7 @@ async function main (): Promise<string> {
    * Request token to content access
    */
   let result = await machinomy.buy({
-    price: new BigNumber(String(headers.get('paywall-price'))),
+    price: BigInt(String(headers.get('paywall-price'))),
     gateway: headers.get('paywall-gateway')!,
     receiver: headers.get('paywall-address')!,
     meta: 'metaidexample'

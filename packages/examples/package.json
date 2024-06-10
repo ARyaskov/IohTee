@@ -4,6 +4,12 @@
   "version": "2.0.0",
   "description": "Examples of Machinomy Berry usage",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
+  "contributors": [
+    {
+      "name": "Andrei Riaskov",
+      "email": "code@riaskov.com"
+    }
+  ],
   "license": "Apache-2.0",
   "keywords": [
     "micropayments",
@@ -18,6 +24,7 @@
     "build": "tsc --project tsconfig.json",
     "test": "exit 0",
     "coverage": "exit 0",
+    "hub": "tsx src/server.ts",
     "sender": "yarn build && DEBUG=* node ./src/sender.js",
     "receiver": "yarn build && DEBUG=* node ./src/receiver.js",
     "senderTokens": "yarn build && DEBUG=* node ./src/senderTokens.js",
@@ -28,24 +35,24 @@
   "dependencies": {
     "@machinomy/types-bn": "^0.0.3",
     "@riaskov/machinomy": "*",
-    "@types/express-serve-static-core": "4.17.27",
-    "@types/fs-extra": "^5.0.4",
-    "commander": "^2.9.0",
-    "debug": "^3.1.0",
+    "@types/express-serve-static-core": "^4.19.3",
+    "@types/fs-extra": "^11.0.4",
+    "commander": "^12.1.0",
+    "debug": "^4.3.5",
     "decko": "^1.2.0",
-    "ethereumjs-util": "^5.1.5",
-    "fs-extra": "^7.0.0",
+    "ethereumjs-util": "^7.1.5",
+    "fs-extra": "^11.2.0",
     "nedb": "^1.8.0",
-    "prompt": "^1.0.0",
-    "request": "^2.76.0",
-    "safe-buffer": "^5.1.2",
+    "prompt": "^1.3.0",
+    "request": "^2.88.2",
+    "safe-buffer": "^5.2.1",
     "types-rlp": "^0.0.1",
-    "uuid": "^3.2.1"
+    "uuid": "^10.0.0",
+    "viem": "*"
   },
   "devDependencies": {
-    "tslint": "^5.10.0",
-    "tslint-config-standard": "^7.0.0",
-    "typescript": "^4.5.4"
+    "tsx": "*",
+    "typescript": "*"
   },
   "resolutions": {
     "sqlite3": "^5.1.7"

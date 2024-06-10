@@ -1796,6 +1796,7 @@ __metadata:
     prompt: "npm:^1.3.0"
     request: "npm:^2.88.2"
     safe-buffer: "npm:^5.2.1"
+    tsx: "npm:*"
     types-rlp: "npm:^0.0.1"
     typescript: "npm:*"
     uuid: "npm:^10.0.0"

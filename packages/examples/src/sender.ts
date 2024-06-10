@@ -1,9 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
-import BigNumber from 'bignumber.js'
-import Web3 from 'web3'
-import Machinomy from 'machinomy'
-import HDWalletProvider from '@machinomy/hdwallet-provider'
+import { Machinomy } from '@riaskov/machinomy'
 import Logger from '@machinomy/logger'
 
 const PROVIDER = process.env.PROVIDER || 'https://rinkeby.infura.io'
@@ -21,9 +18,9 @@ async function run () {
   const senderAccount = (await provider.getAddresses())[0]
   const receiverAccount = (await provider.getAddresses())[0]
   const web3 = new Web3(provider)
-  const minimumChannelAmount = new BigNumber(1).shiftedBy(4)
-  const channelValue = new BigNumber(1).shiftedBy(6)
-  const paymentPrice = new BigNumber(200000)
+  const minimumChannelAmount = 1n * 10n ** 4n
+  const channelValue = 1n * 10n ** 6n
+  const paymentPrice = 200000n
 
   LOG.info(`PROVIDER = ${PROVIDER}`)
   LOG.info(`MNEMONIC = ${MNEMONIC}`)

@@ -1,13 +1,12 @@
 import * as configuration from 'machinomy/lib/configuration'
-import Web3 from 'web3'
-import Machinomy from 'machinomy'
+import { Machinomy } from '@riaskov/machinomy'
 import express from 'express'
 import bodyParser from 'body-parser'
 import fs from 'fs'
 
 async function main () {
-  let sender = '0x0108d76118d97b88aa40167064cb242fa391effa'
-  let receiver = '0x3155694d7558eec974cfe35eaa3c2c7bcebb793f'
+  let sender: `0x${string}` = '0x0108d76118d97b88aa40167064cb242fa391effa'
+  let receiver: `0x${string}` = '0x3155694d7558eec974cfe35eaa3c2c7bcebb793f'
 
   let getBalance = async (web3: Web3, account: string) => {
     return web3.eth.getBalance(account)
