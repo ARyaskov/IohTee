@@ -26,6 +26,7 @@
     "test": "exit 0",
     "coverage": "exit 0",
     "hub": "tsx src/server.ts",
+    "run:machinomy": "tsx src/machinomy.ts",
     "sender": "yarn build && DEBUG=* node ./src/sender.js",
     "receiver": "yarn build && DEBUG=* node ./src/receiver.js",
     "senderTokens": "yarn build && DEBUG=* node ./src/senderTokens.js",
