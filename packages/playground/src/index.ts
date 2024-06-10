@@ -1,18 +1,15 @@
 import 'dotenv/config'
 import express from 'express'
 import bodyParser from 'body-parser'
-import HDWalletProvider from '@machinomy/hdwallet-provider'
 import {
-  Network,
   NetworkType,
   networkByName,
-  DefaultUnidirectionalAddress,
   Unidirectional,
 } from '@riaskov/machinomy-contracts'
 import Paywall from './Paywall'
 import morgan from 'morgan'
 import url from 'url'
-import { Chain, createWalletClient, http } from 'viem'
+import { createWalletClient, http } from 'viem'
 
 async function main() {
   const HOST = String(process.env.HOST)
