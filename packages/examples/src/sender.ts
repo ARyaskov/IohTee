@@ -4,16 +4,18 @@ import { Machinomy } from '@riaskov/machinomy'
 import Logger from '@machinomy/logger'
 
 const PROVIDER = process.env.PROVIDER || 'https://rinkeby.infura.io'
-const MNEMONIC = process.env.MNEMONIC || 'peanut giggle name tree canoe tube render ketchup survey segment army will'
+const MNEMONIC =
+  process.env.MNEMONIC ||
+  'peanut giggle name tree canoe tube render ketchup survey segment army will'
 const LOG = new Logger('machinomy-sender')
 
-async function run () {
+async function run() {
   fs.removeSync(path.resolve('./sender-receiver'))
 
   const provider = HDWalletProvider.mnemonic({
     mnemonic: MNEMONIC!,
     rpc: PROVIDER,
-    numberOfAccounts: 2
+    numberOfAccounts: 2,
   })
   const senderAccount = (await provider.getAddresses())[0]
   const receiverAccount = (await provider.getAddresses())[0]
@@ -25,25 +27,28 @@ async function run () {
   LOG.info(`PROVIDER = ${PROVIDER}`)
   LOG.info(`MNEMONIC = ${MNEMONIC}`)
 
-  const machinomy = new Machinomy(
-    senderAccount,
-    web3, {
-      databaseUrl: 'nedb://sender-receiver/database.nedb',
-      minimumChannelAmount: minimumChannelAmount
-    }
-  )
+  const machinomy = new Machinomy(senderAccount, web3, {
+    databaseUrl: 'nedb://sender-receiver/database.nedb',
+    minimumChannelAmount: minimumChannelAmount,
+  })
 
-  LOG.info(`Start opening Machinomy channel between sender ${senderAccount} and receiver ${receiverAccount} with value ${channelValue} Wei`)
-  LOG.info(`For remote Ethereum nodes (e.g. Rinkeby or Ropsten) it can taking a 30-60 seconds.`)
+  LOG.info(
+    `Start opening Machinomy channel between sender ${senderAccount} and receiver ${receiverAccount} with value ${channelValue} Wei`,
+  )
+  LOG.info(
+    `For remote Ethereum nodes (e.g. Rinkeby or Ropsten) it can taking a 30-60 seconds.`,
+  )
 
   await machinomy.open(receiverAccount, channelValue)
 
   LOG.info(`Channel was opened.`)
-  LOG.info(`Trace the last transaction via https://rinkeby.etherscan.io/address/${senderAccount}`)
+  LOG.info(
+    `Trace the last transaction via https://rinkeby.etherscan.io/address/${senderAccount}`,
+  )
 
   const payment = await machinomy.payment({
     receiver: receiverAccount,
-    price: paymentPrice
+    price: paymentPrice,
   })
 
   LOG.info('Payment: ')
@@ -56,6 +61,6 @@ async function run () {
   process.exit(0)
 }
 
-run().catch(err => {
+run().catch((err) => {
   console.error(err)
 })

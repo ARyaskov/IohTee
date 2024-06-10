@@ -8,11 +8,15 @@ import contracts from '@machinomy/contracts'
 
 const payment = require(path.resolve('./payment.json'))
 const PROVIDER = process.env.PROVIDER || 'https://rinkeby.infura.io'
-const MNEMONIC_SENDER = process.env.MNEMONIC_SENDER || 'peanut giggle name tree canoe tube render ketchup survey segment army will'
-const MNEMONIC_RECEIVER = process.env.MNEMONIC_RECEIVER || 'dance mutual spike analyst together average reject pudding hazard move fence install'
+const MNEMONIC_SENDER =
+  process.env.MNEMONIC_SENDER ||
+  'peanut giggle name tree canoe tube render ketchup survey segment army will'
+const MNEMONIC_RECEIVER =
+  process.env.MNEMONIC_RECEIVER ||
+  'dance mutual spike analyst together average reject pudding hazard move fence install'
 const LOG = new Logger('machinomy-receiver')
 
-async function run () {
+async function run() {
   fs.removeSync(path.resolve('./sender-receiver'))
 
   LOG.info(`PROVIDER = ${PROVIDER}`)
@@ -21,11 +25,11 @@ async function run () {
 
   const provider1 = HDWalletProvider.mnemonic({
     mnemonic: MNEMONIC_SENDER!,
-    rpc: PROVIDER
+    rpc: PROVIDER,
   })
   const provider2 = HDWalletProvider.mnemonic({
     mnemonic: MNEMONIC_RECEIVER!,
-    rpc: PROVIDER
+    rpc: PROVIDER,
   })
   const senderAccount = (await provider1.getAddresses())[0]
   const receiverAccount = (await provider2.getAddresses())[0]
@@ -33,23 +37,24 @@ async function run () {
   const tokenAddress = payment.tokenContract
   const TestToken = contracts.TestToken.contract(receiverWeb3.currentProvider)
   const instanceTestToken = await TestToken.deployed()
-  const receiverMachinomy = new Machinomy(
-    receiverAccount,
-    receiverWeb3, {
-      databaseUrl: 'nedb://sender-receiver/database.nedb'
-    }
-  )
+  const receiverMachinomy = new Machinomy(receiverAccount, receiverWeb3, {
+    databaseUrl: 'nedb://sender-receiver/database.nedb',
+  })
 
   LOG.info(`Sender: ${senderAccount}`)
   LOG.info(`Receiver: ${receiverAccount}`)
   LOG.info(`Token address: ${tokenAddress}`)
   LOG.info(`Accept payment: ${JSON.stringify(payment)}`)
 
-  LOG.info(`Balance of Wallet ${senderAccount} = ${ await instanceTestToken.balanceOf(senderAccount) } tokens (+ ${payment.channelValue} tokens deposited in channel).`)
-  LOG.info(`Balance of Wallet ${receiverAccount} = ${ await instanceTestToken.balanceOf(receiverAccount) } tokens.`)
+  LOG.info(
+    `Balance of Wallet ${senderAccount} = ${await instanceTestToken.balanceOf(senderAccount)} tokens (+ ${payment.channelValue} tokens deposited in channel).`,
+  )
+  LOG.info(
+    `Balance of Wallet ${receiverAccount} = ${await instanceTestToken.balanceOf(receiverAccount)} tokens.`,
+  )
 
   await receiverMachinomy.acceptPayment({
-    payment: payment
+    payment: payment,
   })
 
   LOG.info(`Start closing channel with channelID ${payment.channelId}`)
@@ -57,15 +62,21 @@ async function run () {
   await receiverMachinomy.close(payment.channelId)
 
   LOG.info(`Channel ${payment.channelId} was successfully closed.`)
-  LOG.info(`Trace the last transaction via https://rinkeby.etherscan.io/address/${receiverAccount}`)
+  LOG.info(
+    `Trace the last transaction via https://rinkeby.etherscan.io/address/${receiverAccount}`,
+  )
   LOG.info(`Receiver done.`)
 
-  LOG.info(`Balance of Wallet ${senderAccount} = ${ await instanceTestToken.balanceOf(senderAccount) } tokens (- ${payment.price} tokens).`)
-  LOG.info(`Balance of Wallet ${receiverAccount} = ${ await instanceTestToken.balanceOf(receiverAccount) } tokens (+ ${payment.price} tokens).`)
+  LOG.info(
+    `Balance of Wallet ${senderAccount} = ${await instanceTestToken.balanceOf(senderAccount)} tokens (- ${payment.price} tokens).`,
+  )
+  LOG.info(
+    `Balance of Wallet ${receiverAccount} = ${await instanceTestToken.balanceOf(receiverAccount)} tokens (+ ${payment.price} tokens).`,
+  )
 
   process.exit(0)
 }
 
-run().catch(err => {
+run().catch((err) => {
   console.error(err)
 })

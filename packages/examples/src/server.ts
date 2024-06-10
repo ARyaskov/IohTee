@@ -19,12 +19,16 @@
  */
 
 import express from 'express'
-import { Machinomy, AcceptTokenRequestSerde, PaymentChannelSerde } from '@riaskov/machinomy'
+import {
+  Machinomy,
+  AcceptTokenRequestSerde,
+  PaymentChannelSerde,
+} from '@riaskov/machinomy'
 import bodyParser from 'body-parser'
-import {createWalletClient, http} from "viem"
-import {networkByName, NetworkType} from "@riaskov/machinomy-contracts"
+import { createWalletClient, http } from 'viem'
+import { networkByName, NetworkType } from '@riaskov/machinomy-contracts'
 
-async function main () {
+async function main() {
   const RPC_URL = String(process.env.RPC_URL).trim()
   const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
   const NETWORK = String(process.env.NETWORK).trim()
@@ -48,16 +52,15 @@ async function main () {
   /**
    * Create machinomy instance that provides API for accepting payments.
    */
-  let machinomy = new Machinomy(
-    {
-      network: chain,
-      account: receiver,
-      httpRpcUrl: RPC_URL,
-      mnemonic: MNEMONIC,
-      options: {
-        databaseUrl: 'nedb://./server'
-      }
-    })
+  let machinomy = new Machinomy({
+    network: chain,
+    account: receiver,
+    httpRpcUrl: RPC_URL,
+    mnemonic: MNEMONIC,
+    options: {
+      databaseUrl: 'nedb://./server',
+    },
+  })
 
   let hub = express()
   hub.use(bodyParser.json())
@@ -76,7 +79,9 @@ async function main () {
    */
   hub.get('/verify/:token', async (req, res) => {
     const token = req.params.token as string
-    const acceptTokenRequest = AcceptTokenRequestSerde.instance.deserialize({ token })
+    const acceptTokenRequest = AcceptTokenRequestSerde.instance.deserialize({
+      token,
+    })
     const isAccepted = (await machinomy.acceptToken(acceptTokenRequest)).status
     if (isAccepted) {
       res.status(200).send({ status: 'ok' })
@@ -141,7 +146,7 @@ async function main () {
   })
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error(error)
   process.exit(1)
 })

@@ -8,27 +8,32 @@ import Logger from '@machinomy/logger'
 import contracts from '@machinomy/contracts'
 
 const PROVIDER = process.env.PROVIDER || 'https://rinkeby.infura.io'
-const MNEMONIC_SENDER = process.env.MNEMONIC_SENDER || 'peanut giggle name tree canoe tube render ketchup survey segment army will'
-const MNEMONIC_RECEIVER = process.env.MNEMONIC_RECEIVER || 'dance mutual spike analyst together average reject pudding hazard move fence install'
+const MNEMONIC_SENDER =
+  process.env.MNEMONIC_SENDER ||
+  'peanut giggle name tree canoe tube render ketchup survey segment army will'
+const MNEMONIC_RECEIVER =
+  process.env.MNEMONIC_RECEIVER ||
+  'dance mutual spike analyst together average reject pudding hazard move fence install'
 const LOG = new Logger('machinomy-sender')
 
-async function run () {
+async function run() {
   fs.removeSync(path.resolve('./sender-receiver'))
 
   const provider1 = HDWalletProvider.mnemonic({
     mnemonic: MNEMONIC_SENDER!,
-    rpc: PROVIDER
+    rpc: PROVIDER,
   })
   const provider2 = HDWalletProvider.mnemonic({
     mnemonic: MNEMONIC_RECEIVER!,
-    rpc: PROVIDER
+    rpc: PROVIDER,
   })
   const senderAccount = (await provider1.getAddresses())[0]
   const receiverAccount = (await provider2.getAddresses())[0]
   const web3 = new Web3(provider1)
   const channelValue = new BigNumber(20)
   const paymentPrice = new BigNumber(5)
-  const instanceTestToken: contracts.TestToken.Contract = await contracts.TestToken.contract(provider1).deployed()
+  const instanceTestToken: contracts.TestToken.Contract =
+    await contracts.TestToken.contract(provider1).deployed()
   const tokenContract = instanceTestToken.address
 
   LOG.info(`PROVIDER = ${PROVIDER}`)
@@ -36,25 +41,28 @@ async function run () {
   LOG.info(`MNEMONIC RECEIVER = ${MNEMONIC_RECEIVER}`)
   LOG.info(`Token contract = ${tokenContract}`)
 
-  const machinomy = new Machinomy(
-    senderAccount,
-    web3, {
-      databaseUrl: 'nedb://sender-receiver/database.nedb'
-    }
-  )
+  const machinomy = new Machinomy(senderAccount, web3, {
+    databaseUrl: 'nedb://sender-receiver/database.nedb',
+  })
 
-  LOG.info(`Start opening Machinomy channel between sender ${senderAccount} and receiver ${receiverAccount} with value ${channelValue} tokens`)
-  LOG.info(`For remote Ethereum nodes (e.g. Rinkeby or Ropsten) it can taking a 30-60 seconds.`)
+  LOG.info(
+    `Start opening Machinomy channel between sender ${senderAccount} and receiver ${receiverAccount} with value ${channelValue} tokens`,
+  )
+  LOG.info(
+    `For remote Ethereum nodes (e.g. Rinkeby or Ropsten) it can taking a 30-60 seconds.`,
+  )
 
   await machinomy.open(receiverAccount, channelValue, undefined, tokenContract)
 
   LOG.info(`Channel was opened.`)
-  LOG.info(`Trace the last transaction via https://rinkeby.etherscan.io/address/${senderAccount}`)
+  LOG.info(
+    `Trace the last transaction via https://rinkeby.etherscan.io/address/${senderAccount}`,
+  )
 
   const payment = await machinomy.payment({
     receiver: receiverAccount,
     price: paymentPrice,
-    tokenContract: tokenContract
+    tokenContract: tokenContract,
   })
 
   LOG.info('Payment: ')
@@ -67,6 +75,6 @@ async function run () {
   process.exit(0)
 }
 
-run().catch(err => {
+run().catch((err) => {
   console.error(err)
 })

@@ -20,14 +20,14 @@ import HDWalletProvider from '@machinomy/hdwallet-provider'
 import Machinomy from 'machinomy'
 import BigNumber from 'bignumber.js'
 
-async function main (): Promise<string> {
+async function main(): Promise<string> {
   const PROVIDER_URL = String(process.env.PROVIDER_URL)
   const MNEMONIC = String(process.env.MNEMONIC).trim()
 
   const TARGET = 'https://playground.machinomy.com/hello-token'
   const provider = HDWalletProvider.mnemonic({
     mnemonic: MNEMONIC!,
-    rpc: PROVIDER_URL
+    rpc: PROVIDER_URL,
   })
   const web3 = new Web3(provider)
 
@@ -40,7 +40,9 @@ async function main (): Promise<string> {
   /**
    * Create machinomy instance that provides API for accepting payments.
    */
-  const machinomy = new Machinomy(sender, web3, { databaseUrl: 'sqlite://./client-token' })
+  const machinomy = new Machinomy(sender, web3, {
+    databaseUrl: 'sqlite://./client-token',
+  })
 
   const response = await fetch(TARGET)
   const headers = response.headers
@@ -53,7 +55,7 @@ async function main (): Promise<string> {
     gateway: headers.get('paywall-gateway')!,
     receiver: headers.get('paywall-address')!,
     meta: 'metaidexample',
-    tokenContract: headers.get('paywall-token-contract')!
+    tokenContract: headers.get('paywall-token-contract')!,
   })
 
   const token = result.token
@@ -63,8 +65,8 @@ async function main (): Promise<string> {
    */
   const content = await fetch(TARGET, {
     headers: {
-      authorization: `paywall ${token} ${'metaidexample'} ${String(headers.get('paywall-price'))} ${String(headers.get('paywall-token-contract'))}`
-    }
+      authorization: `paywall ${token} ${'metaidexample'} ${String(headers.get('paywall-price'))} ${String(headers.get('paywall-token-contract'))}`,
+    },
   })
 
   // tslint:disable-next-line:no-unnecessary-type-assertion
@@ -72,11 +74,13 @@ async function main (): Promise<string> {
   return body.read().toString()
 }
 
-main().then((content: string) => {
-  console.log('Bought content: ')
-  console.log(`"${content}"`)
-  process.exit(0)
-}).catch(error => {
-  console.error(error)
-  process.exit(1)
-})
+main()
+  .then((content: string) => {
+    console.log('Bought content: ')
+    console.log(`"${content}"`)
+    process.exit(0)
+  })
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })

@@ -15,12 +15,11 @@
  * The server side for selling the content is provided in `server.ts` file.
  */
 
-
 import HDWalletProvider from '@machinomy/hdwallet-provider'
 import Machinomy from 'machinomy'
 import { BigNumber } from 'bignumber.js'
 
-async function main (): Promise<string> {
+async function main(): Promise<string> {
   const RPC_URL = String(process.env.RPC_URL).trim()
   const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
   const NETWORK = String(process.env.NETWORK).trim()
@@ -28,7 +27,7 @@ async function main (): Promise<string> {
   const TARGET = 'https://play.machinomy.toivo.tech/hello'
   const provider = HDWalletProvider.mnemonic({
     mnemonic: MNEMONIC!,
-    rpc: PROVIDER_URL
+    rpc: PROVIDER_URL,
   })
   let web3 = new Web3(provider)
 
@@ -41,7 +40,9 @@ async function main (): Promise<string> {
   /**
    * Create machinomy instance that provides API for accepting payments.
    */
-  let machinomy = new Machinomy(sender, web3, { databaseUrl: 'sqlite://./client' })
+  let machinomy = new Machinomy(sender, web3, {
+    databaseUrl: 'sqlite://./client',
+  })
 
   let response = await fetch(TARGET)
   let headers = response.headers
@@ -53,7 +54,7 @@ async function main (): Promise<string> {
     price: BigInt(String(headers.get('paywall-price'))),
     gateway: headers.get('paywall-gateway')!,
     receiver: headers.get('paywall-address')!,
-    meta: 'metaidexample'
+    meta: 'metaidexample',
   })
 
   let token = result.token
@@ -63,8 +64,8 @@ async function main (): Promise<string> {
    */
   let content = await fetch(TARGET, {
     headers: {
-      authorization: `paywall ${token} ${'metaidexample'} ${String(headers.get('paywall-price'))}`
-    }
+      authorization: `paywall ${token} ${'metaidexample'} ${String(headers.get('paywall-price'))}`,
+    },
   })
 
   // tslint:disable-next-line:no-unnecessary-type-assertion
@@ -72,11 +73,13 @@ async function main (): Promise<string> {
   return body.read().toString()
 }
 
-main().then((content: string) => {
-  console.log('Bought content: ')
-  console.log(`"${content}"`)
-  process.exit(0)
-}).catch(error => {
-  console.error(error)
-  process.exit(1)
-})
+main()
+  .then((content: string) => {
+    console.log('Bought content: ')
+    console.log(`"${content}"`)
+    process.exit(0)
+  })
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })

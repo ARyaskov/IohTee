@@ -4,7 +4,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import fs from 'fs'
 
-async function main () {
+async function main() {
   let sender: `0x${string}` = '0x0108d76118d97b88aa40167064cb242fa391effa'
   let receiver: `0x${string}` = '0x3155694d7558eec974cfe35eaa3c2c7bcebb793f'
 
@@ -15,20 +15,33 @@ async function main () {
   let provider = configuration.currentProvider()
   let web3 = new Web3(provider)
 
-  let machinomyHub = new Machinomy(receiver, web3, { databaseUrl: 'nedb://./hub' })
+  let machinomyHub = new Machinomy(receiver, web3, {
+    databaseUrl: 'nedb://./hub',
+  })
   let hub = express()
   hub.use(bodyParser.json())
   hub.use(bodyParser.urlencoded({ extended: false }))
-  hub.post('/machinomy', async (req: express.Request, res: express.Response, next: Function) => {
-    let body = await machinomyHub.acceptPayment(req.body)
-    res.status(200).send(body)
-  })
+  hub.post(
+    '/machinomy',
+    async (req: express.Request, res: express.Response, next: Function) => {
+      let body = await machinomyHub.acceptPayment(req.body)
+      res.status(200).send(body)
+    },
+  )
 
-  let checkBalance = async (message: string, web3: Web3, sender: string, cb: Function) => {
+  let checkBalance = async (
+    message: string,
+    web3: Web3,
+    sender: string,
+    cb: Function,
+  ) => {
     console.log('----------')
     console.log(message)
     let balanceBefore = await getBalance(web3, sender)
-    console.log('Balance before', web3.fromWei(balanceBefore, 'mwei').toString())
+    console.log(
+      'Balance before',
+      web3.fromWei(balanceBefore, 'mwei').toString(),
+    )
     let result = await cb()
     let balanceAfter = await getBalance(web3, sender)
     console.log('Balance after', web3.fromWei(balanceAfter, 'mwei').toString())
@@ -41,30 +54,37 @@ async function main () {
   let server = hub.listen(port, async () => {
     const price = 1000000
 
-    let machinomy = new Machinomy(sender, web3, { settlementPeriod: 0, databaseUrl: 'nedb://./client' })
+    let machinomy = new Machinomy(sender, web3, {
+      settlementPeriod: 0,
+      databaseUrl: 'nedb://./client',
+    })
 
     let message = 'This is first buy:'
     let resultFirst = await checkBalance(message, web3, sender, async () => {
-      return machinomy.buy({
-        receiver: receiver,
-        price: price,
-        gateway: 'http://localhost:3001/machinomy',
-        meta: 'metaexample'
-      }).catch((e: Error) => {
-        console.log(e)
-      })
+      return machinomy
+        .buy({
+          receiver: receiver,
+          price: price,
+          gateway: 'http://localhost:3001/machinomy',
+          meta: 'metaexample',
+        })
+        .catch((e: Error) => {
+          console.log(e)
+        })
     })
 
     message = 'This is second buy:'
     let resultSecond = await checkBalance(message, web3, sender, async () => {
-      return machinomy.buy({
-        receiver: receiver,
-        price: price,
-        gateway: 'http://localhost:3001/machinomy',
-        meta: 'metaexample'
-      }).catch((e: Error) => {
-        console.log(e)
-      })
+      return machinomy
+        .buy({
+          receiver: receiver,
+          price: price,
+          gateway: 'http://localhost:3001/machinomy',
+          meta: 'metaexample',
+        })
+        .catch((e: Error) => {
+          console.log(e)
+        })
     })
 
     let channelId = resultSecond.channelId
@@ -85,14 +105,16 @@ async function main () {
 
     message = 'Once more buy'
     let resultThird = await checkBalance(message, web3, sender, async () => {
-      return machinomy.buy({
-        receiver: receiver,
-        price: price,
-        gateway: 'http://localhost:3001/machinomy',
-        meta: 'metaexample'
-      }).catch((e: Error) => {
-        console.log(e)
-      })
+      return machinomy
+        .buy({
+          receiver: receiver,
+          price: price,
+          gateway: 'http://localhost:3001/machinomy',
+          meta: 'metaexample',
+        })
+        .catch((e: Error) => {
+          console.log(e)
+        })
     })
 
     message = 'Claim by reciver'
@@ -105,14 +127,24 @@ async function main () {
     console.log('ChannelId after once more buy:', resultThird.channelId)
 
     server.close()
-    try { fs.unlinkSync('client') } catch (error) { console.log(error) }
-    try { fs.unlinkSync('hub') } catch (error) { console.log(error) }
+    try {
+      fs.unlinkSync('client')
+    } catch (error) {
+      console.log(error)
+    }
+    try {
+      fs.unlinkSync('hub')
+    } catch (error) {
+      console.log(error)
+    }
   })
 }
 
-main().then(() => {
-  // Do Nothing
-}).catch(error => {
-  console.error(error)
-  process.exit(1)
-})
+main()
+  .then(() => {
+    // Do Nothing
+  })
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })
