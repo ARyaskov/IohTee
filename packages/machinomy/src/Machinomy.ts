@@ -17,6 +17,8 @@ import {
   createPublicClient,
   createWalletClient,
   http,
+  PublicClient,
+  WalletClient,
   WriteContractReturnType,
 } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
@@ -48,28 +50,43 @@ export default class Machinomy {
 
   private migrated: boolean = false
 
+  private readonly _publicClient
+  private readonly _walletClient
+
   constructor(params: MachinomyCtorParams) {
     this.account = params.account
     let _options = MachinomyOptions.defaults(params.options)
-    const publicClient = createPublicClient({
+    this._publicClient = createPublicClient({
       batch: {
         multicall: true,
       },
       chain: params.network as any,
-      transport: http(params.httpRpcUrl),
+      transport: http(params.httpRpcUrl, {
+        batch: true,
+      }),
     })
-    const walletClient = createWalletClient({
+    this._walletClient = createWalletClient({
       chain: params.network as any,
-      transport: http(params.httpRpcUrl),
+      transport: http(params.httpRpcUrl, {
+        batch: true,
+      }),
       account: mnemonicToAccount(params.mnemonic),
     })
 
     this.registry = new Registry(
       params.account,
-      publicClient as any,
-      walletClient,
+      this._publicClient as any,
+      this._walletClient as any,
       params.options,
     )
+  }
+
+  publicClient() {
+    return this._publicClient
+  }
+
+  walletClient() {
+    return this._walletClient
   }
 
   /**
