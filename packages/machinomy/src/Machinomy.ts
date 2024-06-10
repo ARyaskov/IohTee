@@ -77,6 +77,7 @@ export default class Machinomy {
       params.account,
       this._publicClient as any,
       this._walletClient as any,
+      params.mnemonic,
       params.options,
     )
   }

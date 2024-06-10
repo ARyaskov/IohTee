@@ -14,20 +14,24 @@ import { Unidirectional } from '@riaskov/machinomy-contracts'
 
 export default class Registry {
   account: `0x${string}`
+  mnemonic: string
   publicClient: PublicClient
   walletClient: WalletClient
   options: MachinomyOptions
+  unidirectional: Unidirectional | null = null
 
   constructor(
     account: `0x${string}`,
     publicClient: PublicClient,
     walletClient: WalletClient,
+    mnemonic: string,
     options: MachinomyOptions,
   ) {
     this.account = account
     this.publicClient = publicClient
     this.walletClient = walletClient
     this.options = options
+    this.mnemonic = mnemonic
   }
 
   // @memoize
@@ -37,14 +41,17 @@ export default class Registry {
     return new ChannelInflator(channelEthContract)
   }
 
-  // @memoize
   async channelEthContract(): Promise<Unidirectional> {
-    return new Unidirectional({
-      publicClient: this.publicClient as any,
-      walletClient: this.walletClient as any,
-      cachePeriod: this.options.chainCachePeriod || 0,
-      network: this.publicClient.chain as any,
-    })
+    if (!this.unidirectional) {
+      this.unidirectional = new Unidirectional({
+        publicClient: this.publicClient as any,
+        walletClient: this.walletClient as any,
+        cachePeriod: this.options.chainCachePeriod || 0,
+        network: this.publicClient.chain as any,
+        mnemonic: this.mnemonic,
+      })
+    }
+    return this.unidirectional
   }
 
   // @memoize
