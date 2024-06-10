@@ -35,7 +35,7 @@
     "build:cjs": "npx rimraf lib/cjs && npx hardhat compile && tsc --project tsconfig.cjs.json",
     "tree-shaking:lib": "npx rimraf lib/cjs/hardhat.config.* && npx rimraf lib/esm/hardhat.config.* && npx rimraf lib/types/hardhat.config.* && npx rimraf lib/cjs/**/*.map && npx rimraf lib/esm/**/*.map && npx rimraf lib/types/**/*.map && npx rimraf lib/cjs/**/*.d.ts && npx rimraf lib/esm/**/*.d.ts",
     "hardhat:node": "npx hardhat node",
-    "deploy:local": "npx hardhat ignition deploy ignition/modules/Unidirectional.ts --network localhost",
+    "deploy:local": "npx hardhat ignition deploy ignition/modules/Unidirectional.ts --network hardhat",
     "deploy:uni:polygon": "npx hardhat ignition deploy ignition/modules/Unidirectional.ts --network polygon --verify",
     "deploy:uni:polygonAmoy": "npx hardhat ignition deploy ignition/modules/Unidirectional.ts --network polygonAmoy",
     "lint:solidity": "solium -d contracts/",

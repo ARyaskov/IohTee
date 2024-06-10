@@ -71,7 +71,7 @@ export const DefaultUnidirectionalAddress: Record<string, `0x${string}`> = {
   Sepolia: '0x',
   'Binance Smart Chain Testnet': '0x',
   'Polygon Amoy': '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
-  Hardhat: '0x',
+  Hardhat: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
 }
 
 export enum UnidirectionalEventName {
