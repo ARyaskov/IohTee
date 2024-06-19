@@ -40,7 +40,7 @@
     "prettier": "^4.0.0-alpha.8",
     "rimraf": "^5.0.7",
     "ts-node": "^7.0.x",
-    "typescript": "^5.5.1-rc"
+    "typescript": "5.4.5"
   },
   "resolutions": {
     "sqlite3": "^5.1.7"
