@@ -24,7 +24,7 @@ async function main(): Promise<string> {
   const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
   const NETWORK = String(process.env.NETWORK).trim()
 
-  const TARGET = 'https://play.machinomy.toivo.tech/hello'
+  const TARGET = 'https://play.iohtee.toivo.tech/hello'
   const provider = HDWalletProvider.mnemonic({
     mnemonic: MNEMONIC!,
     rpc: PROVIDER_URL,
