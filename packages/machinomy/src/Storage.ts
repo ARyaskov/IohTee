@@ -23,6 +23,7 @@ import PostgresTokensDatabase from './storage/postgresql/PostgresTokensDatabase'
 import PostgresPaymentsDatabase from './storage/postgresql/PostgresPaymentsDatabase'
 import PostgresChannelsDatabase from './storage/postgresql/PostgresChannelsDatabase'
 import PostgresqlMigrator from './storage/postgresql/PostgresqlMigrator'
+import * as path from 'node:path'
 
 export interface Storage {
   engine: IEngine
@@ -116,6 +117,11 @@ export namespace Storage {
         log.info('Use postgresql database')
         return buildPostgres(databaseUrl, inflator, namespace)
       case 'sqlite':
+        if (!path.isAbsolute(splits[1])) {
+          throw new Error(
+            `# Machinomy Storage: Please specify path to DB in the format "db-type://absolute-path-to-db-here"`,
+          )
+        }
         log.info('Use sqlite database')
         return buildSqlite(databaseUrl, inflator, namespace)
       default:

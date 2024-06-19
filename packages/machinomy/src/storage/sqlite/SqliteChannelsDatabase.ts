@@ -10,16 +10,16 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
         'INSERT INTO channel("channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil") ' +
           'VALUES ($channelId, $kind, $sender, $receiver, $value, $spent, $state, $tokenContract, $settlementPeriod, $settlingUntil)',
         {
-          $channelId: paymentChannel.channelId,
-          $kind: this.kind,
-          $sender: paymentChannel.sender,
-          $receiver: paymentChannel.receiver,
-          $value: paymentChannel.value.toString(),
-          $spent: paymentChannel.spent.toString(),
-          $state: paymentChannel.state,
-          $tokenContract: paymentChannel.tokenContract,
-          $settlementPeriod: paymentChannel.settlementPeriod,
-          $settlingUntil: paymentChannel.settlingUntil.toString(),
+          channelId: paymentChannel.channelId,
+          kind: this.kind,
+          sender: paymentChannel.sender,
+          receiver: paymentChannel.receiver,
+          value: paymentChannel.value.toString(),
+          spent: paymentChannel.spent.toString(),
+          state: paymentChannel.state,
+          tokenContract: paymentChannel.tokenContract,
+          settlementPeriod: paymentChannel.settlementPeriod,
+          settlingUntil: paymentChannel.settlingUntil.toString(),
         },
       )
     })
@@ -31,7 +31,7 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
         'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
           'WHERE "channelId" = $channelId LIMIT 1',
         {
-          $channelId: channelId,
+          channelId: channelId,
         },
       )
       return raw ? this.inflatePaymentChannel(raw) : null
@@ -43,8 +43,8 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
       return client.run(
         'UPDATE channel SET spent = $spent WHERE "channelId" = $channelId',
         {
-          $channelId: channelId,
-          $spent: spent.toString(),
+          channelId: channelId,
+          spent: spent.toString(),
         },
       )
     })
@@ -62,8 +62,8 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
       return client.run(
         'UPDATE channel SET value = $value WHERE "channelId" = $channelId',
         {
-          $channelId: channelId,
-          $value: newValue.toString(),
+          channelId: channelId,
+          value: newValue.toString(),
         },
       )
     })
@@ -99,9 +99,9 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
         'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
           'WHERE sender = $sender AND receiver = $receiver AND value >= spent + $amount AND state = 0',
         {
-          $sender: sender,
-          $receiver: receiver,
-          $amount: amount.toString(),
+          sender: sender,
+          receiver: receiver,
+          amount: amount.toString(),
         },
       )
       if (raw) {
@@ -125,8 +125,8 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
         'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
           'WHERE sender = $sender AND receiver = $receiver',
         {
-          $sender: sender,
-          $receiver: receiver,
+          sender: sender,
+          receiver: receiver,
         },
       )
       return this.inflatePaymentChannels(rows)
@@ -143,9 +143,9 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
         'SELECT "channelId", kind, sender, receiver, value, spent, state, "tokenContract", "settlementPeriod", "settlingUntil" FROM channel ' +
           'WHERE sender = $sender AND receiver = $receiver AND "channelId" = $channelId LIMIT 1',
         {
-          $sender: sender,
-          $receiver: receiver,
-          $channelId: channelId,
+          sender: sender,
+          receiver: receiver,
+          channelId: channelId,
         },
       )
       return row ? this.inflatePaymentChannel(row) : null
@@ -160,8 +160,8 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
       return client.run(
         'UPDATE channel SET state = $state WHERE "channelId" = $channelId',
         {
-          $state: state,
-          $channelId: channelId.toString(),
+          state: state,
+          channelId: channelId.toString(),
         },
       )
     })
@@ -175,8 +175,8 @@ export class SqliteChannelsDatabase extends AbstractChannelsDatabase<EngineSqlit
       return client.run(
         'UPDATE channel SET "settlingUntil" = $settlingUntil WHERE "channelId" = $channelId',
         {
-          $settlingUntil: settlingUntil.toString(),
-          $channelId: channelId,
+          settlingUntil: settlingUntil.toString(),
+          channelId: channelId,
         },
       )
     })

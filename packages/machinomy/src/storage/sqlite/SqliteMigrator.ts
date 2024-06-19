@@ -1,12 +1,9 @@
-import { ConnectionString } from 'connection-string'
 import Logger from '@machinomy/logger'
 import SqlMigrator from '../SqlMigrator'
 import * as path from 'path'
 
 export function migrationsConfig(connectionUrl: string) {
-  let c = new ConnectionString(connectionUrl)
-  let segments = c.segments || []
-  let filename = '/' + segments.join('/')
+  const filename = connectionUrl.split('sqlite://')[1]
   return {
     cmdOptions: {
       'migrations-dir': path.resolve(__dirname, './migrations/'),

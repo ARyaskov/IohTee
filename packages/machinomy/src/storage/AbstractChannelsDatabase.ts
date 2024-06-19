@@ -66,6 +66,7 @@ export default abstract class AbstractChannelsDatabase<T extends IEngine>
           LOG.info(
             `Spending channel with ID ${paymentChannel.channelId.toString()}: ${JSON.stringify(
               paymentChannel,
+              (_, v) => (typeof v === 'bigint' ? v.toString() : v),
             )}`,
           )
           return this.spend(paymentChannel.channelId, paymentChannel.spent)
@@ -73,6 +74,7 @@ export default abstract class AbstractChannelsDatabase<T extends IEngine>
           LOG.info(
             `Saving channel with ID ${paymentChannel.channelId.toString()}: ${JSON.stringify(
               paymentChannel,
+              (_, v) => (typeof v === 'bigint' ? v.toString() : v),
             )}`,
           )
           return this.save(paymentChannel)
