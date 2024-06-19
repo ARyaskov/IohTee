@@ -1,4 +1,4 @@
-# Machinomy Berry (v2) Monorepo 
+# IohTee Monorepo 
 [![Module type: CJS+ESM](https://img.shields.io/badge/module%20type-cjs%2Besm-brightgreen)]()
 [![Coverage Status][codecov-img]][codecov]
 [![Greenkeeper badge](https://badges.greenkeeper.io/machinomy/machinomy.svg)](https://greenkeeper.io/)
@@ -8,15 +8,15 @@
 
 ### ! Upgrading to v2 is in progress! Expect bugs !
 
-Machinomy Berry (v2) Monorepo repository. The second life of [original Machinomy library](https://github.com/machinomy/machinomy).
+IohTee Monorepo repository. The second life of [Machinomy library](https://github.com/machinomy/machinomy).
 We're upgrading it to contemporary standards (TypeScript 5+, Node.js 18+, ES2023+) and adding new features.
 
 Available sub-projects:
-- [Machinomy](packages/machinomy) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
-- [Contracts](packages/contracts) is a TypeScript interface for Ethereum contracts managed by [Truffle](https://github.com/trufflesuite/truffle) used by [Machinomy](packages/machinomy).
+- [IohTee](packages/machinomy) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
+- [Contracts](packages/contracts) is a TypeScript interface for Ethereum contracts managed by [Truffle](https://github.com/trufflesuite/truffle) used by [IohTee](packages/machinomy).
 - [Examples](packages/examples) is [Machinomy](packages/machinomy) examples.
 - [Playground](packages/playground) contains code of playground.machinomy.com
-- [cli](packages/cli) is Machinomy Command Line Interface.
+- [cli](packages/cli) is IohTee Command Line Interface.
 
 
 ## Tasks in progress
