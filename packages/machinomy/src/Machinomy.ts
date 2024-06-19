@@ -22,12 +22,21 @@ import {
   WriteContractReturnType,
 } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
+import { polygonAmoy } from 'viem/chains'
+import {
+  ethers,
+  getDefaultProvider,
+  JsonRpcProvider,
+  JsonRpcSigner,
+  Wallet,
+} from 'ethers'
 
 export interface MachinomyCtorParams {
   network: NetworkType
   account: `0x${string}`
   httpRpcUrl: string
   mnemonic: string
+  hdPath: `m/44'/60'/${string}`
   options: MachinomyOptions
 }
 
@@ -70,14 +79,25 @@ export default class Machinomy {
       transport: http(params.httpRpcUrl, {
         batch: true,
       }),
-      account: mnemonicToAccount(params.mnemonic),
+      account: mnemonicToAccount(params.mnemonic, { path: params.hdPath }),
     })
+    const hdWallet = ethers.HDNodeWallet.fromPhrase(
+      params.mnemonic,
+      undefined,
+      params.hdPath,
+    )
+    const ethersWallet = new Wallet(
+      hdWallet.privateKey,
+      getDefaultProvider(params.httpRpcUrl),
+    )
 
     this.registry = new Registry(
       params.account,
       this._publicClient as any,
       this._walletClient as any,
       params.mnemonic,
+      params.hdPath,
+      ethersWallet,
       params.options,
     )
   }
@@ -108,6 +128,7 @@ export default class Machinomy {
    */
   async buy(options: BuyOptions): Promise<BuyResult> {
     await this.checkMigrationsState()
+
     if (!options.gateway) {
       throw new Error('gateway must be specified.')
     }
@@ -219,7 +240,7 @@ export default class Machinomy {
   }
 
   /**
-   * Share the money between sender and reciver according to payments made.
+   * Share the money between sender and receiver according to payments made.
    *
    * For example a channel was opened with 10 Ether. Sender makes 6 purchases, 1 Ether each.
    * Total value transferred is 6 Ether.
@@ -286,24 +307,25 @@ export default class Machinomy {
       options.meta || '',
     )
   }
-
-  // @memoize
+  
   private async checkMigrationsState(): Promise<void> {
-    if (this.migrated) return
+    if (!this.migrated) {
+      let storage = await this.registry.storage()
+      let isLatest = await storage.migrator.isLatest()
+      let needMigration = !isLatest
 
-    let storage = await this.registry.storage()
-    let isLatest = await storage.migrator.isLatest()
-    let needMigration = !isLatest
-
-    if (needMigration) {
-      if (
-        this.registry.options.migrate === undefined ||
-        this.registry.options.migrate === MigrateOption.Silent
-      ) {
-        this.migrated = true
-        return storage.migrator.sync()
+      if (needMigration) {
+        if (
+          this.registry.options.migrate === undefined ||
+          this.registry.options.migrate === MigrateOption.Silent
+        ) {
+          this.migrated = true
+          return storage.migrator.sync()
+        } else {
+          throw new Error('There are non-applied db-migrations!')
+        }
       } else {
-        throw new Error('There are non-applied db-migrations!')
+        this.migrated = true
       }
     }
   }

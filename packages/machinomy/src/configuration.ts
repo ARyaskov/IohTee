@@ -9,7 +9,7 @@ import {
   WalletClient,
   Chain,
 } from 'viem'
-import { polygon, polygonAmoy } from 'viem/chains'
+import {hardhat, polygon, polygonAmoy} from 'viem/chains'
 import * as env from './env'
 import {
   DefaultUnidirectionalAddress,
@@ -26,7 +26,7 @@ export const PAYWALL_PATH = 'api/paywall/' + PROTOCOL
 const log = new Logger('configuration')
 
 const CONTRACTS = {
-  development: '0x',
+  development: DefaultUnidirectionalAddress.Hardhat,
   polygon: DefaultUnidirectionalAddress.Polygon,
   polygonAmoy: DefaultUnidirectionalAddress.PolygonAmoy,
 }
@@ -121,18 +121,18 @@ export const receiver = (): Configuration => {
 
 export function publicClient(): PublicClient {
   const defaultRpcUrl =
-    process.env.MACHINOMY_GETH_ADDR || 'http://localhost:8545'
+    process.env.RPC_URL || 'http://localhost:8545'
 
   if (typeof window !== 'undefined' && (window as any).ethereum) {
     const publicClient = createPublicClient({
-      chain: polygonAmoy, // TODO make a multiple chains
       transport: (window as any).ethereum,
     })
     return publicClient as any
   } else {
     const publicClient = createPublicClient({
-      chain: polygonAmoy, // TODO make a multiple chains
-      transport: http(defaultRpcUrl),
+      transport: http(defaultRpcUrl, {
+       batch: true
+      }),
     })
     return publicClient as any
   }
@@ -140,7 +140,7 @@ export function publicClient(): PublicClient {
 
 export function walletClient(chain: Chain = polygonAmoy): WalletClient {
   const defaultRpcUrl =
-    process.env.MACHINOMY_GETH_ADDR || 'http://localhost:8545'
+    process.env.RPC_URL || 'http://localhost:8545'
 
   if (typeof window !== 'undefined' && (window as any).ethereum) {
     const walletClient = createWalletClient({
@@ -151,21 +151,17 @@ export function walletClient(chain: Chain = polygonAmoy): WalletClient {
   } else {
     const walletClient = createWalletClient({
       chain: chain,
-      transport: http(defaultRpcUrl),
+      transport: http(defaultRpcUrl, {
+        batch: true
+      }),
     })
     return walletClient as WalletClient
   }
 }
 
 export function httpRpc(chain: NetworkType): string {
-  const defaultRpcUrl =
-    process.env.MACHINOMY_HTTP_RPC || 'http://localhost:8545'
-  let result = defaultRpcUrl
-  if (chain === polygon) {
-    result = process.env.POLYGON_RPC_URL!
-  } else if (chain === polygonAmoy) {
-    result = process.env.POLYGON_AMOY_RPC_URL!
-  }
+  const result =
+    process.env.RPC_URL || 'http://localhost:8545'
 
   return result
 }

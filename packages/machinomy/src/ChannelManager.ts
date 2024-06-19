@@ -33,7 +33,13 @@ const DAY_IN_SECONDS = 86400
 const NEW_BLOCK_TIME_IN_SECONDS = 15
 
 function generateToken(payment: any): string {
-  const dataString = JSON.stringify(payment) + new Date().toISOString()
+  const dataString =
+    JSON.stringify({
+      ...payment,
+      price: payment.price.toString(),
+      value: payment.value.toString(),
+      channelValue: payment.channelValue.toString(),
+    }) + new Date().toISOString()
   const hash = keccak256(stringToHex(dataString))
   return toHex(hash)
 }
@@ -289,54 +295,6 @@ export default class ChannelManager
     return this.tokensDao.isPresent(token)
   }
 
-  /**
-   * DO NOT USE THIS.
-   * @param sender
-   * @param receiver
-   * @param remoteChannels
-   */
-  async syncChannels(
-    sender: string,
-    receiver: string,
-    remoteChannels: RemoteChannelInfo[],
-  ): Promise<void> {
-    const channels = await this.openChannels()
-    const recChannels = channels.filter((chan) => chan.receiver === receiver)
-    const promises = remoteChannels.map(async (remoteChan) => {
-      const localChan = recChannels.find(
-        (chan) => chan.channelId === remoteChan.channelId,
-      )
-      if (localChan) {
-        // all is ok
-        if (localChan.spent >= remoteChan.spent) {
-          return
-        }
-      } else {
-        await this.nextPayment(remoteChan.channelId, BigInt(0), '')
-      }
-      const digest = await this.channelContract.paymentDigest(
-        remoteChan.channelId,
-        remoteChan.spent,
-      )
-      const restored = recoverPersonalSignature({
-        data: digest,
-        signature: remoteChan.sign.toString(),
-      })
-      if (restored !== sender) {
-        throw new InvalidChannelError('signature')
-      }
-      const payment = await this.nextPayment(
-        remoteChan.channelId,
-        remoteChan.spent,
-        '',
-      )
-      let chan = await this.findChannel(payment)
-      chan.spent = remoteChan.spent
-      await this.channelsDao.saveOrUpdate(chan)
-    })
-    await Promise.all(promises)
-  }
-
   async lastPayment(channelId: string | ChannelId): Promise<Payment | null> {
     channelId = channelId.toString()
     return this.paymentsDao.firstMaximum(channelId)
@@ -451,10 +409,10 @@ export default class ChannelManager
         payment.signature,
         channel.receiver,
       )
-      await this.channelsDao.updateState(channel.channelId, 2)
+      await this.channelsDao.updateState(channel.channelId, ChannelState.Settled)
       return result
     } else {
-      throw new Error('Can not claim unknown channnel')
+      throw new Error('Can not claim unknown channel')
     }
   }
 

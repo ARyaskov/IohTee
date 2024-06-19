@@ -21,6 +21,7 @@ export async function buyContent(
     account: account,
     httpRpcUrl: httpRpc(chain),
     mnemonic: mnemonic(),
+    hdPath: `m/44'/60'/0'/0/0`,
     options: MachinomyOptions.defaults(),
   })
   let pair = await client.buyUrl(uri)

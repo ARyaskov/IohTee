@@ -133,6 +133,24 @@ export default class ChannelContract {
     }
   }
 
+  async recoveryPaymentDigest(
+    channelId: `0x${string}`,
+    value: bigint,
+  ): Promise<`0x${string}`> {
+    const channel = await this.channelsDao.firstById(channelId)
+    if (channel) {
+      const tokenContract = channel.tokenContract
+      if (ChannelInflator.isTokenContractDefined(tokenContract)) {
+        // TODO FIXME return this.channelTokenContract.recoveryPaymentDigest(channelId, value, tokenContract)
+        return this.channelEthContract.recoveryPaymentDigest(channelId, value)
+      } else {
+        return this.channelEthContract.recoveryPaymentDigest(channelId, value)
+      }
+    } else {
+      throw new Error(`Channel ${channelId} is not found`)
+    }
+  }
+
   async canClaim(payment: Payment): Promise<boolean> {
     const channelId: `0x${string}` = payment.channelId
     const value: bigint = payment.value

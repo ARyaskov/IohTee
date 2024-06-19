@@ -19,11 +19,11 @@ export interface PaymentJSON {
 
 export interface SerializedPayment {
   channelId: `0x${string}`
-  value: bigint
+  value: string
   sender: `0x${string}`
   receiver: `0x${string}`
-  price: bigint
-  channelValue: bigint
+  price: string
+  channelValue: string
   v: number
   r: string
   s: string
@@ -81,11 +81,11 @@ export class PaymentSerde implements Serde<Payment> {
 
     return {
       channelId: obj.channelId,
-      value: obj.value,
+      value: obj.value.toString(),
       sender: obj.sender,
       receiver: obj.receiver,
-      price: obj.price,
-      channelValue: obj.channelValue,
+      price: obj.price.toString(),
+      channelValue: obj.channelValue.toString(),
       v: sig.v,
       r: sig.r,
       s: sig.s,

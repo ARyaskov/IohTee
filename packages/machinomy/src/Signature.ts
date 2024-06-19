@@ -7,7 +7,7 @@ export interface SignatureParts {
 }
 
 export default class Signature {
-  private rpcSig: string
+  rpcSig: string
 
   constructor(rpcSig: string) {
     this.rpcSig = rpcSig
@@ -23,7 +23,9 @@ export default class Signature {
       util.toBuffer(parts.r),
       util.toBuffer(parts.s),
     )
-    return new Signature(serialized)
+    const sig = new Signature(serialized)
+    sig.rpcSig = sig.rpcSig.slice(0, -2) + parts.v.toString(16)
+    return sig
   }
 
   public toString(): `0x${string}` {
