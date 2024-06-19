@@ -1032,7 +1032,6 @@ __metadata:
     bignumber.js: "npm:^9.1.2"
     chai: "npm:^5.1.1"
     chai-as-promised: "npm:^7.1.2"
-    coveralls: "npm:^3.1.1"
     cpx: "npm:^1.5.0"
     cross-env: "npm:^7.0.3"
     dotenv: "npm:^16.4.5"
@@ -1765,7 +1764,6 @@ __metadata:
     bignumber.js: "npm:*"
     chai: "npm:4.4.1"
     chai-as-promised: "npm:^7.1.2"
-    coveralls: "npm:^3.1.1"
     cpx: "npm:*"
     dotenv: "npm:*"
     eth-gas-reporter: "npm:^0.2.27"
@@ -1874,7 +1872,6 @@ __metadata:
     chai-as-promised: "npm:*"
     commander: "npm:^2.9.0"
     connection-string: "npm:^0.5.3"
-    coveralls: "npm:^3.1.1"
     db-migrate: "npm:^0.11.14"
     db-migrate-pg: "npm:^1.5.2"
     db-migrate-plugin-typescript: "npm:^2.0.0"
@@ -4442,21 +4439,6 @@ __metadata:
   version: 1.0.3
   resolution: "core-util-is@npm:1.0.3"
   checksum: 10c0/90a0e40abbddfd7618f8ccd63a74d88deea94e77d0e8dbbea059fa7ebebb8fbb4e2909667fe26f3a467073de1a542ebe6ae4c73a73745ac5833786759cd906c9
-  languageName: node
-  linkType: hard
-
-"coveralls@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "coveralls@npm:3.1.1"
-  dependencies:
-    js-yaml: "npm:^3.13.1"
-    lcov-parse: "npm:^1.0.0"
-    log-driver: "npm:^1.2.7"
-    minimist: "npm:^1.2.5"
-    request: "npm:^2.88.2"
-  bin:
-    coveralls: bin/coveralls.js
-  checksum: 10c0/9ada8daa6a93064f966cf070b1a6c0bb112b00502c67ce0b3047464b83a026bb60405b23abcd9888521458b28f111052cb353af6878a098cd748954df75faa6d
   languageName: node
   linkType: hard
 
@@ -7988,15 +7970,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lcov-parse@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "lcov-parse@npm:1.0.0"
-  bin:
-    lcov-parse: ./bin/cli.js
-  checksum: 10c0/0d7c3f55361a0f6eda4788928b014a7b56685ceb62b5f8fc1daf0b1dedba4d02e6aa0069e21fee92c479b7dacfd2e8e951e5cdec908f1615b516ff9f91033030
-  languageName: node
-  linkType: hard
-
 "levn@npm:~0.3.0":
   version: 0.3.0
   resolution: "levn@npm:0.3.0"
@@ -8127,13 +8100,6 @@ __metadata:
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: 10c0/d8cbea072bb08655bb4c989da418994b073a608dffa608b09ac04b43a791b12aeae7cd7ad919aa4c925f33b48490b5cfe6c1f71d827956071dae2e7bb3a6b74c
-  languageName: node
-  linkType: hard
-
-"log-driver@npm:^1.2.7":
-  version: 1.2.7
-  resolution: "log-driver@npm:1.2.7"
-  checksum: 10c0/025a1ea2fcdd2a379c6411ce6dde7af23083b5795861d226de9baaec82a6a583eb9ab283e2d7585d2d7b6c8d2c3ff68729232c76a782cf050d0d254c23f0971a
   languageName: node
   linkType: hard
 
@@ -8550,17 +8516,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimist@npm:0.0.8":
-  version: 0.0.8
-  resolution: "minimist@npm:0.0.8"
-  checksum: 10c0/d0a998c3042922dbcd5f23566b52811d6977649ad089fd75dd89e8a9bff27634194900818b2dfb1b873f204edb902d0c8cdea9cb8dca8488b301f69bd522d5dc
-  languageName: node
-  linkType: hard
-
-"minimist@npm:^1.1.0, minimist@npm:^1.2.0, minimist@npm:^1.2.3, minimist@npm:^1.2.5, minimist@npm:^1.2.6":
-  version: 1.2.8
-  resolution: "minimist@npm:1.2.8"
-  checksum: 10c0/19d3fcdca050087b84c2029841a093691a91259a47def2f18222f41e7645a0b7c44ef4b40e88a1e58a40c84d2ef0ee6047c55594d298146d0eb3f6b737c20ce6
+"minimist@npm:^0.2.4":
+  version: 0.2.4
+  resolution: "minimist@npm:0.2.4"
+  checksum: 10c0/6a8e8f4afa4a60d578b3eddabef1e3a40f3aa308290b17a55e060bbacfba7a575fd77f310969dd6b514c24251438a43039aafa0d6c9a3471ac2b5b45027d3369
   languageName: node
   linkType: hard
 
