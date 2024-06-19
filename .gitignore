@@ -17,3 +17,4 @@ packages/machinomy/coverage
 .nyc_output
 !truffle-config.js
 .yarn/install-state.gz
+**/*.db
