@@ -78,7 +78,6 @@
     "chai": "4.4.1",
     "chai-as-promised": "^7.1.2",
     "cpx": "*",
-    "eth-gas-reporter": "^0.2.27",
     "ethlint": "1.2.5",
     "hardhat-gas-reporter": "^2.2.0",
     "mocha": "10.4.0",
