@@ -15,6 +15,9 @@ export async function up(db: any, callback: CallbackFunction) {
       spent: bigNumberColumn,
       state: 'smallint',
       contractAddress: 'string',
+      tokenContract: 'string',
+      settlementPeriod: 'string',
+      settlingUntil: 'string',
     },
     ifNotExists: true,
   }

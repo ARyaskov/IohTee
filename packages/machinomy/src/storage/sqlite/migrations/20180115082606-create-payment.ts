@@ -4,6 +4,11 @@ import bigNumberColumn from './util/bigNumberColumn'
 export function up(db: any, callback: CallbackFunction) {
   const createTableOptions = {
     columns: {
+      id: {
+        type: 'int',
+        primaryKey: true,
+        autoIncrement: true,
+      },
       channelId: {
         type: 'string',
         notNull: true,
@@ -32,6 +37,8 @@ export function up(db: any, callback: CallbackFunction) {
       s: 'string',
       meta: 'string',
       contractAddress: 'string',
+      tokenContract: 'string',
+      createdAt: 'bigint',
     },
     ifNotExists: true,
   }
