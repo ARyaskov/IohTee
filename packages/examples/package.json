@@ -50,7 +50,7 @@
     "safe-buffer": "^5.2.1",
     "types-rlp": "^0.0.1",
     "uuid": "^10.0.0",
-    "viem": "*"
+    "viem": "2.15.1"
   },
   "devDependencies": {
     "tsx": "*",
