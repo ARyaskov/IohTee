@@ -83,6 +83,12 @@ $ yarn run sender && yarn run receiver
 
 Look at [sender.ts](packages/examples/src/sender.ts) and [receiver.ts](packages/examples/src/receiver.ts) for more information.
 
+## Aux
+
+If you want to see all logs in verbose format use `DEBUG=*`
+
+There is a weird bug with CJS in TS5.5+, we'll stay on 5.4 so far
+
 ## Documentation
 
 For more advanced documentation go to [doc/](doc/) folder.
