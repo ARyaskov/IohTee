@@ -13,7 +13,15 @@ import {
 import { GetContractReturnType } from '@nomicfoundation/hardhat-viem/types'
 import MemoryCache from './caching/MemoryCache'
 import { mnemonicToAccount } from 'viem/accounts'
-import { getTransactionReceipt } from 'viem/actions'
+import {
+  AbstractProvider,
+  Contract,
+  ethers,
+  getDefaultProvider,
+  HDNodeWallet,
+  JsonRpcProvider,
+  Wallet,
+} from 'ethers'
 import {
   Channel,
   ChannelState,
@@ -32,6 +40,7 @@ export type CtorBaseParams = {
   network: NetworkType
   deployedContractAddress?: `0x${string}`
   cachePeriod?: number
+  hdPath: `m/44'/60'/${string}`
 }
 
 export type CtorAccountParamPure = CtorBaseParams & {
@@ -42,6 +51,7 @@ export type CtorAccountParamPure = CtorBaseParams & {
 export type CtorAccountParamViem = CtorBaseParams & {
   publicClient: PublicClient
   walletClient: WalletClient
+  mnemonic: string
 }
 
 function isCtorAccountParamPure(
@@ -61,32 +71,73 @@ export class Unidirectional {
   private readonly _walletClient: WalletClient
   private readonly _contract: GetContractReturnType
   private readonly _abi: any
+  private readonly _ethersProvider: AbstractProvider | null = null
+  private readonly _ethersWallet: Wallet | null = null
+  private readonly _ethersContract: Contract | null = null
   private readonly cache: MemoryCache<Object>
 
   constructor(params: CtorParams) {
     this.cache = new MemoryCache(1000) // 1 sec
-    if (isCtorAccountParamPure(params)) {
-      // @ts-ignore
-      this._publicClient = createPublicClient({
-        batch: {
-          multicall: true,
-        },
-        chain: params.network,
-        transport: http(params.httpRpcUrl),
-      })
-      this._walletClient = createWalletClient({
-        chain: params.network,
-        transport: http(params.httpRpcUrl),
-        account: mnemonicToAccount(params.mnemonic),
-      })
-    } else {
-      this._publicClient = params.publicClient
-      this._walletClient = params.walletClient
-    }
+
     if (!params.deployedContractAddress) {
       this._address = DefaultUnidirectionalAddress[params.network.name]
     } else {
       this._address = params.deployedContractAddress
+    }
+
+    const hdWallet = ethers.HDNodeWallet.fromPhrase(
+      params.mnemonic,
+      undefined,
+      params.hdPath,
+    )
+
+    if (isCtorAccountParamPure(params)) {
+      // @ts-ignore
+      this._publicClient = createPublicClient({
+        // batch: {
+        //   multicall: true,
+        // },
+        chain: params.network,
+        transport: http(
+          params.httpRpcUrl,
+          //   {
+          //   batch: true,
+          // }
+        ),
+      })
+      this._walletClient = createWalletClient({
+        chain: params.network,
+        transport: http(
+          params.httpRpcUrl,
+          //   {
+          //   batch: true,
+          // }
+        ),
+        account: mnemonicToAccount(params.mnemonic, { path: params.hdPath }),
+      })
+      this._ethersProvider = getDefaultProvider(params.httpRpcUrl)
+
+      this._ethersWallet = new Wallet(hdWallet.privateKey, this._ethersProvider)
+
+      this._ethersContract = new Contract(
+        this._address,
+        uniArtifact.abi,
+        this._ethersWallet,
+      )
+    } else {
+      this._publicClient = params.publicClient
+      this._walletClient = params.walletClient
+
+      this._ethersProvider = getDefaultProvider(
+        this._walletClient.transport.url,
+      )
+      this._ethersWallet = new Wallet(hdWallet.privateKey, this._ethersProvider)
+
+      this._ethersContract = new Contract(
+        this._address,
+        uniArtifact.abi,
+        this._ethersWallet,
+      )
     }
 
     this._contract = getContract({
@@ -187,24 +238,66 @@ export class Unidirectional {
     from?: `0x${string}`,
   ): Promise<Channel> {
     let result
-    const txId = await this._walletClient.writeContract({
-      chain: this._walletClient.chain,
-      address: this._address,
-      abi: this.abi(),
-      functionName: 'open',
-      args: [channelId, receiver, settlingPeriod],
-      account: from ?? this._walletClient.account!.address,
-      value: value,
+    // const { request } = await this._publicClient.simulateContract({
+    //   chain: this._walletClient.chain,
+    //   address: this._address,
+    //   abi: this.abi(),
+    //   functionName: 'open',
+    //   args: [channelId, receiver, settlingPeriod],
+    //   account: from ?? this._walletClient.account!.address,
+    //   value: value,
+    // })
+    // const txId = await this._walletClient.writeContract({
+    //   chain: this._walletClient.chain,
+    //   address: this._address,
+    //   abi: this.abi(),
+    //   functionName: 'open',
+    //   args: [channelId, receiver, settlingPeriod],
+    //   account: from ?? this._walletClient.account!.address,
+    //   value: value,
+    // })
+
+    // const tx = await this._ethersContract!.populateTransaction.open(
+
+    // )
+    let txResponse = await this._ethersContract!.open(
+      channelId,
+      receiver,
+      settlingPeriod,
+      { value: value },
+    )
+    console.log('After open txId:', txResponse.hash)
+    // try {
+    //   const estimatedGas = await this._ethersProvider!.estimateGas(tx)
+    //   console.log('Estimated Gas:', estimatedGas.toString())
+    //
+    //   const txResponse = await this._ethersWallet!.sendTransaction({
+    //     ...tx,
+    //     gasLimit: estimatedGas,
+    //   })
+    //
+    //   const txReceipt = await txResponse.wait()
+    //   console.log('Transaction Hash:', txResponse.hash)
+    //   console.log('Transaction was mined in block:', txReceipt?.blockNumber)
+    //
+    //   txId = txResponse.hash
+    // } catch (error) {
+    //   console.error('Error simulating or sending transaction:', error)
+    //   throw error
+    // }
+    const receipt = await this.publicClient().waitForTransactionReceipt({
+      hash: txResponse.hash,
     })
 
-    const receipt = await getTransactionReceipt(this.publicClient() as any, {
-      hash: txId,
-    })
-
+    // const receipt = await getTransactionReceipt(this.publicClient() as any, {
+    //   hash: txResponse.hash as never as `0x${string}`,
+    // })
+    console.log(receipt)
     const logs = parseEventLogs({
       abi: this.abi(),
       logs: receipt.logs,
     })
+    console.log(logs)
 
     if (!hasEvent(logs, UnidirectionalEventName.DidOpen)) {
       throw new Error(`Unidirectional#open(): Can not open channel`)
@@ -228,7 +321,8 @@ export class Unidirectional {
         }
       }
     }
-
+    console.log('LOGS:')
+    console.log(logs)
     return result
   }
 
@@ -236,44 +330,28 @@ export class Unidirectional {
     channelId: `0x${string}`,
     value: bigint,
     from?: `0x${string}`,
-  ): Promise<WriteContractReturnType> {
-    return await this._walletClient.writeContract({
-      chain: this._walletClient.chain,
-      address: this._address,
-      abi: this.abi(),
-      functionName: 'deposit',
-      args: [channelId],
-      account: from ?? this._walletClient.account!.address,
+  ): Promise<any> {
+    let txResponse = await this._ethersContract!.deposit(channelId, {
       value: value,
     })
+
+    return txResponse
   }
 
   async startSettling(
     channelId: `0x${string}`,
     from?: `0x${string}`,
   ): Promise<WriteContractReturnType> {
-    return await this._walletClient.writeContract({
-      chain: this._walletClient.chain,
-      address: this._address,
-      abi: this.abi(),
-      functionName: 'startSettling',
-      args: [channelId],
-      account: from ?? this._walletClient.account!.address,
-    })
+    let txResponse = await this._ethersContract!.startSettling(channelId)
+    return txResponse
   }
 
   async settle(
     channelId: `0x${string}`,
     from?: `0x${string}`,
   ): Promise<WriteContractReturnType> {
-    return await this._walletClient.writeContract({
-      chain: this._walletClient.chain,
-      address: this._address,
-      abi: this.abi(),
-      functionName: 'settle',
-      args: [channelId],
-      account: from ?? this._walletClient.account!.address,
-    })
+    let txResponse = await this._ethersContract!.settle(channelId)
+    return txResponse
   }
 
   async claim(
@@ -282,14 +360,12 @@ export class Unidirectional {
     signature: `0x${string}`,
     from?: `0x${string}`,
   ): Promise<WriteContractReturnType> {
-    return await this._walletClient.writeContract({
-      chain: this._walletClient.chain,
-      address: this._address,
-      abi: this.abi(),
-      functionName: 'claim',
-      args: [channelId, payment, signature],
-      account: from ?? this._walletClient.account!.address,
-    })
+    let txResponse = await this._ethersContract!.claim(
+      channelId,
+      payment,
+      signature,
+    )
+    return txResponse
   }
 
   async getSettlementPeriod(channelId: `0x${string}`): Promise<bigint> {
@@ -347,12 +423,21 @@ export class Unidirectional {
     origin: string,
     signature: `0x${string}`,
   ): Promise<boolean> {
-    return (await this._publicClient.readContract({
-      address: this._address,
-      abi: this.abi(),
-      functionName: 'canClaim',
-      args: [channelId, payment, origin, signature],
-    })) as never as boolean
+    // return (await this._publicClient.readContract({
+    //   address: this._address,
+    //   abi: this.abi(),
+    //   functionName: 'canClaim',
+    //   args: [channelId, payment, origin, signature],
+    // })) as never as boolean
+
+    let txResponse = await this._ethersContract!.canClaim(
+      channelId,
+      payment,
+      origin,
+      signature,
+    )
+    console.log('# canClaim:', txResponse)
+    return txResponse
   }
 
   async canDeposit(channelId: `0x${string}`, origin: string): Promise<boolean> {
@@ -380,11 +465,25 @@ export class Unidirectional {
     channelId: `0x${string}`,
     payment: bigint,
   ): Promise<`0x${string}`> {
-    return (await this._publicClient.readContract({
+    let result = (await this._publicClient.readContract({
       address: this._address,
       abi: this.abi(),
       functionName: 'paymentDigest',
       args: [channelId, payment],
     })) as never as `0x${string}`
+    return result
+  }
+
+  async recoveryPaymentDigest(
+    channelId: `0x${string}`,
+    payment: bigint,
+  ): Promise<`0x${string}`> {
+    let result = (await this._publicClient.readContract({
+      address: this._address,
+      abi: this.abi(),
+      functionName: 'recoveryPaymentDigest',
+      args: [channelId, payment],
+    })) as never as `0x${string}`
+    return result
   }
 }

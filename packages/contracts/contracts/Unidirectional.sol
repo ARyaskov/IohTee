@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 
 /// @title Unidirectional Ether payment channels contract.
@@ -22,6 +23,7 @@ contract Unidirectional {
     event DidClaim(bytes32 indexed channelId);
     event DidStartSettling(bytes32 indexed channelId);
     event DidSettle(bytes32 indexed channelId);
+    event debug1(address indexed addr1, address indexed addr2);
 
     /*** ACTIONS AND CONSTRAINTS ***/
 
@@ -90,8 +92,7 @@ contract Unidirectional {
     /// @dev Check if settling period is over by comparing `settlingUntil` to a current block number.
     /// @param channelId Identifier of the channel.
     function canSettle(bytes32 channelId) public view returns(bool) {
-        PaymentChannel memory channel = channels[channelId];
-        bool isWaitingOver = isSettling(channelId) && block.number >= channel.settlingUntil;
+        bool isWaitingOver = isSettling(channelId) && block.number >= channels[channelId].settlingUntil;
         return isSettling(channelId) && isWaitingOver;
     }
 
@@ -114,12 +115,11 @@ contract Unidirectional {
     /// @param origin Caller of `claim` function.
     /// @param signature Signature for the payment promise.
     function canClaim(bytes32 channelId, uint256 payment, address origin, bytes memory signature) public view returns(bool) {
-        PaymentChannel memory channel = channels[channelId];
-        bool isReceiver = origin == channel.receiver;
-        bytes32 hash = recoveryPaymentDigest(channelId, payment);
-        bool isSigned = channel.sender == ECDSA.recover(hash, signature);
-
-        return isReceiver && isSigned;
+        require(origin == channels[channelId].receiver,
+            "canClaim: origin and channels[channelId].receiver addresses are different");
+        require(channels[channelId].sender == ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(paymentDigest(channelId, payment)), signature),
+            "canClaim: channel.sender and restored from the sig addresses are different");
+        return true;
     }
 
     /// @notice Claim the funds, and close the channel.
@@ -179,14 +179,6 @@ contract Unidirectional {
     /// @param channelId Identifier of the channel.
     /// @param payment Amount to send, and to claim later.
     function paymentDigest(bytes32 channelId, uint256 payment) public view returns(bytes32) {
-        return keccak256(abi.encodePacked(address(this), channelId, payment));
-    }
-
-    /// @return Actually signed hash of the payment promise, considering "Ethereum Signed Message" prefix.
-    /// @param channelId Identifier of the channel.
-    /// @param payment Amount to send, and to claim later.
-    function recoveryPaymentDigest(bytes32 channelId, uint256 payment) internal view returns(bytes32) {
-        bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-        return keccak256(abi.encodePacked(prefix, paymentDigest(channelId, payment)));
+        return keccak256(abi.encode(address(this), channelId, payment));
     }
 }

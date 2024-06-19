@@ -1,20 +1,5 @@
 import 'dotenv/config'
-import {
-  Abi,
-  AbiEvent,
-  bytesToHex,
-  Chain,
-  createPublicClient,
-  createWalletClient,
-  getContract,
-  http,
-  parseEventLogs,
-  ParseEventLogsReturnType,
-  PublicClient,
-  WalletClient,
-  WriteContractReturnType,
-} from 'viem'
-import { GetContractReturnType } from '@nomicfoundation/hardhat-viem/types'
+import { bytesToHex, Chain, ParseEventLogsReturnType } from 'viem'
 import {
   bsc,
   bscTestnet,
@@ -70,7 +55,7 @@ export const DefaultUnidirectionalAddress: Record<string, `0x${string}`> = {
   Polygon: '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
   Sepolia: '0x',
   'Binance Smart Chain Testnet': '0x',
-  'Polygon Amoy': '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
+  'Polygon Amoy': '0x96Cd8a0cAC5632c718Fcb520b4886585a8b8f976',
   Hardhat: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
 }
 
