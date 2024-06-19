@@ -1,7 +1,6 @@
 import "dotenv/config"
 import "@nomicfoundation/hardhat-viem"
-import "@nomiclabs/hardhat-ethers"
-import "@nomiclabs/hardhat-waffle"
+import "@nomicfoundation/hardhat-ethers"
 import "@nomicfoundation/hardhat-toolbox-viem"
 import '@typechain/hardhat'
 
