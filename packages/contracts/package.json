@@ -55,7 +55,7 @@
     "@typechain/hardhat": "^9.1.0",
     "bignumber.js": "*",
     "dotenv": "*",
-    "ethers": "^6.13.0",
+    "ethers": "^6.13.1",
     "hardhat": "2.23.0-dev.3",
     "humanize-plus": "*",
     "solidity-coverage": "^0.8.12",
