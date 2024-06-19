@@ -1,4 +1,5 @@
-import Datastore = require('nedb')
+import Datastore, { Document } from '@seald-io/nedb'
+import Nedb from '@seald-io/nedb'
 
 export class NedbDatastore {
   datastore: Datastore
@@ -7,60 +8,37 @@ export class NedbDatastore {
     this.datastore = datastore
   }
 
-  find<A>(query: any): Promise<Array<A>> {
-    return new Promise<Array<A>>((resolve, reject) => {
-      this.datastore.find<A>(query, (error: Error, documents: A[]) => {
-        error ? reject(error) : resolve(documents)
-      })
-    })
+  find<A>(query: any): Promise<Array<any>> {
+    return this.datastore.findAsync(query)
   }
 
-  findOne<A>(query: any): Promise<A> {
-    return new Promise<A>((resolve, reject) => {
-      this.datastore.findOne<A>(query, (error, documents) => {
-        error ? reject(error) : resolve(documents)
-      })
-    })
+  findOne<A>(query: any): Promise<any> {
+    return this.datastore.findOneAsync(query)
   }
 
   update<A>(
     query: any,
     updateQuery: any,
     options?: Nedb.UpdateOptions,
-  ): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      this.datastore.update<A>(
-        query,
-        updateQuery,
-        options,
-        (error, numberOfUpdates, upsert) => {
-          error ? reject(error) : resolve(numberOfUpdates)
-        },
-      )
-    })
+  ): Promise<{
+    numAffected: number
+    affectedDocuments: any
+    upsert: boolean
+  }> {
+    return this.datastore.updateAsync(query, updateQuery, options)
   }
 
-  insert<A>(newDoc: A): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.datastore.insert(newDoc, (err) => {
-        err ? reject(err) : resolve()
-      })
-    })
+  insert<A>(
+    newDoc: Record<string, any>,
+  ): Promise<Document<Record<string, any>>> {
+    return this.datastore.insertAsync(newDoc)
   }
 
-  count(query: any): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      this.datastore.count(query, (err, count) => {
-        err ? reject(err) : resolve(count)
-      })
-    })
+  async count(query: any): Promise<number> {
+    return (await this.datastore.countAsync(query)).valueOf()
   }
 
   remove(query: any, options: any): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      this.datastore.remove(query, options, (err, count) => {
-        err ? reject(err) : resolve(count)
-      })
-    })
+    return this.datastore.removeAsync(query, options)
   }
 }

@@ -1,4 +1,4 @@
-import Datastore = require('nedb')
+import Datastore from '@seald-io/nedb'
 import IEngine from '../IEngine'
 import IExec from '../IExec'
 import { NedbDatastore } from './NedbDatastore'
