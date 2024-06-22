@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.esm.json",
   "compilerOptions": {
-    "target": "ES2023",
+    "target": "ES2022",
     "sourceRoot": "src/",
     "outDir": "dist/"
   },
