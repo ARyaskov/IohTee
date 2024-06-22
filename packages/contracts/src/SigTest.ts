@@ -6,17 +6,19 @@ import {
   http,
   PublicClient,
   WalletClient,
+  extractChain,
 } from 'viem'
 import { GetContractReturnType } from '@nomicfoundation/hardhat-viem/types'
 import { mnemonicToAccount } from 'viem/accounts'
 import { Contract, HDNodeWallet, JsonRpcProvider, Wallet } from 'ethers'
-import { DefaultUnidirectionalAddress, NetworkType } from './common'
+import { DefaultUnidirectionalAddress } from './common'
+import * as chains from 'viem/chains'
 
 // require used intentionally here, suddenly json import is not working with TS 5.5 even with resolveJsonModule: true
 const uniArtifact = require('../abi/SigTest.json')
 
 export type CtorBaseParams = {
-  network: NetworkType
+  networkId: number
   deployedContractAddress?: `0x${string}`
   cachePeriod?: number
 }
@@ -55,7 +57,7 @@ export class SigTest {
 
   constructor(params: CtorParams) {
     if (!params.deployedContractAddress) {
-      this._address = DefaultUnidirectionalAddress[params.network.name]
+      this._address = DefaultUnidirectionalAddress[params.networkId]
     } else {
       this._address = params.deployedContractAddress
     }
@@ -63,15 +65,21 @@ export class SigTest {
     if (isCtorAccountParamPure(params)) {
       // @ts-ignore
       this._publicClient = createPublicClient({
-        // batch: {
-        //   multicall: true,
-        // },
-        chain: params.network,
-        transport: http(params.httpRpcUrl),
+        batch: {
+          multicall: true,
+        },
+        chain: extractChain({
+          chains: Object.values(chains) as any,
+          id: params.networkId,
+        }),
+        transport: http(params.httpRpcUrl, { batch: true }),
       })
       this._walletClient = createWalletClient({
-        chain: params.network,
-        transport: http(params.httpRpcUrl),
+        chain: extractChain({
+          chains: Object.values(chains) as any,
+          id: params.networkId,
+        }),
+        transport: http(params.httpRpcUrl, { batch: true }),
         account: mnemonicToAccount(params.mnemonic),
       })
       this._ethersProvider = new JsonRpcProvider(params.httpRpcUrl, 80002)

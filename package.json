@@ -20,11 +20,11 @@
     "coverage": "wsrun coverage $PKG"
   },
   "dependencies": {
-    "@riaskov/machinomy-contracts": "*",
+    "@riaskov/iohtee-contracts": "*",
     "bignumber.js": "^9.1.2",
     "dotenv": "^16.4.5",
     "humanize-plus": "^1.8.2",
-    "viem": "^2.15.1"
+    "viem": "^2.16.1"
   },
   "devDependencies": {
     "@types/bignumber.js": "^5.0.0",

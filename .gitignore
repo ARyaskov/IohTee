@@ -18,3 +18,4 @@ packages/machinomy/coverage
 !truffle-config.js
 .yarn/install-state.gz
 **/*.db
+**/*.db-*

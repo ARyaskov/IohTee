@@ -1,14 +1,5 @@
 import 'dotenv/config'
-import { bytesToHex, Chain, ParseEventLogsReturnType } from 'viem'
-import {
-  bsc,
-  bscTestnet,
-  hardhat,
-  mainnet,
-  polygon,
-  polygonAmoy,
-  sepolia,
-} from 'viem/chains'
+import { bytesToHex } from 'viem'
 
 export interface OpenProps {
   gas: number
@@ -23,48 +14,14 @@ export interface Channel {
   settlingUntil: bigint
 }
 
-export interface Event {
-  eventName: string
-  args: any
-  address: `0x${string}`
-  blockHash: `0x${string}`
-  blockNumber: bigint
-  data: `0x${string}`
-  logIndex: number
-  removed: boolean
-  topics: [] | [`0x${string}`, ...`0x${string}`[]]
-  transactionHash: `0x${string}`
-  transactionIndex: number
-}
-
-export const Network = {
-  Mainnet: mainnet,
-  Bsc: bsc,
-  Polygon: polygon,
-  Sepolia: sepolia,
-  BscTestnet: bscTestnet,
-  PolygonAmoy: polygonAmoy,
-  Hardhat: hardhat,
-} as const
-
-export type NetworkType = (typeof Network)[keyof typeof Network]
-
-export const DefaultUnidirectionalAddress: Record<string, `0x${string}`> = {
-  Ethereum: '0x',
-  'BNB Smart Chain': '0x',
-  Polygon: '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5',
-  Sepolia: '0x',
-  'Binance Smart Chain Testnet': '0x',
-  'Polygon Amoy': '0x96Cd8a0cAC5632c718Fcb520b4886585a8b8f976',
-  Hardhat: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-}
-
-export enum UnidirectionalEventName {
-  DidClaim = 'DidClaim',
-  DidDeposit = 'DidDeposit',
-  DidOpen = 'DidOpen',
-  DidSettle = 'DidSettle',
-  DidStartSettling = 'DidStartSettling',
+export const DefaultUnidirectionalAddress: Record<number, `0x${string}`> = {
+  1: '0x', // Ethereum
+  56: '0x', // BNB Smart Chain
+  137: '0x88fDf5Ba18E8da373ee23c7D5d60C94A957cC3f5', // Polygon
+  11155111: '0x', // Sepolia
+  97: '0x', // Binance Smart Chain Testnet
+  80002: '0x96Cd8a0cAC5632c718Fcb520b4886585a8b8f976', // Polygon Amoy
+  31337: '0x5FbDB2315678afecb367f032d93F642f64180aa3', // Hardhat
 }
 
 export enum ChannelState {
@@ -74,50 +31,8 @@ export enum ChannelState {
   Settled = 2,
 }
 
-export function networkByName(networkName: string): Chain {
-  const network = Object.values(Network).find(
-    (network) => network.name === networkName,
-  )
-  if (!network) {
-    throw new Error(`Network ${networkName} not found`)
-  }
-  return network
-}
-
 export function channelId(): `0x${string}` {
   const randomBytes = crypto.getRandomValues(new Uint8Array(32))
   const randomHexValue = bytesToHex(randomBytes)
   return randomHexValue
-}
-
-export function hasEvent(
-  logs: ParseEventLogsReturnType,
-  eventName: string,
-): boolean {
-  return logs.some((log) => log.eventName === eventName)
-}
-
-export function parseEvents(logs: ParseEventLogsReturnType): Event[] {
-  return logs.map((log) => {
-    return {
-      eventName: log.eventName,
-      args: log.args,
-      address: log.address,
-      blockHash: log.blockHash,
-      blockNumber: log.blockNumber,
-      data: log.data,
-      logIndex: log.logIndex,
-      removed: log.removed,
-      topics: log.topics,
-      transactionHash: log.transactionHash,
-      transactionIndex: log.transactionIndex,
-    }
-  })
-}
-
-export function extractEventFromLogs(
-  logs: Event[],
-  eventName: UnidirectionalEventName,
-): Event | undefined {
-  return logs.find((log) => log.eventName === eventName)
 }
