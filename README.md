@@ -2,6 +2,7 @@
 [![Module type: CJS+ESM](https://img.shields.io/badge/module%20type-cjs%2Besm-brightgreen)]()
 [![Coverage Status][codecov-img]][codecov]
 [![Greenkeeper badge](https://badges.greenkeeper.io/machinomy/machinomy.svg)](https://greenkeeper.io/)
+[![Dependabot](https://badgen.net/badge/Dependabot/enabled/green?icon=dependabot)](https://dependabot.com/)
 
 [codecov]: https://codecov.io/gh/machinomy/machinomy
 [codecov-img]: https://codecov.io/gh/machinomy/machinomy/branch/master/graph/badge.svg
