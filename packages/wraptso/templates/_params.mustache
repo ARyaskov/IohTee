@@ -1,3 +1,1 @@
-{{#each inputs}}
-  {{name}},
-{{/each}}
+{{#each inputs}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}

@@ -1,4 +1,10 @@
-{{this.name}}: {
-  ({{> method_input inputs=inputs}}): Promise<{{> method_output outputs=outputs}}>
-  call ({{> method_input inputs=inputs}}): Promise<{{> method_output outputs=outputs}}>
+async {{this.name}}({{> method_input inputs=inputs}}): Promise<{{> method_output outputs=outputs}}> {
+  return (await this.publicClient().readContract({
+    address: this.address(),
+    abi: this.abi(),
+    functionName: "{{this.name}}",
+    args: [
+      {{> params inputs=inputs}}
+    ],
+  })) as never as {{> method_output outputs=outputs}}
 }
