@@ -1,6 +1,7 @@
 import { Channel, ChannelState, DefaultUnidirectionalAddress } from './common'
 import {
-  CtorParams, DidOpen,
+  CtorParams,
+  DidOpen,
   isCtorAccountParamPure,
   TxOptions,
   UnidirectionalContract,
@@ -78,10 +79,11 @@ export class Unidirectional extends UnidirectionalContract {
     ) {
       throw new Error(`Unidirectional#open(): Can not open channel`)
     } else {
-      const didOpenEvent = UnidirectionalContract.extractEventFromReceipt<DidOpen>(
-        receipt,
-        UnidirectionalEventName.DidOpen,
-      )
+      const didOpenEvent =
+        UnidirectionalContract.extractEventFromReceipt<DidOpen>(
+          receipt,
+          UnidirectionalEventName.DidOpen,
+        )
       console.log(didOpenEvent)
       if (!didOpenEvent) {
         throw new Error(
@@ -92,7 +94,7 @@ export class Unidirectional extends UnidirectionalContract {
           channelId: didOpenEvent.args.channelId,
           sender: didOpenEvent.args.sender,
           receiver: didOpenEvent.args.receiver,
-          value: didOpenEvent.args.value
+          value: didOpenEvent.args.value,
         }
       }
     }
