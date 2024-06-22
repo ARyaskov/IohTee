@@ -41,6 +41,7 @@
     "viem": "*"
   },
   "devDependencies": {
+    "prettier": "*",
     "tsx": "*"
   },
   "resolutions": {

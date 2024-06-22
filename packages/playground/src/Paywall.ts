@@ -22,6 +22,12 @@ function isAcceptUrl(url: string) {
   return url === PREFIX + '/accept'
 }
 
+function isValidToken(token: string): boolean {
+  const tokenRegex = /^0x[0-9a-fA-F]{64}$/
+
+  return tokenRegex.test(token)
+}
+
 function paywallHeaders(
   receiverAccount: `0x${string}`,
   gatewayUri: string,
@@ -64,6 +70,9 @@ function parseToken(
     let authorization = content.split(' ')
     let type = authorization[0].toLowerCase()
     let token = authorization[1]
+    if (!isValidToken(token)) {
+      throw new Error(`Invalid token received: ${token}`)
+    }
     let meta = authorization[2]
     let price = BigInt(authorization[3])
     if (type === TOKEN_NAME) {
