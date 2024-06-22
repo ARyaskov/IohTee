@@ -28,6 +28,12 @@ import bodyParser from 'body-parser'
 import { createWalletClient, http } from 'viem'
 import { networkByName, NetworkType } from '@riaskov/iohtee-contracts'
 
+function isValidToken(token: string): boolean {
+  const tokenRegex = /^0x[0-9a-fA-F]{64}$/
+
+  return tokenRegex.test(token)
+}
+
 async function main() {
   const RPC_URL = String(process.env.RPC_URL).trim()
   const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
@@ -128,6 +134,9 @@ async function main() {
     let content = req.get('authorization')
     if (content) {
       let token = content.split(' ')[1]
+      if (!isValidToken(token)) {
+        throw new Error(`Invalid token received: ${token}`)
+      }
       let response = await fetch(reqUrl + '/' + token)
       let json = await response.json()
       let status = json.status
