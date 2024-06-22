@@ -42,7 +42,8 @@
     "deploy:sigTest:hardhat": "npx rimraf ignition/deployments && npx hardhat ignition deploy ignition/modules/SigTest.ts --network hardhat",
     "lint:solidity": "solium -d contracts/",
     "prepublish": "yarn build",
-    "postinstall": "yarn build"
+    "postinstall": "yarn build",
+    "docs:generate": "npx typedoc --skipErrorChecking ./src/abi-wrapper/UnidirectionalContract.ts"
   },
   "dependencies": {
     "@machinomy/logger": "^0.2.5",
@@ -80,9 +81,9 @@
     "hardhat-gas-reporter": "^2.2.0",
     "mocha": "10.4.0",
     "nyc": "^15.1.0",
-    "prettier": "*"
-  },
-  "resolutions": {
-    "sqlite3": "^5.1.7"
+    "prettier": "*",
+    "ts-readme-generator": "^0.7.3",
+    "typedoc": "^0.26.0",
+    "typescript": "*"
   }
 }

@@ -30,8 +30,5 @@
     "prettier": "*",
     "typescript": "*",
     "typescript-logger": "^5.0.1"
-  },
-  "resolutions": {
-    "sqlite3": "^5.1.7"
   }
 }
