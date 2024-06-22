@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
-import { Machinomy } from '@riaskov/machinomy'
+import { Machinomy } from '@riaskov/iohtee'
 import Logger from '@machinomy/logger'
 
 const PROVIDER = process.env.PROVIDER || 'https://rinkeby.infura.io'

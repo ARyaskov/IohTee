@@ -23,10 +23,10 @@ import {
   Machinomy,
   AcceptTokenRequestSerde,
   PaymentChannelSerde,
-} from '@riaskov/machinomy'
+} from '@riaskov/iohtee'
 import bodyParser from 'body-parser'
 import { createWalletClient, http } from 'viem'
-import { networkByName, NetworkType } from '@riaskov/machinomy-contracts'
+import { networkByName, NetworkType } from '@riaskov/iohtee-contracts'
 
 async function main() {
   const RPC_URL = String(process.env.RPC_URL).trim()

@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "@riaskov/machinomy-examples",
+  "name": "@riaskov/iohtee-examples",
   "version": "2.0.0",
-  "description": "Examples of Machinomy Berry usage",
+  "description": "Examples of IohTee  usage",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
   "contributors": [
     {
@@ -18,7 +18,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ARyaskov/machinomy.git"
+    "url": "https://github.com/ARyaskov/iohtee.git"
   },
   "scripts": {
     "build": "tsc --project tsconfig.json",
@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@machinomy/types-bn": "^0.0.3",
-    "@riaskov/machinomy": "*",
+    "@riaskov/iohtee": "*",
     "@seald-io/nedb": "^4.0.4",
     "@types/express-serve-static-core": "^4.19.3",
     "@types/fs-extra": "^11.0.4",
