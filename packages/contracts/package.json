@@ -47,7 +47,7 @@
   "dependencies": {
     "@machinomy/logger": "^0.2.5",
     "@nomicfoundation/hardhat-ethers": "^3.0.6",
-    "@nomicfoundation/hardhat-ignition": "0.15.4",
+    "@nomicfoundation/hardhat-ignition": "^0.15.5",
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
     "@nomicfoundation/hardhat-viem": "^2.0.2",
     "@openzeppelin/contracts": "5.0.2",
@@ -55,8 +55,7 @@
     "@typechain/hardhat": "^9.1.0",
     "bignumber.js": "*",
     "dotenv": "*",
-    "ethers": "^6.13.1",
-    "hardhat": "2.23.0-dev.3",
+    "hardhat": "^2.23.0-dev.3",
     "humanize-plus": "*",
     "solidity-coverage": "^0.8.12",
     "typechain": "8.3.2",
