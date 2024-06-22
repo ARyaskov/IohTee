@@ -13,9 +13,9 @@ We're upgrading it to contemporary standards (TypeScript 5+, Node.js 18+, ES2023
 
 Available sub-projects:
 - [IohTee](packages/machinomy) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
-- [Contracts](packages/contracts) is a TypeScript interface for Ethereum contracts managed by [Truffle](https://github.com/trufflesuite/truffle) used by [IohTee](packages/machinomy).
-- [Examples](packages/examples) is [Machinomy](packages/machinomy) examples.
-- [Playground](packages/playground) contains code of playground.machinomy.com
+- [Contracts](packages/contracts) is a TypeScript interface for Ethereum contracts managed by [HardHat](https://github.com/NomicFoundation/hardhat) used by [IohTee](packages/iohtee).
+- [Examples](packages/examples) is [IohTee](packages/iohtee) examples.
+- [Playground](packages/playground) contains code of play.iohtee.toivo.tech
 - [cli](packages/cli) is IohTee Command Line Interface.
 
 
@@ -29,11 +29,13 @@ FAQ: [GitHub Wiki Page](https://github.com/machinomy/machinomy/wiki/Frequently-A
 
 ## Installation
 
-Using [yarn](https://yarnpkg.com/lang/en/) and Node.js **v18** is mandatory (**don't use npm!**)
+[//]: # (Using [yarn]&#40;https://yarnpkg.com/lang/en/&#41; and Node.js **v18** is mandatory &#40;**don't use npm!**&#41;)
 
-    $ yarn add machinomy
+[//]: # ()
+[//]: # (    $ yarn add machinomy)
 
-The library supports mainnet, Ropsten, and [Rinkeby](https://www.rinkeby.io/) networks.
+[//]: # ()
+[//]: # (The library supports mainnet, Ropsten, and [Rinkeby]&#40;https://www.rinkeby.io/&#41; networks.)
 
 ## Tinkering
 

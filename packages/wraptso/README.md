@@ -14,6 +14,7 @@ It takes raw json artifact file and render ready-to-use TS-wrapper. Use viem v2 
 
 ## TODO
 - add postprocess with prettier
+- smartcontract docs autogen
 
 :exclamation:
 Please, pay attention, this package is the part of [IohTee Monorepo](https://github.com/ARyaskov/iohtee) 
