@@ -1,14 +1,15 @@
-import * as Web3 from 'web3'
+import { AbiEvent, AbiFunction } from 'viem'
 
-export interface MethodAbi extends Web3.MethodAbi {
+export interface MethodAbi extends AbiFunction {
   singleReturnValue: boolean
 }
 
 export default interface Context {
   artifact: string
+  abi: string
   contractName: string
   relativeArtifactPath: string
-  getters: Array<MethodAbi>
-  functions: Array<MethodAbi>
-  events: Array<Web3.EventAbi>
+  getters: Array<AbiFunction>
+  functions: Array<AbiFunction>
+  events: Array<AbiEvent>
 }

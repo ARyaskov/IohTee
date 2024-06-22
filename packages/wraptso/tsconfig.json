@@ -1,11 +1,9 @@
 {
-  "extends": "../../tsconfig",
+  "extends": "../../tsconfig.esm.json",
   "compilerOptions": {
+    "target": "ES2023",
     "sourceRoot": "src/",
-    "outDir": "dist/",
-    "types": [
-      "@machinomy/types-web3"
-    ]
+    "outDir": "dist/"
   },
   "include": [
     "src/**/*"

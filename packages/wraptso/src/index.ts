@@ -1,3 +1,1 @@
-import Wraptso from './Wraptso'
-
-export default Wraptso
+export { AbiWrapper } from './abiWrapper.js'
