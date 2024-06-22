@@ -5,7 +5,7 @@ import {
   NetworkType,
   networkByName,
   Unidirectional,
-} from '@riaskov/machinomy-contracts'
+} from '@riaskov/iohtee-contracts'
 import Paywall from './Paywall'
 import morgan from 'morgan'
 import url from 'url'
