@@ -46,7 +46,7 @@
     "ethereumjs-util": "^7.1.5",
     "fs-extra": "^11.2.0",
     "prompt": "^1.3.0",
-    "request": "^2.88.2",
+    "request": "*",
     "safe-buffer": "^5.2.1",
     "sqlite3": "^5.1.7",
     "types-rlp": "^0.0.1",

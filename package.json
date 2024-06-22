@@ -24,6 +24,7 @@
     "bignumber.js": "^9.1.2",
     "dotenv": "^16.4.5",
     "humanize-plus": "^1.8.2",
+    "request": "^2.88.2",
     "viem": "^2.16.1"
   },
   "devDependencies": {
@@ -31,6 +32,7 @@
     "@types/chai": "^4.3.16",
     "@types/chai-as-promised": "^7.1.8",
     "@types/humanize-plus": "^1.8.2",
+    "@types/request": "^2.48.12",
     "chai": "^5.1.1",
     "chai-as-promised": "^7.1.2",
     "cpx": "^1.5.0",
