@@ -21,11 +21,12 @@ import {
   PublicClient,
   WalletClient,
   GetBlockNumberReturnType,
+  TransactionReceipt,
 } from 'viem'
 import { PaymentNotValidError, InvalidChannelError } from './Exceptions'
 import { RemoteChannelInfo } from './RemoteChannelInfo'
 import { recoverPersonalSignature } from '@metamask/eth-sig-util'
-import { ChannelState } from '@riaskov/machinomy-contracts'
+import { ChannelState } from '@riaskov/iohtee-contracts'
 
 const LOG = new Logger('channel-manager')
 
@@ -107,7 +108,7 @@ export default class ChannelManager
     })
   }
 
-  closeChannel(channelId: `0x${string}`): Promise<`0x${string}`> {
+  closeChannel(channelId: `0x${string}`): Promise<TransactionReceipt> {
     return this.mutex.synchronizeOn(channelId, () =>
       this.internalCloseChannel(channelId),
     )
@@ -116,7 +117,7 @@ export default class ChannelManager
   deposit(
     channelId: `0x${string}`,
     value: bigint,
-  ): Promise<WriteContractReturnType> {
+  ): Promise<TransactionReceipt> {
     return this.mutex.synchronizeOn(channelId, async () => {
       const channel = await this.channelById(channelId)
 
@@ -125,7 +126,6 @@ export default class ChannelManager
       }
 
       const res = await this.channelContract.deposit(
-        this.account,
         channelId,
         value,
         channel.tokenContract,
@@ -344,7 +344,7 @@ export default class ChannelManager
 
     this.emit('willCloseChannel', channel)
 
-    let res: Promise<WriteContractReturnType>
+    let res: Promise<TransactionReceipt>
 
     if (channel.sender === this.account) {
       res = this.settle(channel)
@@ -357,7 +357,7 @@ export default class ChannelManager
     return txn
   }
 
-  private settle(channel: PaymentChannel): Promise<WriteContractReturnType> {
+  private settle(channel: PaymentChannel): Promise<TransactionReceipt> {
     return this.channelContract
       .channelState(channel.channelId)
       .then(async (state: number) => {
@@ -372,7 +372,6 @@ export default class ChannelManager
             const settlingUntil = block + channel.settlementPeriod
             const res = await this.channelContract.startSettle(
               channel.channelId,
-              this.account,
             )
             await this.channelsDao.updateState(
               channel.channelId,
@@ -386,8 +385,8 @@ export default class ChannelManager
           }
           case ChannelState.Settling:
             return this.channelContract
-              .finishSettle(this.account, channel.channelId)
-              .then((res: WriteContractReturnType) =>
+              .finishSettle(channel.channelId)
+              .then((res: TransactionReceipt) =>
                 this.channelsDao
                   .updateState(channel.channelId, ChannelState.Settled)
                   .then(() => res),
@@ -398,9 +397,7 @@ export default class ChannelManager
       })
   }
 
-  private async claim(
-    channel: PaymentChannel,
-  ): Promise<WriteContractReturnType> {
+  private async claim(channel: PaymentChannel): Promise<TransactionReceipt> {
     let payment = await this.lastPayment(channel.channelId)
     if (payment) {
       let result = await this.channelContract.claim(
@@ -409,7 +406,10 @@ export default class ChannelManager
         payment.signature,
         channel.receiver,
       )
-      await this.channelsDao.updateState(channel.channelId, ChannelState.Settled)
+      await this.channelsDao.updateState(
+        channel.channelId,
+        ChannelState.Settled,
+      )
       return result
     } else {
       throw new Error('Can not claim unknown channel')
@@ -426,7 +426,6 @@ export default class ChannelManager
     tokenContract?: `0x${string}`,
   ): Promise<PaymentChannel> {
     const channel = await this.channelContract.open(
-      sender,
       receiver,
       price,
       settlementPeriod,

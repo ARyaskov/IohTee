@@ -2,13 +2,18 @@ import Logger from '@machinomy/logger'
 import ChannelInflator from './ChannelInflator'
 import IChannelsDatabase from './storage/IChannelsDatabase'
 import Payment from './payment'
-import { PublicClient, WalletClient, WriteContractReturnType } from 'viem'
+import {
+  PublicClient,
+  TransactionReceipt,
+  WalletClient,
+  WriteContractReturnType,
+} from 'viem'
 import {
   Channel,
   channelId,
   ChannelState,
   Unidirectional,
-} from '@riaskov/machinomy-contracts'
+} from '@riaskov/iohtee-contracts'
 
 const LOG = new Logger('channel-contract')
 
@@ -34,7 +39,6 @@ export default class ChannelContract {
   }
 
   async open(
-    sender: `0x${string}`,
     receiver: `0x${string}`,
     value: bigint,
     settlementPeriod: bigint,
@@ -47,20 +51,22 @@ export default class ChannelContract {
 
     if (ChannelInflator.isTokenContractDefined(tokenContract)) {
       // TODO FIXME return this.channelTokenContract.open(sender, receiver, value, settlementPeriod, tokenContract!, channelId)
-      return this.channelEthContract.open(
+      return this.channelEthContract.openChannel(
         channelIdentifier,
         receiver,
         settlementPeriod,
-        value,
-        sender,
+        {
+          value,
+        },
       )
     } else {
-      return this.channelEthContract.open(
+      return this.channelEthContract.openChannel(
         channelIdentifier,
         receiver,
         settlementPeriod,
-        value,
-        sender,
+        {
+          value,
+        },
       )
     }
   }
@@ -70,22 +76,25 @@ export default class ChannelContract {
     value: bigint,
     signature: `0x${string}`,
     receiver: `0x${string}`,
-  ): Promise<WriteContractReturnType> {
+  ): Promise<TransactionReceipt> {
     const contract = await this.getContractByChannelId(channelId)
-    return contract.claim(channelId, value, signature, receiver)
+    return contract.claim(channelId, value, signature)
   }
 
   async deposit(
-    sender: `0x${string}`,
     channelId: `0x${string}`,
     value: bigint,
     tokenContract?: `0x${string}`,
-  ): Promise<WriteContractReturnType> {
+  ): Promise<TransactionReceipt> {
     if (ChannelInflator.isTokenContractDefined(tokenContract)) {
       // TODO FIXME return this.channelTokenContract.deposit(sender, channelId, value, tokenContract!)
-      return this.channelEthContract.deposit(channelId, value, sender)
+      return this.channelEthContract.deposit(channelId, {
+        value,
+      })
     } else {
-      return this.channelEthContract.deposit(channelId, value, sender)
+      return this.channelEthContract.deposit(channelId, {
+        value,
+      })
     }
   }
 
@@ -99,20 +108,14 @@ export default class ChannelContract {
     return contract.getSettlementPeriod(channelId)
   }
 
-  async startSettle(
-    channelId: `0x${string}`,
-    account: `0x${string}`,
-  ): Promise<WriteContractReturnType> {
+  async startSettle(channelId: `0x${string}`): Promise<TransactionReceipt> {
     const contract = await this.getContractByChannelId(channelId)
-    return contract.startSettling(channelId, account)
+    return contract.startSettling(channelId)
   }
 
-  async finishSettle(
-    channelId: `0x${string}`,
-    account: `0x${string}`,
-  ): Promise<WriteContractReturnType> {
+  async finishSettle(channelId: `0x${string}`): Promise<TransactionReceipt> {
     const contract = await this.getContractByChannelId(channelId)
-    return contract.settle(channelId, account)
+    return contract.settle(channelId)
   }
 
   async paymentDigest(
@@ -127,24 +130,6 @@ export default class ChannelContract {
         return this.channelEthContract.paymentDigest(channelId, value)
       } else {
         return this.channelEthContract.paymentDigest(channelId, value)
-      }
-    } else {
-      throw new Error(`Channel ${channelId} is not found`)
-    }
-  }
-
-  async recoveryPaymentDigest(
-    channelId: `0x${string}`,
-    value: bigint,
-  ): Promise<`0x${string}`> {
-    const channel = await this.channelsDao.firstById(channelId)
-    if (channel) {
-      const tokenContract = channel.tokenContract
-      if (ChannelInflator.isTokenContractDefined(tokenContract)) {
-        // TODO FIXME return this.channelTokenContract.recoveryPaymentDigest(channelId, value, tokenContract)
-        return this.channelEthContract.recoveryPaymentDigest(channelId, value)
-      } else {
-        return this.channelEthContract.recoveryPaymentDigest(channelId, value)
       }
     } else {
       throw new Error(`Channel ${channelId} is not found`)

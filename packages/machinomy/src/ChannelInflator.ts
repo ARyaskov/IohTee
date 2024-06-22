@@ -1,5 +1,5 @@
 import { PaymentChannel, PaymentChannelJSON } from './PaymentChannel'
-import { Unidirectional, ChannelState } from '@riaskov/machinomy-contracts'
+import { Unidirectional, ChannelState } from '@riaskov/iohtee-contracts'
 
 export default class ChannelInflator {
   channelEthContract: Unidirectional

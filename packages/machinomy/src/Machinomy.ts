@@ -1,4 +1,3 @@
-import { NetworkType } from '@riaskov/machinomy-contracts'
 import { MigrateOption } from './MigrateOption'
 import { PaymentChannel } from './PaymentChannel'
 import Payment, { PaymentSerde } from './payment'
@@ -11,28 +10,20 @@ import MachinomyOptions from './MachinomyOptions'
 import BuyOptions from './BuyOptions'
 import NextPaymentResult from './NextPaymentResult'
 import BuyResult from './BuyResult'
-import { memoize } from 'decko'
 import { PaymentRequiredResponse } from './PaymentRequiredResponse'
 import {
   createPublicClient,
   createWalletClient,
+  extractChain,
   http,
-  PublicClient,
-  WalletClient,
-  WriteContractReturnType,
+  TransactionReceipt,
 } from 'viem'
+import * as chains from 'viem/chains'
 import { mnemonicToAccount } from 'viem/accounts'
-import { polygonAmoy } from 'viem/chains'
-import {
-  ethers,
-  getDefaultProvider,
-  JsonRpcProvider,
-  JsonRpcSigner,
-  Wallet,
-} from 'ethers'
+import { ethers, getDefaultProvider, Wallet } from 'ethers'
 
 export interface MachinomyCtorParams {
-  network: NetworkType
+  networkId: number
   account: `0x${string}`
   httpRpcUrl: string
   mnemonic: string
@@ -69,13 +60,19 @@ export default class Machinomy {
       batch: {
         multicall: true,
       },
-      chain: params.network as any,
+      chain: extractChain({
+        chains: Object.values(chains) as any,
+        id: params.networkId,
+      }),
       transport: http(params.httpRpcUrl, {
         batch: true,
       }),
     })
     this._walletClient = createWalletClient({
-      chain: params.network as any,
+      chain: extractChain({
+        chains: Object.values(chains) as any,
+        id: params.networkId,
+      }),
       transport: http(params.httpRpcUrl, {
         batch: true,
       }),
@@ -188,7 +185,7 @@ export default class Machinomy {
   async deposit(
     channelId: `0x${string}`,
     value: bigint,
-  ): Promise<WriteContractReturnType> {
+  ): Promise<TransactionReceipt> {
     await this.checkMigrationsState()
     let channelManager = await this.registry.channelManager()
     return channelManager.deposit(channelId, value)
@@ -251,7 +248,7 @@ export default class Machinomy {
    * The method nicely abstracts over that, so you do not need to know what is really going on under the hood.
    * For more details on how payment channels work refer to a website.
    */
-  async close(channelId: `0x${string}`): Promise<WriteContractReturnType> {
+  async close(channelId: `0x${string}`): Promise<TransactionReceipt> {
     await this.checkMigrationsState()
     let channelManager = await this.registry.channelManager()
     return channelManager.closeChannel(channelId)
@@ -307,7 +304,7 @@ export default class Machinomy {
       options.meta || '',
     )
   }
-  
+
   private async checkMigrationsState(): Promise<void> {
     if (!this.migrated) {
       let storage = await this.registry.storage()

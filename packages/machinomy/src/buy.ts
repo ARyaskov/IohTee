@@ -1,8 +1,7 @@
 import * as configuration from './configuration'
 import Machinomy from './Machinomy'
 import BuyResult from './BuyResult'
-import { httpRpc, mnemonic } from './configuration'
-import { NetworkType } from '@riaskov/machinomy-contracts'
+import { hdPath, httpRpc, mnemonic } from './configuration'
 import MachinomyOptions from './MachinomyOptions'
 
 /**
@@ -11,17 +10,17 @@ import MachinomyOptions from './MachinomyOptions'
 export async function buyContent(
   uri: string,
   account: `0x${string}`,
-  chain: NetworkType,
+  chainId: number,
   password: string,
 ): Promise<BuyResult> {
   let settings = configuration.sender()
 
   let client = new Machinomy({
-    network: chain,
+    networkId: chainId,
     account: account,
-    httpRpcUrl: httpRpc(chain),
+    httpRpcUrl: httpRpc(),
     mnemonic: mnemonic(),
-    hdPath: `m/44'/60'/0'/0/0`,
+    hdPath: hdPath(),
     options: MachinomyOptions.defaults(),
   })
   let pair = await client.buyUrl(uri)

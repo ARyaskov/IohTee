@@ -1,4 +1,3 @@
-// import { memoize } from 'decko'
 import { PublicClient, WalletClient } from 'viem'
 import ChannelInflator from './ChannelInflator'
 import Storage from './Storage'
@@ -10,9 +9,8 @@ import PaymentManager from './PaymentManager'
 import ChainManager from './ChainManager'
 import Client, { ClientImpl } from './client'
 import { Transport } from './transport'
-import { Unidirectional } from '@riaskov/machinomy-contracts'
-import { HDNodeWallet, Wallet } from 'ethers'
-import * as path from 'node:path'
+import { Unidirectional } from '@riaskov/iohtee-contracts'
+import { Wallet } from 'ethers'
 
 export default class Registry {
   account: `0x${string}`
@@ -60,13 +58,9 @@ export default class Registry {
 
   async channelEthContract(): Promise<Unidirectional> {
     if (!this.unidirectional) {
-      this.unidirectional = new Unidirectional({
-        publicClient: this.publicClient as any,
-        walletClient: this.walletClient as any,
-        cachePeriod: this.options.chainCachePeriod || 0,
-        network: this.publicClient.chain as any,
-        mnemonic: this.mnemonic,
-        hdPath: this.hdPath,
+      this.unidirectional = new Unidirectional(null, {
+        publicClientViem: this.publicClient as any,
+        walletClientViem: this.walletClient as any,
       })
     }
     return this.unidirectional

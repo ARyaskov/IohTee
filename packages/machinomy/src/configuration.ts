@@ -9,12 +9,9 @@ import {
   WalletClient,
   Chain,
 } from 'viem'
-import {hardhat, polygon, polygonAmoy} from 'viem/chains'
 import * as env from './env'
-import {
-  DefaultUnidirectionalAddress,
-  NetworkType,
-} from '@riaskov/machinomy-contracts'
+import { DefaultUnidirectionalAddress } from '@riaskov/iohtee-contracts'
+import { polygonAmoy } from 'viem/chains'
 
 const BASE_DIR = '.machinomy'
 const CONFIGURATION_FILE = 'config.json'
@@ -26,9 +23,9 @@ export const PAYWALL_PATH = 'api/paywall/' + PROTOCOL
 const log = new Logger('configuration')
 
 const CONTRACTS = {
-  development: DefaultUnidirectionalAddress.Hardhat,
-  polygon: DefaultUnidirectionalAddress.Polygon,
-  polygonAmoy: DefaultUnidirectionalAddress.PolygonAmoy,
+  development: DefaultUnidirectionalAddress[31337],
+  polygon: DefaultUnidirectionalAddress[137],
+  polygonAmoy: DefaultUnidirectionalAddress[80002],
 }
 
 export const contractAddress = (): string => {
@@ -120,8 +117,7 @@ export const receiver = (): Configuration => {
 }
 
 export function publicClient(): PublicClient {
-  const defaultRpcUrl =
-    process.env.RPC_URL || 'http://localhost:8545'
+  const defaultRpcUrl = process.env.RPC_URL || 'http://localhost:8545'
 
   if (typeof window !== 'undefined' && (window as any).ethereum) {
     const publicClient = createPublicClient({
@@ -131,7 +127,7 @@ export function publicClient(): PublicClient {
   } else {
     const publicClient = createPublicClient({
       transport: http(defaultRpcUrl, {
-       batch: true
+        batch: true,
       }),
     })
     return publicClient as any
@@ -139,8 +135,7 @@ export function publicClient(): PublicClient {
 }
 
 export function walletClient(chain: Chain = polygonAmoy): WalletClient {
-  const defaultRpcUrl =
-    process.env.RPC_URL || 'http://localhost:8545'
+  const defaultRpcUrl = process.env.RPC_URL || 'http://localhost:8545'
 
   if (typeof window !== 'undefined' && (window as any).ethereum) {
     const walletClient = createWalletClient({
@@ -152,20 +147,23 @@ export function walletClient(chain: Chain = polygonAmoy): WalletClient {
     const walletClient = createWalletClient({
       chain: chain,
       transport: http(defaultRpcUrl, {
-        batch: true
+        batch: true,
       }),
     })
     return walletClient as WalletClient
   }
 }
 
-export function httpRpc(chain: NetworkType): string {
-  const result =
-    process.env.RPC_URL || 'http://localhost:8545'
+export function httpRpc(): string {
+  const result = process.env.RPC_URL || 'http://localhost:8545'
 
   return result
 }
 
 export function mnemonic(): string {
   return String(process.env.ACCOUNT_MNEMONIC!).trim()
+}
+
+export function hdPath(): `m/44'/60'/${string}` {
+  return `m/44'/60'/0'/0/0`
 }

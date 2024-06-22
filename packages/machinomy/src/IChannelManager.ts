@@ -2,7 +2,7 @@ import Payment from './payment'
 import { EventEmitter } from 'events'
 import { PaymentChannel } from './PaymentChannel'
 import { RemoteChannelInfo } from './RemoteChannelInfo'
-import { WriteContractReturnType } from 'viem'
+import { TransactionReceipt, WriteContractReturnType } from 'viem'
 
 export default interface IChannelManager extends EventEmitter {
   openChannel(
@@ -13,11 +13,8 @@ export default interface IChannelManager extends EventEmitter {
     channelId?: `0x${string}`,
     tokenContract?: string,
   ): Promise<PaymentChannel>
-  closeChannel(channelId: `0x${string}`): Promise<WriteContractReturnType>
-  deposit(
-    channelId: `0x${string}`,
-    value: bigint,
-  ): Promise<WriteContractReturnType>
+  closeChannel(channelId: `0x${string}`): Promise<TransactionReceipt>
+  deposit(channelId: `0x${string}`, value: bigint): Promise<TransactionReceipt>
   nextPayment(
     channelId: `0x${string}`,
     amount: bigint,
