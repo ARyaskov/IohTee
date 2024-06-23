@@ -7,8 +7,9 @@ import {
   PublicClient,
   WalletClient,
   extractChain,
+  GetContractReturnType,
 } from 'viem'
-import { GetContractReturnType } from '@nomicfoundation/hardhat-viem/types'
+
 import { mnemonicToAccount } from 'viem/accounts'
 import { Contract, HDNodeWallet, JsonRpcProvider, Wallet } from 'ethers'
 import { DefaultUnidirectionalAddress } from './common'

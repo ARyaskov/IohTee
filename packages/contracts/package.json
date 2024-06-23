@@ -18,13 +18,22 @@
       "email": "code@riaskov.com"
     }
   ],
-  "main": "lib/cjs/src/index.js",
-  "module": "lib/esm/src/index.js",
-  "types": "lib/types/src/index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib-bundle/esm/iohtee-contracts.min.mjs",
+  "source": "./src/index.ts",
+  "types": "./lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib-bundle/esm/iohtee-contracts.min.mjs",
+      "require": "./lib/cjs/index.js"
+    }
+  },
   "files": [
-    "lib/"
+    "lib/",
+    "lib-bundle/"
   ],
   "scripts": {
+    "build:webpack": "npx webpack --config webpack.config.js",
     "build": "yarn format && yarn build:esm && yarn build:cjs && yarn copy-abi:uni && yarn build:types && yarn tree-shaking:lib",
     "build:types": "tsc --project tsconfig.types.json",
     "test": "yarn build && npx hardhat test",
@@ -78,12 +87,22 @@
     "chai": "4.4.1",
     "chai-as-promised": "^7.1.2",
     "cpx": "*",
+    "crypto-browserify": "*",
     "hardhat-gas-reporter": "^2.2.0",
     "mocha": "10.4.0",
     "nyc": "^15.1.0",
+    "os-browserify": "*",
+    "path-browserify": "*",
     "prettier": "*",
+    "stream-browserify": "*",
+    "terser-webpack-plugin": "*",
+    "ts-loader": "*",
     "ts-readme-generator": "^0.7.3",
     "typedoc": "^0.26.0",
-    "typescript": "*"
+    "typescript": "*",
+    "vm-browserify": "*",
+    "webpack": "*",
+    "webpack-cli": "*",
+    "webpack-merge": "*"
   }
 }

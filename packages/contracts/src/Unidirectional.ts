@@ -7,7 +7,6 @@ import {
   UnidirectionalContract,
   UnidirectionalEventName,
 } from './abi-wrapper/UnidirectionalContract'
-import { any } from 'hardhat/internal/core/params/argumentTypes'
 
 export class Unidirectional extends UnidirectionalContract {
   constructor(
@@ -95,6 +94,8 @@ export class Unidirectional extends UnidirectionalContract {
           sender: didOpenEvent.args.sender,
           receiver: didOpenEvent.args.receiver,
           value: didOpenEvent.args.value,
+          settlingPeriod: BigInt(-1),
+          settlingUntil: BigInt(-1),
         }
       }
     }

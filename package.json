@@ -37,12 +37,22 @@
     "chai-as-promised": "^7.1.2",
     "cpx": "^1.5.0",
     "cross-env": "^7.0.3",
+    "crypto-browserify": "^3.12.0",
     "node-gyp": "^10.1.0",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
     "prettier": "^3.3.2",
     "rimraf": "^5.0.7",
     "rollup": "^4.18.0",
+    "stream-browserify": "^3.0.0",
+    "terser-webpack-plugin": "^5.3.10",
+    "ts-loader": "^9.5.1",
     "ts-node": "^7.0.x",
-    "typescript": "5.4.5"
+    "typescript": "5.4.5",
+    "vm-browserify": "^1.1.2",
+    "webpack": "^5.92.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-merge": "^5.10.0"
   },
   "packageManager": "yarn@4.2.2"
 }
