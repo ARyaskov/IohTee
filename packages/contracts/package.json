@@ -51,7 +51,7 @@
     "deploy:sigTest:hardhat": "npx rimraf ignition/deployments && npx hardhat ignition deploy ignition/modules/SigTest.ts --network hardhat",
     "lint:solidity": "solium -d contracts/",
     "prepublish": "yarn build",
-    "postinstall": "yarn build",
+    "postinstall": "exit 0",
     "docs:generate": "npx typedoc --skipErrorChecking ./src/abi-wrapper/UnidirectionalContract.ts"
   },
   "dependencies": {
