@@ -6,7 +6,11 @@
     "types": [
       "@machinomy/types-ethereumjs-util",
       "@machinomy/types-ethereumjs-units",
-    ]
+    ],
+    "paths": {
+      "@riaskov/iohtee-contracts": ["../contracts/src"],
+      "@riaskov/iohtee": ["../machinomy/src"]
+    }
   },
   "include": [
     "./src/**/*"

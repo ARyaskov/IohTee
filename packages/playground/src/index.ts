@@ -1,39 +1,24 @@
 import 'dotenv/config'
 import express from 'express'
 import bodyParser from 'body-parser'
-import { Unidirectional } from '@riaskov/iohtee-contracts'
 import Paywall from './Paywall'
 import morgan from 'morgan'
-import url from 'url'
+import { URL } from 'url'
 import { mnemonicToAccount } from 'viem/accounts'
-import { hdPath } from '@riaskov/iohtee/lib/types/configuration'
 
 async function main() {
   const HOST = String(process.env.HOST)
   const PORT = Number(process.env.PORT)
-
   const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
-  const RPC_URL = String(process.env.RPC_URL).trim()
   const GATEWAY_URL = String(process.env.GATEWAY_URL).trim()
-  const NETWORK = String(process.env.NETWORK).trim()
-  const chainId = Number(process.env.CHAIN_ID)
 
   const account = mnemonicToAccount(MNEMONIC, {
-    path: hdPath(),
-  })
-  const base = new url.URL(GATEWAY_URL)
-  const paywall = new Paywall(account.address, base)
-
-  const unidirectional = new Unidirectional(null, {
-    httpRpcUrl: RPC_URL,
-    networkId: chainId,
-    mnemonic: MNEMONIC,
-    hdPath: hdPath(),
+    path: `m/44'/60'/0'/0/0`,
   })
 
-  // const tokenContract = instanceTestToken.address
+  const paywall = new Paywall(account.address, new URL(GATEWAY_URL))
 
-  let app = express()
+  const app = express()
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(paywall.middleware())
