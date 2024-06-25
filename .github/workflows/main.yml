@@ -51,7 +51,8 @@ jobs:
 
       - name: Install global dependencies
         run: |
-          yarn dlx node-gyp
+          npm install node-gyp --global --no-save
+          npm install codecov --global --no-save
 
       - name: Install dependencies
         run: |
@@ -74,10 +75,6 @@ jobs:
 
       - name: Generate coverage report
         run: yarn run coverage
-
-      - name: Install global codecov
-        run: |
-          yarn dlx codecov
 
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash) -s packages -t ${{ secrets.CODECOV_TOKEN }}
