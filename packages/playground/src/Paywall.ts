@@ -1,5 +1,5 @@
+import 'dotenv/config'
 import debug from 'debug'
-import dotenv from 'dotenv'
 import express from 'express'
 import { URL } from 'url'
 import urljoin from 'url-join'
@@ -9,8 +9,6 @@ const log = debug('paywall')
 const HEADER_NAME = 'authorization'
 const TOKEN_NAME = 'paywall'
 const PREFIX = '/payments'
-
-dotenv.config()
 
 const GATEWAY_URL = process.env.GATEWAY_URL
 
