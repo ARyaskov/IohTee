@@ -30,6 +30,7 @@ jobs:
       PGUSER: postgres
       PGDATABASE: machinomy_test
       NODE_ENV: test
+      YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
     steps:
       - name: Checkout repository
