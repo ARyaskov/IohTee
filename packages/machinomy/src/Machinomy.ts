@@ -24,7 +24,6 @@ import { ethers, getDefaultProvider, Wallet } from 'ethers'
 
 export interface MachinomyCtorParams {
   networkId: number
-  account: `0x${string}`
   httpRpcUrl: string
   mnemonic: string
   hdPath: `m/44'/60'/${string}`
@@ -54,7 +53,6 @@ export default class Machinomy {
   private readonly _walletClient
 
   constructor(params: MachinomyCtorParams) {
-    this.account = params.account
     let _options = MachinomyOptions.defaults(params.options)
     this._publicClient = createPublicClient({
       batch: {
@@ -83,13 +81,16 @@ export default class Machinomy {
       undefined,
       params.hdPath,
     )
+
+    this.account = hdWallet.address as `0x${string}`
+
     const ethersWallet = new Wallet(
       hdWallet.privateKey,
       getDefaultProvider(params.httpRpcUrl),
     )
 
     this.registry = new Registry(
-      params.account,
+      this.account,
       this._publicClient as any,
       this._walletClient as any,
       params.mnemonic,

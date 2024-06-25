@@ -10,7 +10,10 @@
       "@types/db-migrate-base",
       "@types/mocha",
       "@types/node"
-    ]
+    ],
+    "paths": {
+      "@riaskov/iohtee-contracts": ["../contracts/src"]
+    }
   },
   "include": [
     "./src/**/*"

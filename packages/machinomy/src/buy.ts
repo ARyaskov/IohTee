@@ -9,15 +9,12 @@ import MachinomyOptions from './MachinomyOptions'
  */
 export async function buyContent(
   uri: string,
-  account: `0x${string}`,
   chainId: number,
-  password: string,
 ): Promise<BuyResult> {
   let settings = configuration.sender()
 
   let client = new Machinomy({
     networkId: chainId,
-    account: account,
     httpRpcUrl: httpRpc(),
     mnemonic: mnemonic(),
     hdPath: hdPath(),

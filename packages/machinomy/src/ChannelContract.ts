@@ -2,12 +2,7 @@ import Logger from '@machinomy/logger'
 import ChannelInflator from './ChannelInflator'
 import IChannelsDatabase from './storage/IChannelsDatabase'
 import Payment from './payment'
-import {
-  PublicClient,
-  TransactionReceipt,
-  WalletClient,
-  WriteContractReturnType,
-} from 'viem'
+import { PublicClient, TransactionReceipt, WalletClient } from 'viem'
 import {
   Channel,
   channelId,
