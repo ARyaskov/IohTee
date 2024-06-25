@@ -15,4 +15,6 @@ It takes raw json artifact file and render ready-to-use TS-wrapper. Use viem v2 
 ## TODO
 - add postprocess with prettier
 - TS-wrapper docs autogen
-
+- add errors and library references handling
+- generate d.ts and min.js wrapper files
+- add solidity comments to wrapper

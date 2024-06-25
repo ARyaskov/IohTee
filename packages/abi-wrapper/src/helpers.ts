@@ -21,11 +21,21 @@ function isArray(solidityType: string): boolean {
   return !!solidityType.match(ARRAY_BRACES)
 }
 
-function typeConversion(types: Array<Mapping>, solidityType: string): string {
+function isTuple(solidityType: string): boolean {
+  return !!solidityType.match('tuple')
+}
+
+function typeConversion(
+  types: Array<Mapping>,
+  solidityType: string,
+  components?: Array<any>,
+): string {
   if (isArray(solidityType)) {
     const solidityItemType = solidityType.replace(ARRAY_BRACES, '')
     const type = typeConversion(types, solidityItemType)
     return `${type}[]`
+  } else if (isTuple(solidityType) && components) {
+    return `[${components.map((e) => inputType(e.type)).join(' ,')}]`
   } else {
     let mapping = types.find((mapping) => !!solidityType.match(mapping.regex))
     if (mapping) {
@@ -36,8 +46,11 @@ function typeConversion(types: Array<Mapping>, solidityType: string): string {
   }
 }
 
-export function inputType(solidityType: string): string {
-  return typeConversion(INPUT_TYPE_MAPPING, solidityType)
+export function inputType(
+  solidityType: string,
+  components?: Array<any>,
+): string {
+  return typeConversion(INPUT_TYPE_MAPPING, solidityType, components)
 }
 
 export function outputType(solidityType: string): string {

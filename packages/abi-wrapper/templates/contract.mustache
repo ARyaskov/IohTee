@@ -80,6 +80,24 @@ export class {{contractName}}Contract {
   private readonly _contract: GetContractReturnType
   private readonly _abi: any
 
+/// GETTERS
+{{#each getters}}
+  {{> getter contractName=../contractName}}
+
+{{/each}}
+
+/// SETTERS
+{{#each functions}}
+  {{> function contractName=../contractName}}
+
+{{/each}}
+
+/// EVENTS
+{{#each events}}
+  {{> event_utils contractName=../contractName}}
+
+{{/each}}
+
   static parseLogs(receipt: TransactionReceipt): ParseEventLogsReturnType {
     const logs = parseEventLogs({
       abi: abi as any,
@@ -188,16 +206,4 @@ export class {{contractName}}Contract {
   events(): AbiEvent[] {
     return this.abi().filter((e) => e.type === 'event') as AbiEvent[]
   }
-
-{{#each getters}}
-  {{> getter contractName=../contractName}}
-{{/each}}
-
-{{#each functions}}
-  {{> function contractName=../contractName}}
-{{/each}}
-
-{{#each events}}
-  {{> event_utils contractName=../contractName}}
-{{/each}}
 }

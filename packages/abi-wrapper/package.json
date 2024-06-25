@@ -23,7 +23,7 @@
     "templates/"
   ],
   "scripts": {
-    "demo": "tsx src/bin/iohtee-abi-wrapper.ts ./abi/* -o ../contracts/src/abi-wrapper/",
+    "demo": "tsx src/bin/iohtee-abi-wrapper.ts ./abi/* -m -o ../contracts/src/abi-wrapper/",
     "build": "yarn format && yarn clean && tsc --project tsconfig.json",
     "clean": "rimraf dist",
     "test": "exit 0",
@@ -33,6 +33,7 @@
   "dependencies": {
     "chalk": "^5.3.0",
     "console.table": "^0.10.0",
+    "esbuild": "^0.21.5",
     "glob": "^10.4.2",
     "handlebars": "^4.7.8",
     "mkdirp": "^3.0.1",

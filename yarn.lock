@@ -1494,6 +1494,7 @@ __metadata:
     "@types/yargs": "npm:^17.0.32"
     chalk: "npm:^5.3.0"
     console.table: "npm:^0.10.0"
+    esbuild: "npm:^0.21.5"
     glob: "npm:^10.4.2"
     handlebars: "npm:^4.7.8"
     mkdirp: "npm:^3.0.1"
@@ -5326,7 +5327,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:~0.21.4":
+"esbuild@npm:^0.21.5, esbuild@npm:~0.21.4":
   version: 0.21.5
   resolution: "esbuild@npm:0.21.5"
   dependencies:

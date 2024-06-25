@@ -1,4 +1,4 @@
-async {{this.name}}({{> method_input inputs=inputs}}): Promise<{{> method_output outputs=outputs}}> {
+async {{this.name}}{{this.namePostfix}}({{> method_input inputs=inputs}}): Promise<{{> method_output outputs=outputs}}> {
   return (await this.publicClient().readContract({
     address: this.address(),
     abi: this.abi(),

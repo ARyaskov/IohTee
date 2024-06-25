@@ -1,4 +1,4 @@
-async {{this.name}}({{> method_input inputs=inputs trailingComma=true}}options?: TxOptions): Promise<TransactionReceipt>{
+async {{this.name}}{{this.namePostfix}}({{> method_input inputs=inputs trailingComma=true}}options?: TxOptions): Promise<TransactionReceipt>{
   const { request } = await this.publicClient().simulateContract({
     chain: this.walletClient().chain,
     address: this.address(),
@@ -12,12 +12,10 @@ async {{this.name}}({{> method_input inputs=inputs trailingComma=true}}options?:
   })
   const txId = await this.walletClient().writeContract(request)
 
-  const receipt = await this.publicClient().waitForTransactionReceipt({
-    hash: txId,
-    confirmations: 3,
-    timeout: 45_000,
-  })
-
-  return receipt
+  return await this.publicClient().waitForTransactionReceipt({
+      hash: txId,
+      confirmations: 3,
+      timeout: 45_000,
+    })
 }
 

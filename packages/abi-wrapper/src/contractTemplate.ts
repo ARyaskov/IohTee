@@ -1,7 +1,8 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import { AbiFunction, AbiEvent } from 'viem'
-import Handlebars from "handlebars"
+import { build } from 'esbuild'
+import Handlebars from 'handlebars'
 import Context, { MethodAbi } from './context.js'
 import * as helpers from './helpers.js'
 
@@ -56,8 +57,9 @@ export default class ContractTemplate {
     this.handlebars.registerHelper('outputType', helpers.outputType)
   }
 
-  render(abiFilePath: string) {
+  render(abiFilePath: string, minified?: boolean) {
     let artifact = JSON.parse(fs.readFileSync(abiFilePath).toString())
+    const sourceAbi = JSON.stringify(artifact.abi)
     let abi = artifact.abi
     if (abi) {
       let methods = abi.filter(isAbiFunction).map((abi: MethodAbi) => {
@@ -70,6 +72,21 @@ export default class ContractTemplate {
         })
         return abi
       })
+      const nameCount: Record<string, number> = {}
+
+      methods = methods.map((abi: any) => {
+        const originalName = abi.name
+
+        if (nameCount[originalName] >= 0) {
+          nameCount[originalName]++
+          abi['namePostfix'] = nameCount[originalName]
+        } else {
+          nameCount[originalName] = 0
+        }
+
+        return abi
+      })
+
       let getters = methods.filter(
         (abi: MethodAbi) =>
           abi.stateMutability === 'view' || abi.stateMutability === 'pure',
@@ -88,7 +105,7 @@ export default class ContractTemplate {
 
       let context: Context = {
         artifact: JSON.stringify(artifact, null, 2),
-        abi: JSON.stringify(abi),
+        abi: JSON.stringify(sourceAbi),
         contractName: contractName,
         relativeArtifactPath: relativeArtifactPath,
         getters: getters,
@@ -97,6 +114,18 @@ export default class ContractTemplate {
       }
       let code = this.template(context)
       fs.writeFileSync(filePath, code)
+      if (minified) {
+        build({
+          entryPoints: [filePath],
+          outfile: `${filePath}.min.js`,
+          bundle: false,
+          minify: true,
+          format: 'esm',
+          platform: 'node',
+          sourcemap: false,
+          target: ['es2020'],
+        }).then()
+      }
     } else {
       throw new Error(`No ABI found in ${abiFilePath}.`)
     }
