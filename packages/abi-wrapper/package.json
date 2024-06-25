@@ -12,7 +12,7 @@
     "url": "https://github.com/ARyaskov/iohtee.git"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=20"
   },
   "type": "module",
   "main": "dist/index.js",
