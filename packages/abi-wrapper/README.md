@@ -7,6 +7,12 @@
 IohTee ABI Wrapper is a TypeScript wrapper for EVM-compatible ABI of Solidity smartcontract.
 It takes raw json artifact file and render ready-to-use TS-wrapper. Use viem v2 internally.
 
+## Install
+
+```bash
+npm install @riaskov/iohtee-abi-wrapper --global --no-save
+```
+
 ## Run
 
 ```bash
