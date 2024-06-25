@@ -10,13 +10,13 @@ It takes raw json artifact file and render ready-to-use TS-wrapper. Use viem v2 
 ## Install
 
 ```bash
-npm install @riaskov/iohtee-abi-wrapper --global --no-save
+ $ npm install @riaskov/iohtee-abi-wrapper --global --no-save
 ```
 
 ## Run
 
 ```bash
- $ iohtee-abi-wrapper -o ./output ./abi 
+ $ iohtee-abi-wrapper -o ./output ./abi/*
 ```
 
 ## TODO
