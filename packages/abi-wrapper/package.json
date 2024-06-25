@@ -1,6 +1,6 @@
 {
   "name": "@riaskov/iohtee-abi-wrapper",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Generate TypeScript wrapper class for Solidity smart contract ABI",
   "license": "Apache-2.0",
   "author": "Machinomy Team <hello@machinomy.com>",
@@ -35,7 +35,8 @@
     "clean": "rimraf dist",
     "test": "exit 0",
     "coverage": "exit 0",
-    "format": "npx prettier --write \"src/**/*.ts\""
+    "format": "npx prettier --write \"src/**/*.ts\"",
+    "postinstall": "exit 0"
   },
   "dependencies": {
     "chalk": "^5.3.0",
