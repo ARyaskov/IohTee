@@ -4,7 +4,7 @@ import yargs from 'yargs'
 import { AbiWrapper } from '../index.js'
 import { hideBin } from 'yargs/helpers'
 
-let args: any = yargs(hideBin(process.argv.slice(2)))
+let args: any = yargs(hideBin(process.argv))
   .option('output', {
     describe: 'Folder for generated files',
     alias: 'o',
