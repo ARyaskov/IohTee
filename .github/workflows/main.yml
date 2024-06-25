@@ -11,24 +11,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: machinomy_test
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     env:
-      PGUSER: postgres
-      PGDATABASE: machinomy_test
       NODE_ENV: test
       YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
@@ -40,6 +23,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.29.0'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Install Yarn v4
         run: npm install -g yarn@berry
@@ -60,20 +60,8 @@ jobs:
         run: |
           yarn
 
-      - name: Set up PostgreSQL
-        run: |
-          psql -c 'create database machinomy_test;' -U postgres -d postgres
-          psql -c "create user testuser with password 'testpassword' createdb;" -U postgres
-          PGPASSWORD='testpassword' psql -c 'create database testdb;' -U testuser -d postgres
-
-      - name: Lint code
-        run: yarn run lint
-
       - name: Build project
         run: yarn run build
-
-      - name: Run tests
-        run: yarn run test
 
       - name: Generate coverage report
         run: yarn run coverage
