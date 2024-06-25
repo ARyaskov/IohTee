@@ -17,11 +17,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ARyaskov/machinomy.git"
+    "url": "https://github.com/ARyaskov/IohTee.git"
   },
   "scripts": {
     "clean:lib": "npx rimraf ./lib",
     "clean:migrations": "npx rimraf lib/storage/**/migrations/*.d.ts",
+    "build:webpack": "npx webpack --config webpack.config.js",
     "build": "yarn format && yarn build:esm && yarn build:cjs && yarn build:types && yarn tree-shaking:lib",
     "build:types": "tsc --project tsconfig.types.json",
     "build:esm": "npx rimraf lib/esm && tsc --project tsconfig.esm.json",
@@ -42,9 +43,16 @@
     "test": "yarn test:sqlite && yarn test:nedb && yarn test:postgresql",
     "coverage": "yarn build && nyc --reporter=lcov yarn run test"
   },
-  "main": "lib/cjs/index.js",
-  "module": "lib/esm/index.js",
-  "types": "lib/types/index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib-bundle/esm/iohtee.min.mjs",
+  "source": "./src/index.ts",
+  "types": "./lib/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib-bundle/esm/iohtee.min.mjs",
+      "require": "./lib/cjs/index.js"
+    }
+  },
   "files": [
     "lib/",
     "migrations/",
@@ -80,6 +88,11 @@
   },
   "devDependencies": {
     "@machinomy/types-ethereumjs-util": "^0.0.12",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/better-sqlite3": "^7.6.10",
     "@types/bluebird": "3.5.36",
     "@types/body-parser": "^1.16.4",
@@ -103,6 +116,7 @@
     "body-parser": "^1.15.2",
     "chai": "*",
     "chai-as-promised": "*",
+    "crypto-browserify": "*",
     "db-migrate-plugin-typescript": "^2.0.0",
     "expect": "^29.7.0",
     "express": "^4.14.0",
@@ -110,12 +124,22 @@
     "mocha": "^10.4.0",
     "nock": "^13.5.4",
     "nyc": "^15.1.0",
+    "os-browserify": "*",
+    "path-browserify": "*",
     "pg": "^8.12.0",
     "rimraf": "*",
+    "rollup": "^4.18.0",
     "sinon": "^4.1.5",
+    "stream-browserify": "*",
+    "terser-webpack-plugin": "*",
     "tmp": "0.0.33",
+    "ts-loader": "*",
     "ts-mocha": "8.0.0",
     "tsconfig-paths": "3.12.0",
-    "typescript": "*"
+    "typescript": "*",
+    "vm-browserify": "*",
+    "webpack": "*",
+    "webpack-cli": "*",
+    "webpack-merge": "*"
   }
 }

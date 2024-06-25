@@ -16,7 +16,7 @@
  */
 
 import HDWalletProvider from '@machinomy/hdwallet-provider'
-import Machinomy from 'machinomy'
+import Machinomy from '@riaskov/iohtee'
 import { BigNumber } from 'bignumber.js'
 
 async function main(): Promise<string> {

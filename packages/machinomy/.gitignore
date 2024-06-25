@@ -277,4 +277,6 @@ fabric.properties
 /lib/types
 *.map
 *.d.ts
-
+!rollup.config.js
+!webpack.config.js
+/lib-bundle
