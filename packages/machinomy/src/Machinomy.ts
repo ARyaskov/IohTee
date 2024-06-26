@@ -27,7 +27,7 @@ export interface MachinomyCtorParams {
   httpRpcUrl: string
   mnemonic: string
   hdPath: `m/44'/60'/${string}`
-  options: MachinomyOptions
+  options?: MachinomyOptions
 }
 
 /**
@@ -96,7 +96,7 @@ export default class Machinomy {
       params.mnemonic,
       params.hdPath,
       ethersWallet,
-      params.options,
+      params.options ?? MachinomyOptions.defaults(),
     )
   }
 

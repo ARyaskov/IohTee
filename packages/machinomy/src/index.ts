@@ -18,6 +18,7 @@ import { AcceptTokenRequestSerde } from './accept_token_request'
 import { PaymentChannelSerde } from './PaymentChannel'
 
 export * from './configuration'
+export * from './buy'
 
 export {
   Payment,
