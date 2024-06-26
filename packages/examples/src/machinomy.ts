@@ -4,28 +4,24 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import fs from 'fs'
 import { getBalance } from 'viem/actions'
-import {mnemonicToAccount} from "viem/accounts";
-import path from "path";
+import { mnemonicToAccount } from 'viem/accounts'
+import path from 'path'
 
 async function main() {
-
-  // let sender: `0x${string}` = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
-  // let receiver: `0x${string}` = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8'
   const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
   const RPC_URL = String(process.env.RPC_URL).trim()
   const CHAIN_ID = Number(process.env.CHAIN_ID)
 
   const senderAccount = mnemonicToAccount(MNEMONIC, {
-    path: `m/44'/60'/0'/0/1`
+    path: `m/44'/60'/0'/0/1`,
   })
 
   const receiverAccount = mnemonicToAccount(MNEMONIC, {
-    path: `m/44'/60'/0'/0/0`
+    path: `m/44'/60'/0'/0/0`,
   })
 
   let machinomyHub = new Machinomy({
     networkId: CHAIN_ID,
-    account: receiverAccount.address,
     httpRpcUrl: RPC_URL,
     mnemonic: MNEMONIC,
     hdPath: `m/44'/60'/0'/0/0`,
@@ -76,7 +72,6 @@ async function main() {
 
     let machinomy = new Machinomy({
       networkId: CHAIN_ID,
-      account: senderAccount.address,
       httpRpcUrl: RPC_URL,
       mnemonic: MNEMONIC,
       hdPath: `m/44'/60'/0'/0/1`,
@@ -86,64 +81,76 @@ async function main() {
       },
     })
 
-    // let message = 'This is first buy:'
-    // let resultFirst = await checkBalance(message, senderAccount.address, async () => {
-    //   return machinomy
-    //     .buy({
-    //       receiver: receiverAccount.address,
-    //       price: price,
-    //       gateway: 'http://localhost:3001/machinomy',
-    //       meta: 'metaexample',
-    //     })
-    //     .catch((e: Error) => {
-    //       console.log(e)
-    //     })
-    // })
-    //
-    // message = 'This is second buy:'
-    // let resultSecond = await checkBalance(message, senderAccount.address, async () => {
-    //   return machinomy
-    //     .buy({
-    //       receiver: receiverAccount.address,
-    //       price: price,
-    //       gateway: 'http://localhost:3001/machinomy',
-    //       meta: 'metaexample',
-    //     })
-    //     .catch((e: Error) => {
-    //       console.log(e)
-    //     })
-    // })
-    //
-    // let channelId = resultSecond.channelId
-    // message = 'Deposit:'
-    // await checkBalance(message, senderAccount.address, async () => {
-    //   await machinomy.deposit(channelId, price)
-    // })
-    //
-    // message = 'First close:'
-    // await checkBalance(message, senderAccount.address, async () => {
-    //   await machinomy.close(channelId)
-    // })
-    //
-    // message = 'Second close:'
-    // await checkBalance(message, senderAccount.address, async () => {
-    //   await machinomy.close(channelId)
-    // })
+    let message = 'This is first buy:'
+    let resultFirst = await checkBalance(
+      message,
+      senderAccount.address,
+      async () => {
+        return machinomy
+          .buy({
+            receiver: receiverAccount.address,
+            price: price,
+            gateway: 'http://localhost:3001/machinomy',
+            meta: 'metaexample',
+          })
+          .catch((e: Error) => {
+            console.log(e)
+          })
+      },
+    )
 
-    let message = 'Once more buy'
-    console.log(receiverAccount.address)
-    let resultThird = await checkBalance(message, senderAccount.address, async () => {
-      return machinomy
-        .buy({
-          receiver: receiverAccount.address,
-          price: price,
-          gateway: 'http://localhost:3001/machinomy',
-          meta: 'metaexample',
-        })
-        .catch((e: Error) => {
-          console.log(e)
-        })
+    message = 'This is second buy:'
+    let resultSecond = await checkBalance(
+      message,
+      senderAccount.address,
+      async () => {
+        return machinomy
+          .buy({
+            receiver: receiverAccount.address,
+            price: price,
+            gateway: 'http://localhost:3001/machinomy',
+            meta: 'metaexample',
+          })
+          .catch((e: Error) => {
+            console.log(e)
+          })
+      },
+    )
+
+    let channelId = resultSecond.channelId
+    message = 'Deposit:'
+    await checkBalance(message, senderAccount.address, async () => {
+      await machinomy.deposit(channelId, price)
     })
+
+    message = 'First close:'
+    await checkBalance(message, senderAccount.address, async () => {
+      await machinomy.close(channelId)
+    })
+
+    message = 'Second close:'
+    await checkBalance(message, senderAccount.address, async () => {
+      await machinomy.close(channelId)
+    })
+
+    message = 'Once more buy'
+    console.log(receiverAccount.address)
+    let resultThird = await checkBalance(
+      message,
+      senderAccount.address,
+      async () => {
+        return machinomy
+          .buy({
+            receiver: receiverAccount.address,
+            price: price,
+            gateway: 'http://localhost:3001/machinomy',
+            meta: 'metaexample',
+          })
+          .catch((e: Error) => {
+            console.log(e)
+          })
+      },
+    )
 
     message = 'Claim by receiver'
     await checkBalance(message, senderAccount.address, async () => {
@@ -169,7 +176,6 @@ async function main() {
         // fs.unlinkSync('hub')
       }
     } catch (error) {
-
       console.log(error)
     }
   })

@@ -4,7 +4,10 @@
     "types": [
       "@machinomy/types-ethereumjs-util",
       "@types/mocha"
-    ]
+    ],
+    "paths": {
+      "@riaskov/iohtee": ["../machinomy/src"]
+    }
   },
   "include": [
     "./src/**/*"

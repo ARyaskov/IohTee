@@ -1,14 +1,14 @@
 /**
  * To run the file, it requires two environment variables to be set.
- * `PROVIDER_URL` is a JSON RPC endpoint. Infura works just fine. For Rinkeby test network,
- * you could set it to `PROVIDER_URL="https://rinkeby.infura.io/"`. Another variable is `MNEMONIC`.
+ * `RPC_URL` is a JSON RPC endpoint. Alchemy works just fine. For Polygon Amoy test network,
+ * you could set it to `RPC_URL=https://rpc-amoy.polygon.technology`. Another variable is `MNEMONIC`.
  * It is a [12-word seed phrase](https://github.com/pirapira/ethereum-word-list/blob/master/README.md#mnemonic-phrase).
- * For example, `MNEMONIC="brain surround have swap horror body response double fire dumb bring hazard"`
+ * For example, `MNEMONIC=tool school decrease elegant fix awful eyebrow immense noble erase dish labor`
  *
  * Start this file then:
  *
  * yarn build
- * PROVIDER_URL="https://rinkeby.infura.io/" MNEMONIC="brain surround have swap horror body response double fire dumb bring hazard" node server.js
+ * PROVIDER_URL="https://rpc-amoy.polygon.technology" MNEMONIC="tool school decrease elegant fix awful eyebrow immense noble erase dish labor" node hub.js
  *
  * The script runs 3 core endpoints:
  * `http://localhost:3000/content` provides an example of the paid content.
@@ -25,8 +25,8 @@ import {
   PaymentChannelSerde,
 } from '@riaskov/iohtee'
 import bodyParser from 'body-parser'
-import { createWalletClient, http } from 'viem'
-import { networkByName, NetworkType } from '@riaskov/iohtee-contracts'
+import { mnemonicToAccount } from 'viem/accounts'
+import path from 'path'
 
 function isValidToken(token: string): boolean {
   const tokenRegex = /^0x[0-9a-fA-F]{64}$/
@@ -35,48 +35,54 @@ function isValidToken(token: string): boolean {
 }
 
 async function main() {
-  const RPC_URL = String(process.env.RPC_URL).trim()
+  const urlScheme = !!process.env.USE_HTTPS ? 'https://' : 'http://'
+  const dbPath = path.resolve(__dirname, '../hub.db')
   const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
-  const NETWORK = String(process.env.NETWORK).trim()
+  const RPC_URL = String(process.env.RPC_URL).trim()
+  const CHAIN_ID = Number(process.env.CHAIN_ID)
 
   const HOST = '127.0.0.1'
   const APP_PORT = 3000
   const HUB_PORT = 3001
-  const chain: any = networkByName(NETWORK) as NetworkType
 
-  const walletClient = createWalletClient({
-    chain: chain,
-    transport: http(RPC_URL),
+  const senderAccountHdPath = `m/44'/60'/0'/0/1`
+  const receiverAccountHdPath = `m/44'/60'/0'/0/1`
+
+  const senderAccount = mnemonicToAccount(MNEMONIC, {
+    path: senderAccountHdPath,
   })
 
-  const addresses = await walletClient.getAddresses()
+  const receiverAccount = mnemonicToAccount(MNEMONIC, {
+    path: receiverAccountHdPath,
+  })
+
   /**
    * Account that receives payments.
    */
-  let receiver = addresses[0]
+  const receiver = receiverAccount.address
 
   /**
-   * Create machinomy instance that provides API for accepting payments.
+   * Create iohtee instance that provides API for accepting payments.
    */
-  let machinomy = new Machinomy({
-    network: chain,
-    account: receiver,
+  const iohtee = new Machinomy({
+    networkId: CHAIN_ID,
     httpRpcUrl: RPC_URL,
     mnemonic: MNEMONIC,
+    hdPath: receiverAccountHdPath,
     options: {
-      databaseUrl: 'nedb://./server',
+      databaseUrl: `sqlite://${dbPath}`,
     },
   })
 
-  let hub = express()
+  const hub = express()
   hub.use(bodyParser.json())
   hub.use(bodyParser.urlencoded({ extended: false }))
 
   /**
-   * Recieve an off-chain payment issued by `machinomy buy` command.
+   * Receive an off-chain payment issued by `iohtee buy` command.
    */
   hub.post('/accept', async (req, res) => {
-    const body = await machinomy.acceptPayment(req.body)
+    const body = await iohtee.acceptPayment(req.body)
     res.status(202).header('Paywall-Token', body.token).send(body)
   })
 
@@ -88,7 +94,7 @@ async function main() {
     const acceptTokenRequest = AcceptTokenRequestSerde.instance.deserialize({
       token,
     })
-    const isAccepted = (await machinomy.acceptToken(acceptTokenRequest)).status
+    const isAccepted = (await iohtee.acceptToken(acceptTokenRequest)).status
     if (isAccepted) {
       res.status(200).send({ status: 'ok' })
     } else {
@@ -97,14 +103,14 @@ async function main() {
   })
 
   hub.get('/channels', async (req, res) => {
-    const channels = await machinomy.channels()
+    const channels = await iohtee.channels()
     res.status(200).send(channels.map(PaymentChannelSerde.instance.serialize))
   })
 
   hub.get('/claim/:channelid', async (req, res) => {
     try {
-      let channelId = req.params.channelid as `0x${string}`
-      await machinomy.close(channelId)
+      const channelId = req.params.channelid as `0x${string}`
+      await iohtee.close(channelId)
       res.status(200).send('Claimed')
     } catch (error) {
       res.status(404).send('No channel found')
@@ -116,21 +122,21 @@ async function main() {
     console.log('HUB is ready on port ' + HUB_PORT)
   })
 
-  let app = express()
-  let paywallHeaders = () => {
+  const app = express()
+  const paywallHeaders = () => {
     let headers: { [index: string]: string } = {}
     headers['Paywall-Version'] = '1.0.0'
     headers['Paywall-Price'] = '1000'
     headers['Paywall-Address'] = receiver
-    headers['Paywall-Gateway'] = `http://${HOST}:${HUB_PORT}/accept`
+    headers['Paywall-Gateway'] = `${urlScheme}${HOST}:${HUB_PORT}/accept`
     return headers
   }
 
   /**
-   * Example of serving a paid content. You can buy it with `machinomy buy http://localhost:3000/content` command.
+   * Example of serving a paid content. You can buy it with `iohtee buy http://localhost:3000/content` command.
    */
   app.get('/content', async (req, res) => {
-    let reqUrl = `http://${HOST}:${HUB_PORT}/verify`
+    let reqUrl = `${urlScheme}${HOST}:${HUB_PORT}/verify`
     let content = req.get('authorization')
     if (content) {
       let token = content.split(' ')[1]

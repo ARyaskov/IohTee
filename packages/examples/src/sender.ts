@@ -2,52 +2,61 @@ import path from 'path'
 import fs from 'fs-extra'
 import { Machinomy } from '@riaskov/iohtee'
 import Logger from '@machinomy/logger'
+import { mnemonicToAccount } from 'viem/accounts'
 
-const PROVIDER = process.env.PROVIDER || 'https://rinkeby.infura.io'
-const MNEMONIC =
-  process.env.MNEMONIC ||
-  'peanut giggle name tree canoe tube render ketchup survey segment army will'
 const LOG = new Logger('machinomy-sender')
 
 async function run() {
-  fs.removeSync(path.resolve('./sender-receiver'))
+  const dbPath = path.resolve(__dirname, '../sender-receiver.db')
+  fs.removeSync(dbPath)
 
-  const provider = HDWalletProvider.mnemonic({
-    mnemonic: MNEMONIC!,
-    rpc: PROVIDER,
-    numberOfAccounts: 2,
-  })
-  const senderAccount = (await provider.getAddresses())[0]
-  const receiverAccount = (await provider.getAddresses())[0]
-  const web3 = new Web3(provider)
+  const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
+  const RPC_URL = String(process.env.RPC_URL).trim()
+  const CHAIN_ID = Number(process.env.CHAIN_ID)
+
   const minimumChannelAmount = 1n * 10n ** 4n
   const channelValue = 1n * 10n ** 6n
   const paymentPrice = 200000n
 
-  LOG.info(`PROVIDER = ${PROVIDER}`)
+  LOG.info(`PROVIDER = ${RPC_URL}`)
   LOG.info(`MNEMONIC = ${MNEMONIC}`)
 
-  const machinomy = new Machinomy(senderAccount, web3, {
-    databaseUrl: 'nedb://sender-receiver/database.nedb',
-    minimumChannelAmount: minimumChannelAmount,
+  const senderAccountHdPath = `m/44'/60'/0'/0/1`
+
+  const senderAccount = mnemonicToAccount(MNEMONIC, {
+    path: senderAccountHdPath,
   })
 
+  const receiverAccount = mnemonicToAccount(MNEMONIC, {
+    path: `m/44'/60'/0'/0/0`,
+  })
+
+  const iohtee = new Machinomy({
+    networkId: CHAIN_ID,
+    httpRpcUrl: RPC_URL,
+    mnemonic: MNEMONIC,
+    hdPath: senderAccountHdPath,
+    options: {
+      databaseUrl: `sqlite://${dbPath}`,
+      minimumChannelAmount: minimumChannelAmount,
+    },
+  })
   LOG.info(
-    `Start opening Machinomy channel between sender ${senderAccount} and receiver ${receiverAccount} with value ${channelValue} Wei`,
+    `Start opening IohTee channel between sender ${senderAccount.address} and receiver ${receiverAccount.address} with value ${channelValue} Wei`,
   )
   LOG.info(
-    `For remote Ethereum nodes (e.g. Rinkeby or Ropsten) it can taking a 30-60 seconds.`,
+    `For remote Ethereum nodes (e.g. Amoy or Sepolia) it can taking a 15-30 seconds.`,
   )
 
-  await machinomy.open(receiverAccount, channelValue)
+  await iohtee.open(receiverAccount.address, channelValue)
 
   LOG.info(`Channel was opened.`)
   LOG.info(
-    `Trace the last transaction via https://rinkeby.etherscan.io/address/${senderAccount}`,
+    `Trace the last transaction via https://amoy.polygonscan.com/address/${senderAccount.address}`,
   )
 
-  const payment = await machinomy.payment({
-    receiver: receiverAccount,
+  const payment = await iohtee.payment({
+    receiver: receiverAccount.address,
     price: paymentPrice,
   })
 

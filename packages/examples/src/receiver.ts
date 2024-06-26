@@ -1,51 +1,62 @@
 import path from 'path'
 import fs from 'fs-extra'
-import { BigNumber } from 'bignumber.js'
-import Web3 from 'web3'
-import Machinomy from 'machinomy'
-import HDWalletProvider from '@machinomy/hdwallet-provider'
+import { Machinomy } from '@riaskov/iohtee'
 import Logger from '@machinomy/logger'
+import { mnemonicToAccount } from 'viem/accounts'
 
 const payment = require(path.resolve('./payment.json'))
-const PROVIDER = process.env.PROVIDER || 'https://rinkeby.infura.io'
-const MNEMONIC =
-  process.env.MNEMONIC ||
-  'peanut giggle name tree canoe tube render ketchup survey segment army will'
-const LOG = new Logger('machinomy-receiver')
+
+const LOG = new Logger('iohtee-receiver')
 
 async function run() {
-  fs.removeSync(path.resolve('./sender-receiver'))
+  const dbPath = path.resolve(__dirname, '../sender-receiver.db')
+  fs.removeSync(dbPath)
 
-  LOG.info(`PROVIDER = ${PROVIDER}`)
+  const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
+  const RPC_URL = String(process.env.RPC_URL).trim()
+  const CHAIN_ID = Number(process.env.CHAIN_ID)
+
+  const minimumChannelAmount = 1n * 10n ** 4n
+
+  LOG.info(`PROVIDER = ${RPC_URL}`)
   LOG.info(`MNEMONIC = ${MNEMONIC}`)
 
-  const provider = HDWalletProvider.mnemonic({
-    mnemonic: MNEMONIC!,
-    rpc: PROVIDER,
-    numberOfAccounts: 2,
+  const senderAccountHdPath = `m/44'/60'/0'/0/0`
+  const receiverAccountHdPath = `m/44'/60'/0'/0/1`
+
+  const senderAccount = mnemonicToAccount(MNEMONIC, {
+    path: senderAccountHdPath,
   })
-  const receiverAccount = (await provider.getAddresses())[0]
-  const receiverWeb3 = new Web3(provider)
-  const minimumChannelAmount = new BigNumber(1).shiftedBy(4)
-  const receiverMachinomy = new Machinomy(receiverAccount, receiverWeb3, {
-    databaseUrl: 'nedb://sender-receiver/database.nedb',
-    minimumChannelAmount: minimumChannelAmount,
+
+  const receiverAccount = mnemonicToAccount(MNEMONIC, {
+    path: receiverAccountHdPath,
+  })
+
+  const iohtee = new Machinomy({
+    networkId: CHAIN_ID,
+    httpRpcUrl: RPC_URL,
+    mnemonic: MNEMONIC,
+    hdPath: senderAccountHdPath,
+    options: {
+      databaseUrl: `sqlite://${dbPath}`,
+      minimumChannelAmount: minimumChannelAmount,
+    },
   })
 
   LOG.info(`Receiver: ${receiverAccount}`)
   LOG.info(`Accept payment: ${JSON.stringify(payment)}`)
 
-  await receiverMachinomy.acceptPayment({
+  await iohtee.acceptPayment({
     payment: payment,
   })
 
   LOG.info(`Start closing channel with channelID ${payment.channelId}`)
 
-  await receiverMachinomy.close(payment.channelId)
+  await iohtee.close(payment.channelId)
 
   LOG.info(`Channel ${payment.channelId} was successfully closed.`)
   LOG.info(
-    `Trace the last transaction via https://rinkeby.etherscan.io/address/${receiverAccount}`,
+    `Trace the last transaction via https://amoy.polygonscan.com/address/${receiverAccount}`,
   )
   LOG.info(`Receiver done.`)
 

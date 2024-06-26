@@ -21,7 +21,7 @@
     "url": "https://github.com/ARyaskov/iohtee.git"
   },
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "build": "yarn format && tsc --project tsconfig.json",
     "format": "npx prettier --write \"src/**/*.ts\"",
     "test": "exit 0",
     "coverage": "exit 0",
