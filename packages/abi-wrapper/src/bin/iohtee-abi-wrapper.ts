@@ -12,6 +12,10 @@ let args: any = yargs(hideBin(process.argv))
   .option('minify', {
     describe: 'Also render minified JS-wrapper',
     alias: 'm',
+  })
+  .option('docs', {
+    describe: 'Folder for generated docs',
+    alias: 'd',
   }).argv
 
 if (args._.length === 0) {
@@ -22,8 +26,9 @@ if (args._.length === 0) {
 const pattern = args._[0]
 const outputDir = args['output']
 const minify = args['minify']
+const docsDir = args['docs']
 
-let abiWrapper = new AbiWrapper(pattern, outputDir, minify)
+let abiWrapper = new AbiWrapper(pattern, outputDir, minify, docsDir)
 abiWrapper
   .run()
   .then(() => {

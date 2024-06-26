@@ -15,9 +15,8 @@ We're upgrading it to contemporary standards (TypeScript 5+, Node.js 18+, ES2023
 Available sub-projects:
 - [IohTee](packages/machinomy) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
 - [Contracts](packages/contracts) is a TypeScript interface for Ethereum contracts managed by [HardHat](https://github.com/NomicFoundation/hardhat) used by [IohTee](packages/iohtee).
-- [Examples](packages/examples) is [IohTee](packages/iohtee) examples.
+- [Examples](packages/examples) is [IohTee](packages/machinomy) examples.
 - [Playground](packages/playground) contains code of play.iohtee.toivo.tech
-- [cli](packages/cli) is IohTee Command Line Interface.
 
 
 ## Tasks in progress
@@ -40,15 +39,11 @@ FAQ: [GitHub Wiki Page](https://github.com/machinomy/machinomy/wiki/Frequently-A
 
 ## Tinkering
 
-First of all, please check your Node's arch -- it should not be arm64 (for M1 chip) otherwise node-gyp will fail. 
-It works fine with Node.js v22 x64.
-
-
 It takes two to tango: a seller and a buyer. Seller is `packages/examples/src/server.ts` script. Build it or run through node-ts.
 ```
-$ git clone https://github.com/machinomy/machinomy
-$ cd machinomy && yarn install && yarn bootstrap && yarn build
-$ node packages/examples/src/server.js
+$ git clone https://github.com/ARyaskov/IohTee
+$ cd IohTee && yarn && yarn build
+$ node packages/examples/src/hub.js
 ```
 
 And then run client script:

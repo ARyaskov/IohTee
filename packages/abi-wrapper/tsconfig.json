@@ -1,8 +1,7 @@
 {
-  "extends": "../../tsconfig.esm.json",
+  "extends": "../../tsconfig.cjs.json",
   "compilerOptions": {
     "target": "ES2022",
-    "sourceRoot": "src/",
     "outDir": "dist/"
   },
   "include": [

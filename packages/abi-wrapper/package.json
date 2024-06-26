@@ -10,6 +10,16 @@
       "email": "code@riaskov.com"
     }
   ],
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "evm",
+    "polygon",
+    "binance",
+    "abi",
+    "hardhat",
+    "wrapper"
+  ],
   "homepage": "https://github.com/ARyaskov/iohtee#readme",
   "bugs": {
     "url": "https://github.com/ARyaskov/iohtee/issues"
@@ -21,7 +31,6 @@
   "engines": {
     "node": ">=20"
   },
-  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": "dist/bin/iohtee-abi-wrapper.js",
@@ -30,7 +39,7 @@
     "templates/"
   ],
   "scripts": {
-    "demo": "tsx src/bin/iohtee-abi-wrapper.ts ./abi/* -m -o ../contracts/src/abi-wrapper/",
+    "demo": "tsx src/bin/iohtee-abi-wrapper.ts ./abi/* -m -d ./docs -o ../contracts/src/abi-wrapper/",
     "build": "yarn format && yarn clean && tsc --project tsconfig.json",
     "clean": "rimraf dist",
     "test": "exit 0",
@@ -42,6 +51,7 @@
     "chalk": "^5.3.0",
     "console.table": "^0.10.0",
     "esbuild": "^0.21.5",
+    "fs-extra": "^11.2.0",
     "glob": "^10.4.2",
     "handlebars": "^4.7.8",
     "mkdirp": "^3.0.1",
@@ -50,6 +60,8 @@
   },
   "devDependencies": {
     "@types/yargs": "^17.0.32",
-    "rimraf": "*"
+    "rimraf": "*",
+    "typedoc": "^0.26.2",
+    "typedoc-plugin-markdown": "^4.1.0"
   }
 }
