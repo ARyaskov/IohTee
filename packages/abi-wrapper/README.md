@@ -85,8 +85,8 @@ constructor(deployedContractAddress: `0x${string}`, params: CtorParams)
 }
 ```
 
-Generated HTML-documentation for TS be like
-
+Generated HTML documentation for TS wrapper be like
+![nice-docs](https://github.com/ARyaskov/IohTee/assets/3934848/935aee80-11c0-4f80-afeb-5f3ca9e5bbfe)
 
 ## TODO
 - add postprocess with prettier and autodetecting of prettierrc
