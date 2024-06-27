@@ -859,12 +859,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@machinomy/monorepo@workspace:."
   dependencies:
-    "@types/bignumber.js": "npm:^5.0.0"
     "@types/chai": "npm:^4.3.16"
     "@types/chai-as-promised": "npm:^7.1.8"
     "@types/humanize-plus": "npm:^1.8.2"
     "@types/request": "npm:^2.48.12"
-    bignumber.js: "npm:^9.1.2"
     chai: "npm:^5.1.1"
     chai-as-promised: "npm:^7.1.2"
     cpx: "npm:^1.5.0"
@@ -884,7 +882,7 @@ __metadata:
     ts-loader: "npm:^9.5.1"
     ts-node: "npm:^7.0.x"
     typescript: "npm:5.4.5"
-    viem: "npm:^2.16.1"
+    viem: "npm:^2.16.2"
     vm-browserify: "npm:^1.1.2"
     webpack: "npm:^5.92.1"
     webpack-cli: "npm:^5.1.4"
@@ -1508,7 +1506,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@riaskov/iohtee-contracts@npm:*, @riaskov/iohtee-contracts@workspace:packages/contracts":
+"@riaskov/iohtee-contracts@npm:^5.0.0, @riaskov/iohtee-contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@riaskov/iohtee-contracts@workspace:packages/contracts"
   dependencies:
@@ -1621,7 +1619,7 @@ __metadata:
     "@machinomy/types-eth-sig-util": "npm:^0.0.8"
     "@machinomy/types-ethereumjs-util": "npm:^0.0.12"
     "@metamask/eth-sig-util": "npm:^7.0.2"
-    "@riaskov/iohtee-contracts": "npm:*"
+    "@riaskov/iohtee-contracts": "npm:^5.0.0"
     "@rollup/plugin-babel": "npm:^6.0.4"
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/plugin-node-resolve": "npm:^15.2.3"
@@ -2191,15 +2189,6 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
   checksum: 10c0/11c4da950e0e1a31270e8c7d98ba34fa5a28fbd3280ffa75945983291d2ec5bc87a9b3b378c21c042249a415d557066a0431da568b83ff9e1bac53eddf4f5adc
-  languageName: node
-  linkType: hard
-
-"@types/bignumber.js@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "@types/bignumber.js@npm:5.0.0"
-  dependencies:
-    bignumber.js: "npm:*"
-  checksum: 10c0/fc8d0639b4e497712befeebcec98f1ff5cd56bd4ffe44baeb7dc90060c80adefb35cf2c6ace0b69ab094c03e5139873935fbb3c7d11d500bd627cd252685aaac
   languageName: node
   linkType: hard
 
@@ -3561,7 +3550,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bignumber.js@npm:*, bignumber.js@npm:^9.1.2":
+"bignumber.js@npm:*":
   version: 9.1.2
   resolution: "bignumber.js@npm:9.1.2"
   checksum: 10c0/e17786545433f3110b868725c449fa9625366a6e675cd70eb39b60938d6adbd0158cb4b3ad4f306ce817165d37e63f4aa3098ba4110db1d9a3b9f66abfbaf10d
@@ -12222,7 +12211,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:*, viem@npm:^2.16.1":
+"viem@npm:*, viem@npm:^2.16.2":
   version: 2.16.2
   resolution: "viem@npm:2.16.2"
   dependencies:
