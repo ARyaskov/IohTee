@@ -1502,7 +1502,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@riaskov/iohtee-contracts@npm:^5.0.1, @riaskov/iohtee-contracts@workspace:packages/contracts":
+"@riaskov/iohtee-contracts@npm:^5.0.2, @riaskov/iohtee-contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@riaskov/iohtee-contracts@workspace:packages/contracts"
   dependencies:
@@ -1611,7 +1611,7 @@ __metadata:
     "@machinomy/types-eth-sig-util": "npm:^0.0.8"
     "@machinomy/types-ethereumjs-util": "npm:^0.0.12"
     "@metamask/eth-sig-util": "npm:^7.0.2"
-    "@riaskov/iohtee-contracts": "npm:^5.0.1"
+    "@riaskov/iohtee-contracts": "npm:^5.0.2"
     "@rollup/plugin-babel": "npm:^6.0.4"
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/plugin-node-resolve": "npm:^15.2.3"
