@@ -878,6 +878,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@machinomy/monorepo@workspace:."
   dependencies:
+    "@riaskov/iohtee-contracts": "npm:^5.0.3"
     "@types/chai": "npm:^4.3.16"
     "@types/chai-as-promised": "npm:^7.1.8"
     "@types/humanize-plus": "npm:^1.8.2"
@@ -1502,9 +1503,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@riaskov/iohtee-contracts@npm:^5.0.2, @riaskov/iohtee-contracts@workspace:packages/contracts":
+"@riaskov/iohtee-contracts2@workspace:packages/contracts":
   version: 0.0.0-use.local
-  resolution: "@riaskov/iohtee-contracts@workspace:packages/contracts"
+  resolution: "@riaskov/iohtee-contracts2@workspace:packages/contracts"
   dependencies:
     "@machinomy/logger": "npm:^0.2.5"
     "@machinomy/types-eth-sig-util": "npm:0.0.8"
@@ -1552,6 +1553,27 @@ __metadata:
     webpack-merge: "npm:*"
   languageName: unknown
   linkType: soft
+
+"@riaskov/iohtee-contracts@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "@riaskov/iohtee-contracts@npm:5.0.3"
+  dependencies:
+    "@machinomy/logger": "npm:^0.2.5"
+    "@nomicfoundation/hardhat-ignition": "npm:^0.15.5"
+    "@nomicfoundation/hardhat-toolbox-viem": "npm:^3.0.0"
+    "@nomicfoundation/hardhat-viem": "npm:^2.0.2"
+    "@nomicfoundation/ignition-core": "npm:^0.15.5"
+    "@openzeppelin/contracts": "npm:5.0.2"
+    "@riaskov/iohtee-abi-wrapper": "npm:^2.0.9"
+    dotenv: "npm:*"
+    hardhat: "npm:^2.23.0-dev.3"
+    humanize-plus: "npm:*"
+    solidity-coverage: "npm:^0.8.12"
+    typechain: "npm:8.3.2"
+    viem: "npm:*"
+  checksum: 10c0/c8edd1b583977c94d39895a75c8016ca8b3c41663d8bde02f37fc74af21d84c19eaa314262e57f9b09ac313d5738709b8a2eefe96af2eb7118211a8682bd8377
+  languageName: node
+  linkType: hard
 
 "@riaskov/iohtee-examples@workspace:packages/examples":
   version: 0.0.0-use.local
@@ -1611,7 +1633,7 @@ __metadata:
     "@machinomy/types-eth-sig-util": "npm:^0.0.8"
     "@machinomy/types-ethereumjs-util": "npm:^0.0.12"
     "@metamask/eth-sig-util": "npm:^7.0.2"
-    "@riaskov/iohtee-contracts": "npm:^5.0.2"
+    "@riaskov/iohtee-contracts": "npm:^5.0.3"
     "@rollup/plugin-babel": "npm:^6.0.4"
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/plugin-node-resolve": "npm:^15.2.3"
@@ -2073,10 +2095,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shikijs/core@npm:1.9.0":
-  version: 1.9.0
-  resolution: "@shikijs/core@npm:1.9.0"
-  checksum: 10c0/0b0ec958a9ad579eb7678032eb9b5f1c82cc771bb094b750afe76ef499451049d5e1797b4fcce4bab713761e633629347f46190005cfd07bd4b81eda029a19ca
+"@shikijs/core@npm:1.9.1":
+  version: 1.9.1
+  resolution: "@shikijs/core@npm:1.9.1"
+  checksum: 10c0/70523a0fc2e8d32da6f35e640c854cb3ae3cb7202bcab2f08c92b8925ea4b2c19ec6df55c5cfd50d586bc3a3a5156945db720962ed66a3e624c2ef241aebe6ce
   languageName: node
   linkType: hard
 
@@ -2512,11 +2534,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:^20.12.12":
-  version: 20.14.8
-  resolution: "@types/node@npm:20.14.8"
+  version: 20.14.9
+  resolution: "@types/node@npm:20.14.9"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/06d4643fa3b179b41fe19f9c75c240278ca1f7a313b3b837bc36ea119499c7ad77f06bbe72694ac04aa91ec77fe747baa09b889f4c435450c1724a26bd55f160
+  checksum: 10c0/911ffa444dc032897f4a23ed580c67903bd38ea1c5ec99b1d00fa10b83537a3adddef8e1f29710cbdd8e556a61407ed008e06537d834e48caf449ce59f87d387
   languageName: node
   linkType: hard
 
@@ -4002,9 +4024,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001629":
-  version: 1.0.30001636
-  resolution: "caniuse-lite@npm:1.0.30001636"
-  checksum: 10c0/e5f965b4da7bae1531fd9f93477d015729ff9e3fa12670ead39a9e6cdc4c43e62c272d47857c5cc332e7b02d697cb3f2f965a1030870ac7476da60c2fc81ee94
+  version: 1.0.30001638
+  resolution: "caniuse-lite@npm:1.0.30001638"
+  checksum: 10c0/33019e0c53ed73f1e728b6f313efed2d7a25710dfa2ad3924d2be9939df10d0991556ac87523d3177d472c246654c9216f03e5532717ed97df58014728c3e798
   languageName: node
   linkType: hard
 
@@ -5166,9 +5188,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.796":
-  version: 1.4.811
-  resolution: "electron-to-chromium@npm:1.4.811"
-  checksum: 10c0/67b527d62224e21c95f78767d6a8f13dcaf8d456ee8ec6d6556093372769abe4ea3ca2bdf161cf7ded2b6e8ff7936ba8b744682413a753b082754536a44b0918
+  version: 1.4.812
+  resolution: "electron-to-chromium@npm:1.4.812"
+  checksum: 10c0/d5cff49155df7b7fa64b911d4075c35c4f9c704af4d191e77a8ae08f81515344a62eef2bd2cfc23ed59fa1617c07e7e9267b55c2a0adbcebec0ea2a66fc11346
   languageName: node
   linkType: hard
 
@@ -8581,11 +8603,11 @@ __metadata:
   linkType: hard
 
 "minimatch@npm:^9.0.4":
-  version: 9.0.4
-  resolution: "minimatch@npm:9.0.4"
+  version: 9.0.5
+  resolution: "minimatch@npm:9.0.5"
   dependencies:
     brace-expansion: "npm:^2.0.1"
-  checksum: 10c0/2c16f21f50e64922864e560ff97c587d15fd491f65d92a677a344e970fe62aafdbeafe648965fa96d33c061b4d0eabfe0213466203dd793367e7f28658cf6414
+  checksum: 10c0/de96cf5e35bdf0eab3e2c853522f98ffbe9a36c37797778d2665231ec1f20a9447a7e567cb640901f89e4daaa95ae5d70c65a9e8aa2bb0019b6facbc3c0575ed
   languageName: node
   linkType: hard
 
@@ -8759,7 +8781,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mocha@npm:*":
+"mocha@npm:*, mocha@npm:^10.0.0, mocha@npm:^10.2.0, mocha@npm:^10.4.0":
   version: 10.5.2
   resolution: "mocha@npm:10.5.2"
   dependencies:
@@ -8787,37 +8809,6 @@ __metadata:
     _mocha: bin/_mocha
     mocha: bin/mocha.js
   checksum: 10c0/ccafc4d6b166a897cc20c6e8bf912c08ef1ac6d3e903812a501a6c0717c8df48490f11752446db8664b0b46ca76d9949d9b18ddf0a5fefb132a8343d631c4000
-  languageName: node
-  linkType: hard
-
-"mocha@npm:^10.0.0, mocha@npm:^10.2.0, mocha@npm:^10.4.0":
-  version: 10.5.1
-  resolution: "mocha@npm:10.5.1"
-  dependencies:
-    ansi-colors: "npm:4.1.1"
-    browser-stdout: "npm:1.3.1"
-    chokidar: "npm:^3.5.3"
-    debug: "npm:4.3.4"
-    diff: "npm:5.0.0"
-    escape-string-regexp: "npm:4.0.0"
-    find-up: "npm:5.0.0"
-    glob: "npm:8.1.0"
-    he: "npm:1.2.0"
-    js-yaml: "npm:4.1.0"
-    log-symbols: "npm:4.1.0"
-    minimatch: "npm:5.0.1"
-    ms: "npm:2.1.3"
-    serialize-javascript: "npm:6.0.0"
-    strip-json-comments: "npm:3.1.1"
-    supports-color: "npm:8.1.1"
-    workerpool: "npm:6.2.1"
-    yargs: "npm:16.2.0"
-    yargs-parser: "npm:20.2.4"
-    yargs-unparser: "npm:2.0.0"
-  bin:
-    _mocha: bin/_mocha
-    mocha: bin/mocha.js
-  checksum: 10c0/0e5a4c9012b8942d42e4c2e9579a50a30458d00b286a88b11a10fef37930d3c38f3c9a01d32ca83c9bc32971583c36a91526fd90f70c2568fe42a1bb71ac1f36
   languageName: node
   linkType: hard
 
@@ -10894,11 +10885,11 @@ __metadata:
   linkType: hard
 
 "shiki@npm:^1.9.0":
-  version: 1.9.0
-  resolution: "shiki@npm:1.9.0"
+  version: 1.9.1
+  resolution: "shiki@npm:1.9.1"
   dependencies:
-    "@shikijs/core": "npm:1.9.0"
-  checksum: 10c0/bc2dd4547a2afec62e2ecba8f2e85bf48d99c5b3b3fb7247f9159f7437a8f83d20afdca75fe5a6ceffe409b5c008671f09dd5546b66a35d895c7dd1eaf1b261b
+    "@shikijs/core": "npm:1.9.1"
+  checksum: 10c0/a9d58279a015f6ab9c2a849d90c23545062f15d6e18d4402f463c41fc7d51992d1d478f9d43b33bf1c1310d56cc0caee90d25a42e4453d4e522166b41409956e
   languageName: node
   linkType: hard
 
