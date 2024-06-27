@@ -1,8 +1,8 @@
 {
-  "name": "@machinomy/monorepo",
+  "name": "@riaskov/iohtee-monorepo",
   "private": true,
   "version": "2.0.0",
-  "repository": "git@github.com:ARyaskov/machinomy.git",
+  "repository": "git@github.com:ARyaskov/IohTee.git",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
   "contributors": [
     {
@@ -29,6 +29,7 @@
     "@types/chai": "^4.3.16",
     "@types/chai-as-promised": "^7.1.8",
     "@types/humanize-plus": "^1.8.2",
+    "@types/node": "^20.14.9",
     "@types/request": "^2.48.12",
     "chai": "^5.1.1",
     "chai-as-promised": "^7.1.2",
@@ -46,7 +47,7 @@
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.5.1",
     "ts-node": "^7.0.x",
-    "typescript": "5.4.5",
+    "typescript": "5.5.2",
     "vm-browserify": "^1.1.2",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4",

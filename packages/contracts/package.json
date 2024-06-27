@@ -1,6 +1,6 @@
 {
   "name": "@riaskov/iohtee-contracts",
-  "version": "5.0.4",
+  "version": "5.0.5",
   "description": "IohTee contracts managed by Hardhat",
   "license": "Apache-2.0",
   "homepage": "https://github.com/ARyaskov/IohTee/blob/main/packages/contracts/.github/README.md",
@@ -24,8 +24,8 @@
   "types": "./lib/cjs/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./lib-bundle/esm/iohtee-contracts.min.mjs",
-      "require": "./lib/cjs/index.js"
+      "import": "./lib/esm/src/index.js",
+      "require": "./lib/cjs/src/index.js"
     }
   },
   "files": [
