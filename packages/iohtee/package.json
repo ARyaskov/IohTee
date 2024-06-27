@@ -1,7 +1,7 @@
 {
   "name": "@riaskov/iohtee",
   "version": "2.0.0",
-  "description": "Micropayments powered by Ethereum",
+  "description": "Micropayments lib for EVM",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
   "contributors": [
     {

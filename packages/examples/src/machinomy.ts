@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { Machinomy } from '@riaskov/iohtee'
+import { IohTee } from '@riaskov/iohtee'
 import express from 'express'
 import bodyParser from 'body-parser'
 import fs from 'fs'
@@ -20,7 +20,7 @@ async function main() {
     path: `m/44'/60'/0'/0/0`,
   })
 
-  let machinomyHub = new Machinomy({
+  let iohteeHub = new IohTee({
     networkId: CHAIN_ID,
     httpRpcUrl: RPC_URL,
     mnemonic: MNEMONIC,
@@ -35,7 +35,7 @@ async function main() {
   hub.post(
     '/machinomy',
     async (req: express.Request, res: express.Response, next: Function) => {
-      let body = await machinomyHub.acceptPayment(req.body)
+      let body = await iohteeHub.acceptPayment(req.body)
       res.status(200).send(body)
     },
   )
@@ -48,14 +48,14 @@ async function main() {
     console.log('----------')
     console.log(message)
 
-    const balanceBefore = await getBalance(machinomyHub.publicClient(), {
+    const balanceBefore = await getBalance(iohteeHub.publicClient(), {
       address: sender,
     })
     console.log('Balance before', balanceBefore / 10n ** 6n)
 
     const result = await cb()
 
-    const balanceAfter = await getBalance(machinomyHub.publicClient(), {
+    const balanceAfter = await getBalance(iohteeHub.publicClient(), {
       address: sender,
     })
     console.log('Balance after', balanceAfter / 10n ** 6n)
@@ -70,7 +70,7 @@ async function main() {
   let server = hub.listen(port, async () => {
     const price = 1_000_000n
 
-    let machinomy = new Machinomy({
+    let iohtee = new IohTee({
       networkId: CHAIN_ID,
       httpRpcUrl: RPC_URL,
       mnemonic: MNEMONIC,
@@ -86,7 +86,7 @@ async function main() {
       message,
       senderAccount.address,
       async () => {
-        return machinomy
+        return iohtee
           .buy({
             receiver: receiverAccount.address,
             price: price,
@@ -104,7 +104,7 @@ async function main() {
       message,
       senderAccount.address,
       async () => {
-        return machinomy
+        return iohtee
           .buy({
             receiver: receiverAccount.address,
             price: price,
@@ -120,17 +120,17 @@ async function main() {
     let channelId = resultSecond.channelId
     message = 'Deposit:'
     await checkBalance(message, senderAccount.address, async () => {
-      await machinomy.deposit(channelId, price)
+      await iohtee.deposit(channelId, price)
     })
 
     message = 'First close:'
     await checkBalance(message, senderAccount.address, async () => {
-      await machinomy.close(channelId)
+      await iohtee.close(channelId)
     })
 
     message = 'Second close:'
     await checkBalance(message, senderAccount.address, async () => {
-      await machinomy.close(channelId)
+      await iohtee.close(channelId)
     })
 
     message = 'Once more buy'
@@ -139,7 +139,7 @@ async function main() {
       message,
       senderAccount.address,
       async () => {
-        return machinomy
+        return iohtee
           .buy({
             receiver: receiverAccount.address,
             price: price,
@@ -154,7 +154,7 @@ async function main() {
 
     message = 'Claim by receiver'
     await checkBalance(message, senderAccount.address, async () => {
-      await machinomyHub.close(resultThird.channelId)
+      await iohteeHub.close(resultThird.channelId)
     })
 
     // console.log('ChannelId after first buy:', resultFirst.channelId)
@@ -162,13 +162,13 @@ async function main() {
     console.log('ChannelId after once more buy:', resultThird.channelId)
 
     server.close()
-    await machinomy.shutdown()
+    await iohtee.shutdown()
     try {
       if (fs.existsSync('client')) {
         // fs.unlinkSync('client')
       }
     } catch (error) {
-      await machinomy.shutdown()
+      await iohtee.shutdown()
       console.log(error)
     }
     try {

@@ -2,10 +2,10 @@ import { MigrateOption } from './MigrateOption'
 import { Transport } from './transport'
 
 /**
- * Params for Machinomy. Currently Machinomy supports nedb and postgresql as a database engine.
+ * Params for IohTee. Currently IohTee supports nedb, SQLite3 and PostgreSQL as a database engine.
  * Nedb is a default engine.
  */
-export interface MachinomyOptions {
+export interface IohTeeOptions {
   databaseUrl: string
   minimumChannelAmount?: bigint
   minimumSettlementPeriod?: number
@@ -16,13 +16,13 @@ export interface MachinomyOptions {
   transport?: Transport
 }
 
-export namespace MachinomyOptions {
-  export function defaults(options?: MachinomyOptions): MachinomyOptions {
+export namespace IohTeeOptions {
+  export function defaults(options?: IohTeeOptions): IohTeeOptions {
     let defaultOptions = {
-      databaseUrl: 'nedb://machinomy',
+      databaseUrl: 'nedb://iohtee',
     }
     return Object.assign({}, defaultOptions, options)
   }
 }
 
-export default MachinomyOptions
+export default IohTeeOptions

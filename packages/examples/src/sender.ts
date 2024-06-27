@@ -1,10 +1,10 @@
 import path from 'path'
 import fs from 'fs-extra'
-import { Machinomy } from '@riaskov/iohtee'
+import { IohTee } from '@riaskov/iohtee'
 import Logger from '@machinomy/logger'
 import { mnemonicToAccount } from 'viem/accounts'
 
-const LOG = new Logger('machinomy-sender')
+const LOG = new Logger('iohtee-sender')
 
 async function run() {
   const dbPath = path.resolve(__dirname, '../sender-receiver.db')
@@ -31,7 +31,7 @@ async function run() {
     path: `m/44'/60'/0'/0/0`,
   })
 
-  const iohtee = new Machinomy({
+  const iohtee = new IohTee({
     networkId: CHAIN_ID,
     httpRpcUrl: RPC_URL,
     mnemonic: MNEMONIC,

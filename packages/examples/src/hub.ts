@@ -20,7 +20,7 @@
 
 import express from 'express'
 import {
-  Machinomy,
+  IohTee,
   AcceptTokenRequestSerde,
   PaymentChannelSerde,
 } from '@riaskov/iohtee'

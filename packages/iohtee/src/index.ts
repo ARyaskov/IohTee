@@ -1,6 +1,6 @@
 import { PaymentChannel } from './PaymentChannel'
 import Payment from './payment'
-import Machinomy from './Machinomy'
+import IohTee from './IohTee'
 import BuyResult from './BuyResult'
 import BuyOptions from './BuyOptions'
 import { Transport } from './transport'
@@ -13,7 +13,7 @@ export * from './PaymentRequiredResponse'
 export * from './RemoteChannelInfo'
 import NextPaymentResult from './NextPaymentResult'
 import ChannelId from './ChannelId'
-import MachinomyOptions from './MachinomyOptions'
+import IohTeeOptions from './IohTeeOptions'
 import { AcceptTokenRequestSerde } from './accept_token_request'
 import { PaymentChannelSerde } from './PaymentChannel'
 
@@ -24,15 +24,15 @@ export {
   Payment,
   PaymentChannel,
   BuyResult,
-  Machinomy,
+  IohTee,
   BuyOptions,
   NextPaymentResult,
   ChannelId,
-  MachinomyOptions,
+  IohTeeOptions,
   Transport,
   AcceptTokenRequestSerde,
   PaymentChannelSerde,
 }
 
 export * from './Exceptions'
-export default Machinomy
+export default IohTee

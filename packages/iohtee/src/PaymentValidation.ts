@@ -3,7 +3,7 @@ import Payment from './payment'
 import Logger from '@machinomy/logger'
 import ChannelContract from './ChannelContract'
 import ChannelManager from './ChannelManager'
-import MachinomyOptions from './MachinomyOptions'
+import IohTeeOptions from './IohTeeOptions'
 
 const LOG = new Logger('payment-validation')
 
@@ -15,13 +15,13 @@ export default class PaymentValidation {
   private readonly payment: Payment
   private readonly paymentChannel: PaymentChannel
   private readonly channelContract: ChannelContract
-  private readonly options: MachinomyOptions
+  private readonly options: IohTeeOptions
 
   constructor(
     channelContract: ChannelContract,
     payment: Payment,
     paymentChannel: PaymentChannel,
-    options: MachinomyOptions,
+    options: IohTeeOptions,
   ) {
     this.payment = payment
     this.paymentChannel = paymentChannel

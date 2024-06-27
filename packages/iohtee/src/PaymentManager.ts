@@ -1,9 +1,8 @@
-import { BigNumber } from 'bignumber.js'
 import ChainManager from './ChainManager'
 import { PaymentChannel } from './PaymentChannel'
 import Payment from './payment'
 import ChannelContract from './ChannelContract'
-import MachinomyOptions from './MachinomyOptions'
+import IohTeeOptions from './IohTeeOptions'
 import PaymentValidation from './PaymentValidation'
 
 export default class PaymentManager {
@@ -11,12 +10,12 @@ export default class PaymentManager {
 
   private channelContract: ChannelContract
 
-  private options: MachinomyOptions
+  private options: IohTeeOptions
 
   constructor(
     chainManager: ChainManager,
     channelContract: ChannelContract,
-    options: MachinomyOptions,
+    options: IohTeeOptions,
   ) {
     this.chainManager = chainManager
     this.channelContract = channelContract

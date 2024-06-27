@@ -15,7 +15,7 @@
  * The server side (the Hub) for selling the content is provided in `hub.ts` file.
  */
 
-import Machinomy from '@riaskov/iohtee'
+import { IohTee } from '@riaskov/iohtee'
 import path from 'path'
 import { mnemonicToAccount } from 'viem/accounts'
 
@@ -45,7 +45,7 @@ async function main(): Promise<string> {
    * Create iohtee instance that provides API for accepting payments.
    */
 
-  const iohtee = new Machinomy({
+  const iohtee = new IohTee({
     networkId: CHAIN_ID,
     httpRpcUrl: RPC_URL,
     mnemonic: MNEMONIC,

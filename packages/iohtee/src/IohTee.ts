@@ -6,7 +6,7 @@ import { AcceptPaymentResponse } from './accept_payment_response'
 import { AcceptTokenRequest } from './accept_token_request'
 import { AcceptTokenResponse } from './accept_token_response'
 import Registry from './Registry'
-import MachinomyOptions from './MachinomyOptions'
+import IohTeeOptions from './IohTeeOptions'
 import BuyOptions from './BuyOptions'
 import NextPaymentResult from './NextPaymentResult'
 import BuyResult from './BuyResult'
@@ -27,21 +27,21 @@ export interface MachinomyCtorParams {
   httpRpcUrl: string
   mnemonic: string
   hdPath: `m/44'/60'/${string}`
-  options?: MachinomyOptions
+  options?: IohTeeOptions
 }
 
 /**
  * Machinomy is a library for micropayments in Ether over HTTP.
  * Machinomy provides API to send and receive a minuscule amount of money instantly.
- * Core method is [buy]{@link Machinomy.buy}. The method does all the heavy lifting providing an easy interface
+ * Core method is [buy]{@link IohTee.buy}. The method does all the heavy lifting providing an easy interface
  * for micropayments.
  *
  * See [examples](https://github.com/ARyaskov/machinomy/tree/master/packages/examples) directory for both client and server sides.
  *
- * NB. All monetary values below are denominated in Wei, including: [buy]{@link Machinomy.buy} and
- * [deposit]{@link Machinomy.deposit} methods.
+ * NB. All monetary values below are denominated in Wei, including: [buy]{@link IohTee.buy} and
+ * [deposit]{@link IohTee.deposit} methods.
  */
-export default class Machinomy {
+export default class IohTee {
   readonly registry: Registry
 
   /** Ethereum account address that sends the money. */
@@ -53,7 +53,7 @@ export default class Machinomy {
   private readonly _walletClient
 
   constructor(params: MachinomyCtorParams) {
-    let _options = MachinomyOptions.defaults(params.options)
+    let _options = IohTeeOptions.defaults(params.options)
     this._publicClient = createPublicClient({
       batch: {
         multicall: true,
@@ -96,7 +96,7 @@ export default class Machinomy {
       params.mnemonic,
       params.hdPath,
       ethersWallet,
-      params.options ?? MachinomyOptions.defaults(),
+      params.options ?? IohTeeOptions.defaults(),
     )
   }
 
@@ -256,7 +256,7 @@ export default class Machinomy {
   }
 
   /**
-   * Save payment into the storage and return an id of the payment. The id can be used by {@link Machinomy.paymentById}.
+   * Save payment into the storage and return an id of the payment. The id can be used by {@link IohTee.paymentById}.
    */
   async acceptPayment(req: any): Promise<AcceptPaymentResponse> {
     await this.checkMigrationsState()

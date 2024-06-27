@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
-import { Machinomy } from '@riaskov/iohtee'
+import { IohTee } from '@riaskov/iohtee'
 import Logger from '@machinomy/logger'
 import { mnemonicToAccount } from 'viem/accounts'
 
@@ -32,7 +32,7 @@ async function run() {
     path: receiverAccountHdPath,
   })
 
-  const iohtee = new Machinomy({
+  const iohtee = new IohTee({
     networkId: CHAIN_ID,
     httpRpcUrl: RPC_URL,
     mnemonic: MNEMONIC,

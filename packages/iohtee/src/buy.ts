@@ -1,8 +1,8 @@
 import * as configuration from './configuration'
-import Machinomy from './Machinomy'
+import IohTee from './IohTee'
 import BuyResult from './BuyResult'
 import { hdPath, httpRpc, mnemonic } from './configuration'
-import MachinomyOptions from './MachinomyOptions'
+import IohTeeOptions from './IohTeeOptions'
 
 /**
  * Shortcut for Sender.buy.
@@ -13,12 +13,12 @@ export async function buyContent(
 ): Promise<BuyResult> {
   let settings = configuration.sender()
 
-  let client = new Machinomy({
+  let client = new IohTee({
     networkId: chainId,
     httpRpcUrl: httpRpc(),
     mnemonic: mnemonic(),
     hdPath: hdPath(),
-    options: MachinomyOptions.defaults(),
+    options: IohTeeOptions.defaults(),
   })
   let pair = await client.buyUrl(uri)
   await client.shutdown()

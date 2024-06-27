@@ -1,7 +1,7 @@
 import { PublicClient, WalletClient } from 'viem'
 import ChannelInflator from './ChannelInflator'
 import Storage from './Storage'
-import MachinomyOptions from './MachinomyOptions'
+import IohTeeOptions from './IohTeeOptions'
 import ChannelContract from './ChannelContract'
 import IChannelManager from './IChannelManager'
 import ChannelManager from './ChannelManager'
@@ -17,7 +17,7 @@ export default class Registry {
   mnemonic: string
   publicClient: PublicClient
   walletClient: WalletClient
-  options: MachinomyOptions
+  options: IohTeeOptions
   unidirectional: Unidirectional | null = null
   channelInflator: ChannelInflator | null = null
   _channelContract: ChannelContract | null = null
@@ -36,7 +36,7 @@ export default class Registry {
     mnemonic: string,
     hdPath: `m/44'/60'/${string}`,
     ethersWallet: Wallet,
-    options: MachinomyOptions,
+    options: IohTeeOptions,
   ) {
     this.account = account
     this.publicClient = publicClient

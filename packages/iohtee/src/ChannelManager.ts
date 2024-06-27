@@ -3,7 +3,7 @@ import PaymentManager from './PaymentManager'
 import ChannelContract from './ChannelContract'
 import Mutex from './Mutex'
 import Payment from './payment'
-import MachinomyOptions from './MachinomyOptions'
+import IohTeeOptions from './IohTeeOptions'
 import IChannelManager from './IChannelManager'
 import ChannelId from './ChannelId'
 import { EventEmitter } from 'events'
@@ -63,7 +63,7 @@ export default class ChannelManager
   private channelContract: ChannelContract
   private paymentManager: PaymentManager
   private mutex: Mutex = new Mutex()
-  private machinomyOptions: MachinomyOptions
+  private iohteeOptions: IohTeeOptions
 
   constructor(
     account: `0x${string}`,
@@ -74,7 +74,7 @@ export default class ChannelManager
     tokensDao: ITokensDatabase,
     channelContract: ChannelContract,
     paymentManager: PaymentManager,
-    machinomyOptions: MachinomyOptions,
+    iohteeOptions: IohTeeOptions,
   ) {
     super()
     this.account = account
@@ -85,7 +85,7 @@ export default class ChannelManager
     this.tokensDao = tokensDao
     this.channelContract = channelContract
     this.paymentManager = paymentManager
-    this.machinomyOptions = machinomyOptions
+    this.iohteeOptions = iohteeOptions
   }
 
   openChannel(

@@ -13,9 +13,9 @@ IohTee Monorepo repository. The second life of [Machinomy library](https://githu
 We're upgrading it to contemporary standards (TypeScript 5+, Node.js 18+, ES2023+) and adding new features.
 
 Available sub-projects:
-- [IohTee](packages/machinomy) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
+- [IohTee](packages/iohtee) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
 - [Contracts](packages/contracts) is a TypeScript interface for Ethereum contracts managed by [HardHat](https://github.com/NomicFoundation/hardhat) used by [IohTee](packages/iohtee).
-- [Examples](packages/examples) is [IohTee](packages/machinomy) examples.
+- [Examples](packages/examples) is [IohTee](packages/iohtee) examples.
 - [Playground](packages/playground) contains code of play.iohtee.toivo.tech
 
 
@@ -23,9 +23,9 @@ Available sub-projects:
 
 - support for dual build ESM+CJS
 
-Web site: [machinomy.com](http://machinomy.com).
-Twitter: [@machinomy](http://twitter.com/machinomy).
-FAQ: [GitHub Wiki Page](https://github.com/machinomy/machinomy/wiki/Frequently-Asked-Questions).
+Web site:
+Twitter:
+FAQ: 
 
 ## Installation
 
@@ -59,11 +59,11 @@ $ node packages/examples/src/client.js
 Using TypeScript
 
 ```typescript
-import Machinomy from 'machinomy'
+import { IohTee } from '@riaskov/iohtee'
 const uri = 'http://localhost:3000/content'
 
-const machinomy = new Machinomy(SENDER_ACCOUNT, web3)
-const contents = await machinomy.buy({ receiver: RECEIVER_ACCOUNT, price: 100, gateway: 'http://localhost:3001/accept' })
+const iohtee = new IohTee(SENDER_ACCOUNT, web3)
+const contents = await iohtee.buy({ receiver: RECEIVER_ACCOUNT, price: 100, gateway: 'http://localhost:3001/accept' })
 console.log(contents)
 ```
 
@@ -74,8 +74,8 @@ The process is more convoluted than buying. Better consult [packages/examples/sr
 ### Sending payments through channels
 
 ```
-$ git clone https://github.com/machinomy/machinomy
-$ cd machinomy && yarn install && yarn bootstrap && yarn build && cd packages/examples
+$ git clone https://github.com/ARyaskov/IohTee
+$ cd IohTee && yarn && yarn build && cd packages/examples
 $ yarn run sender && yarn run receiver
 ```
 
@@ -85,32 +85,27 @@ Look at [sender.ts](packages/examples/src/sender.ts) and [receiver.ts](packages/
 
 If you want to see all logs in verbose format use `DEBUG=*`
 
-There is a weird bug with CJS in TS5.5+, we'll stay on 5.4 so far
-
 ## Documentation
 
 For more advanced documentation go to [doc/](doc/) folder.
 
 ## Contributing
 
-**Developers:** Machinomy is for you. Feel free to use it, break it, fork it, and make the world better. The code is standard TypeScript, no special skills required:
+**Developers:** IohTee is for you. Feel free to use it, break it, fork it, and make the world better. The code is standard TypeScript, no special skills required:
 
-    $ yarn install && yarn bootstrap
+    $ yarn
 
-Using [yarn](https://yarnpkg.com/lang/en/) is mandatory (**don't use npm!**)
+Using [yarn v4](https://yarnpkg.com/lang/en/) is mandatory (**don't use npm!**)
 
-Apply migrations (eg. for PostgreSQL, refer [packages/machinomy/database.json](packages/machinomy/database.json)):
+Apply migrations (eg. for PostgreSQL, refer [packages/iohtee/database.json](packages/iohtee/database.json)):
 
     $ PGUSER=user PGPASSWORD=pass PGHOSTADDR=localhost PGDATABASE=dbname yarn migrate
 
 **Non-Developers:** You are lovely. As a starter, help us spread the word! Tell a friend right now.
 If not enough, developers need flesh-world guidance. It starts with proper documentation and a pinch of fantasy.
 Really anything, whether it is a short post on a use case of IoT micropayments, addition to the documentation (code comments, yay!),
-or an elaborate analysis of machine economy implications. Do not hesitate to share any idea with us on [Gitter](https://gitter.im/machinomy/machinomy).
+or an elaborate analysis of machine economy implications.
 
 ## License
 
 Licensed under [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
-
-This project includes web3.js, which is licensed under the LGPL license.
-You can find the source code and license at https://github.com/web3/web3.js.
