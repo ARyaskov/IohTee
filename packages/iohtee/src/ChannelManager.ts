@@ -216,7 +216,7 @@ export default class ChannelManager
         return token
       }
 
-      if (this.machinomyOptions.closeOnInvalidPayment) {
+      if (this.iohteeOptions.closeOnInvalidPayment) {
         LOG.info(`Received invalid payment from ${payment.sender}!`)
         const existingChannel =
           await this.channelsDao.findBySenderReceiverChannelId(
@@ -248,10 +248,10 @@ export default class ChannelManager
     return this.mutex.synchronize(async () => {
       if (
         !minDepositAmount &&
-        this.machinomyOptions &&
-        this.machinomyOptions.minimumChannelAmount
+        this.iohteeOptions &&
+        this.iohteeOptions.minimumChannelAmount
       ) {
-        minDepositAmount = this.machinomyOptions.minimumChannelAmount
+        minDepositAmount = this.iohteeOptions.minimumChannelAmount
       }
       let channel = await this.channelsDao.findUsable(sender, receiver, amount)
       return (
@@ -316,7 +316,7 @@ export default class ChannelManager
 
     this.emit('willOpenChannel', sender, receiver, depositAmount)
     let settlementPeriod = BigInt(
-      this.machinomyOptions.settlementPeriod ||
+      this.iohteeOptions.settlementPeriod ||
         ChannelManager.DEFAULT_SETTLEMENT_PERIOD,
     )
     let paymentChannel = await this.buildChannel(
