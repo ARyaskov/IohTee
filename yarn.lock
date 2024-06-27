@@ -1611,9 +1611,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@riaskov/iohtee@npm:*, @riaskov/iohtee@workspace:packages/machinomy":
+"@riaskov/iohtee@npm:*, @riaskov/iohtee@workspace:packages/iohtee":
   version: 0.0.0-use.local
-  resolution: "@riaskov/iohtee@workspace:packages/machinomy"
+  resolution: "@riaskov/iohtee@workspace:packages/iohtee"
   dependencies:
     "@machinomy/logger": "npm:^0.2.5"
     "@machinomy/types-bn": "npm:^0.0.3"
