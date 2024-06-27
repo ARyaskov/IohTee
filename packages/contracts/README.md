@@ -1,11 +1,6 @@
-# IohTee Contracts [![Coverage Status][coveralls-img]][coveralls]
+# IohTee Contracts
 
-[coveralls]: https://coveralls.io/github/machinomy/machinomy-contracts?branch=master
-[coveralls-img]: https://coveralls.io/repos/github/machinomy/machinomy-contracts/badge.svg?branch=master
-
-### ! Upgrading to v2 is in progress! Expect bugs ! 
-
-IohTee contracts is a TypeScript interface for Ethereum contracts managed by [Hardhat](https://github.com/NomicFoundation/hardhat) used by [IohTee](https://github.com/ARyaskov/IohTee/tree/master/packages/iohtee).
+IohTee contracts is a TypeScript interface for Ethereum contracts managed by [Hardhat](https://github.com/NomicFoundation/hardhat) used by [IohTee](https://github.com/ARyaskov/IohTee/tree/main/packages/iohtee).
 
 ## Installation
 

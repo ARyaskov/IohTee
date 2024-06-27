@@ -3,7 +3,7 @@
   "version": "5.0.0",
   "description": "IohTee contracts managed by Hardhat",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/ARyaskov/iohtee#readme",
+  "homepage": "https://github.com/ARyaskov/IohTee/blob/main/packages/contracts/.github/README.md",
   "bugs": {
     "url": "https://github.com/ARyaskov/iohtee/issues"
   },
