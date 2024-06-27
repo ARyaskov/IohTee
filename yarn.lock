@@ -1486,7 +1486,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@riaskov/iohtee-abi-wrapper@workspace:packages/abi-wrapper":
+"@riaskov/iohtee-abi-wrapper@npm:^2.0.8, @riaskov/iohtee-abi-wrapper@workspace:packages/abi-wrapper":
   version: 0.0.0-use.local
   resolution: "@riaskov/iohtee-abi-wrapper@workspace:packages/abi-wrapper"
   dependencies:
@@ -1525,6 +1525,7 @@ __metadata:
     "@nomicfoundation/hardhat-viem": "npm:^2.0.2"
     "@nomiclabs/hardhat-waffle": "npm:^2.0.6"
     "@openzeppelin/contracts": "npm:5.0.2"
+    "@riaskov/iohtee-abi-wrapper": "npm:^2.0.8"
     "@typechain/ethers-v6": "npm:^0.5.1"
     "@typechain/hardhat": "npm:^9.1.0"
     "@types/chai": "npm:4.3.16"
