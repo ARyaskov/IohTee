@@ -18,6 +18,7 @@
     "binance",
     "abi",
     "hardhat",
+    "viem",
     "wrapper"
   ],
   "homepage": "https://github.com/ARyaskov/IohTee/tree/main/packages/abi-wrapper#readme",

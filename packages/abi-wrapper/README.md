@@ -1,6 +1,6 @@
 # IohTee ABI Wrapper
 
-[![Module type: ESM](https://img.shields.io/badge/module%20type-ESM-brightgreen)]()
+[![Module type: CJS](https://img.shields.io/badge/module%20type-CJS-brightgreen)]()
 [![Target: Node20](https://img.shields.io/badge/Node.js->=20-brightgreen)]()
 [![Target: ES2022](https://img.shields.io/badge/target-ES2022-brightgreen)]()
 
