@@ -44,12 +44,12 @@
     "coverage": "yarn build && nyc --reporter=lcov yarn run test"
   },
   "main": "./lib/cjs/index.js",
-  "module": "./lib-bundle/esm/iohtee.min.mjs",
+  "module": "./lib/esm/index.js",
   "source": "./src/index.ts",
-  "types": "./lib/cjs/index.d.ts",
+  "types": "./lib/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./lib-bundle/esm/iohtee.min.mjs",
+      "import": "./lib/esm/index.js",
       "require": "./lib/cjs/index.js"
     }
   },
