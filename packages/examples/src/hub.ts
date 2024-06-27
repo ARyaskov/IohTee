@@ -64,7 +64,7 @@ async function main() {
   /**
    * Create iohtee instance that provides API for accepting payments.
    */
-  const iohtee = new Machinomy({
+  const iohtee = new IohTee({
     networkId: CHAIN_ID,
     httpRpcUrl: RPC_URL,
     mnemonic: MNEMONIC,
