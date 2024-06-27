@@ -2,7 +2,6 @@
 // TODO This test suite is in progress guys
 import 'dotenv/config'
 import '@nomicfoundation/hardhat-viem'
-import '@nomicfoundation/hardhat-ethers'
 import * as hre from 'hardhat'
 import { getAddress, isAddressEqual, PublicClient } from 'viem'
 import { assert } from 'chai'

@@ -1,8 +1,6 @@
 import "dotenv/config"
 import "@nomicfoundation/hardhat-viem"
-import "@nomicfoundation/hardhat-ethers"
 import "@nomicfoundation/hardhat-toolbox-viem"
-import '@typechain/hardhat'
 
 const config = {
   solidity: {
