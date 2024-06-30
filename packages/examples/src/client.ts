@@ -75,7 +75,9 @@ async function main(): Promise<string> {
    */
   const content = await fetch(TARGET, {
     headers: {
-      authorization: `paywall ${token} ${'metaidexample'} ${String(headers.get('paywall-price'))}`,
+      authorization: `paywall ${token} ${'metaidexample'} ${String(
+        headers.get('paywall-price'),
+      )}`,
     },
   })
 

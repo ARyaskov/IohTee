@@ -10,6 +10,7 @@ const config = {
         enabled: true,
         runs: 200,
       },
+      evmVersion: "cancun"
     },
   },
   defaultNetwork: 'hardhat',

@@ -2,12 +2,8 @@
   "extends": "../../tsconfig.esm.json",
   "compilerOptions": {
     "types": [
-      "@machinomy/types-ethereumjs-util",
       "@types/mocha"
-    ],
-    "paths": {
-      "@riaskov/iohtee": ["../iohtee/src"]
-    }
+    ]
   },
   "include": [
     "./src/**/*"

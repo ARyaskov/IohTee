@@ -56,15 +56,17 @@ jobs:
           npm install codecov --global --no-save
           npm install hardhat --global --no-save
 
-      - name: Install dependencies
-        run: |
-          yarn
+      - name: AbiWrapper:Build project
+        run: cd packages/abi-wrapper && yarn && yarn build
 
-      - name: Build project
-        run: yarn run build
+#      - name: IohTeeContracts:Build project
+#        run: cd packages/contracts && yarn && yarn build
 
-      - name: Generate coverage report
-        run: yarn run coverage
+      - name: IohTeeExamples:Build project
+        run: cd packages/examples && yarn && yarn build
 
-      - name: Upload coverage to Codecov
-        run: bash <(curl -s https://codecov.io/bash) -s packages -t ${{ secrets.CODECOV_TOKEN }}
+      - name: IohTee:Build project
+        run: cd packages/iohtee && yarn && yarn build
+
+      - name: IohTeePlayground:Build project
+        run: cd packages/playground && yarn && yarn build

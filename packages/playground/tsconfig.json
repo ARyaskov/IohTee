@@ -3,13 +3,6 @@
   "compilerOptions": {
     "sourceRoot": "src/",
     "outDir": "dist/",
-    "types": [
-      "@machinomy/types-ethereumjs-util",
-      "@machinomy/types-ethereumjs-units",
-    ],
-    "paths": {
-      "@riaskov/iohtee": ["../machinomy/src"]
-    }
   },
   "include": [
     "./src/**/*"

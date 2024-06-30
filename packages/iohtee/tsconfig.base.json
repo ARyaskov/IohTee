@@ -5,7 +5,6 @@
     "sourceRoot": "src/",
     "outDir": "lib/",
     "types": [
-      "@machinomy/types-ethereumjs-util",
       "@machinomy/types-eth-sig-util",
       "@types/db-migrate-base",
       "@types/mocha",

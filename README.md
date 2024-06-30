@@ -9,8 +9,10 @@
 
 ### ! Upgrading to v2 is in progress! Expect bugs !
 
-IohTee Monorepo repository. The second life of [Machinomy library](https://github.com/machinomy/machinomy).
+IohTee repository. The second life of [Machinomy library](https://github.com/machinomy/machinomy).
 We're upgrading it to contemporary standards (TypeScript 5+, Node.js 18+, ES2023+) and adding new features.
+Please note, this is NOT monorepo anymore due to some Yarn v4 monorepos limitations: you have to install deps and build
+each package separately.
 
 Available sub-projects:
 - [IohTee](packages/iohtee) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
@@ -22,9 +24,13 @@ Available sub-projects:
 ## Tasks in progress
 
 - support for dual build ESM+CJS
+- split pseudo-monorepo into separate repos
+- add IohTee Contracts to GH Actions Workflow
 
-Web site:
+Web site: [iohtee.toivo.tech](https://iohtee.toivo.tech)
+
 Twitter:
+
 FAQ: 
 
 ## Installation

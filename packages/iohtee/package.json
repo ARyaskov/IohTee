@@ -1,6 +1,6 @@
 {
   "name": "@riaskov/iohtee",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "Micropayments lib for EVM",
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
   "contributors": [
@@ -23,11 +23,10 @@
     "clean:lib": "npx rimraf ./lib",
     "clean:migrations": "npx rimraf lib/storage/**/migrations/*.d.ts",
     "build:webpack": "npx webpack --config webpack.config.js",
-    "build": "yarn format && yarn build:esm && yarn build:cjs && yarn build:types && yarn tree-shaking:lib",
-    "build:types": "tsc --project tsconfig.types.json",
+    "build": "yarn format && yarn build:esm && yarn build:cjs && yarn tree-shaking:lib",
     "build:esm": "npx rimraf lib/esm && tsc --project tsconfig.esm.json",
     "build:cjs": "npx rimraf lib/cjs && tsc --project tsconfig.cjs.json",
-    "tree-shaking:lib": "npx rimraf lib/cjs/**/*.map && npx rimraf lib/esm/**/*.map && npx rimraf lib/types/**/*.map && npx rimraf lib/cjs/**/*.d.ts && npx rimraf lib/esm/**/*.d.ts",
+    "tree-shaking:lib": "npx rimraf lib/cjs/**/*.map && npx rimraf lib/esm/**/*.map",
     "format": "npx prettier --write \"src/**/*.ts\"",
     "prepublish": "yarn lint && yarn build",
     "lint": "tslint --format stylish --project .",
@@ -46,7 +45,6 @@
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "source": "./src/index.ts",
-  "types": "./lib/types/index.d.ts",
   "exports": {
     ".": {
       "import": "./lib/esm/index.js",
@@ -73,7 +71,7 @@
     "db-migrate-pg": "^1.5.2",
     "db-migrate-sqlite3": "^0.5.0",
     "debug": "^3.1.0",
-    "ethereumjs-util": "^5.1.5",
+    "ethereumjs-util": "^7.1.5",
     "ethers": "^6.13.0",
     "prompt": "^1.0.0",
     "request": "*",
@@ -87,7 +85,6 @@
     "pg": "8.12.0"
   },
   "devDependencies": {
-    "@machinomy/types-ethereumjs-util": "^0.0.12",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
