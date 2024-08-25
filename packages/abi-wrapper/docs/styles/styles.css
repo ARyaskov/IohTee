@@ -1,0 +1,55 @@
+:root {
+  --primary-color: #0044cc;
+  --secondary-color: #779ecb;
+  --background-color: #f5faff;
+  --dot-color: rgba(0, 68, 204, 0.15);
+  --dark-primary-color: #0044cc;
+  --button-hover-color: #002a80;
+}
+
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: var(--background-color);
+  color: #333;
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.cover-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+  padding: 0 20px;
+}
+
+h1 {
+  font-size: 3.5rem;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  color: var(--secondary-color);
+  margin: 1rem 0;
+}
+
+.btn-primary {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.8rem 2rem;
+  background-color: var(--dark-primary-color);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--button-hover-color);
+}
