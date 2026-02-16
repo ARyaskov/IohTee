@@ -1,6 +1,6 @@
 import { PaymentChannel } from './PaymentChannel'
 import Payment from './payment'
-import Logger from '@machinomy/logger'
+import Logger from './log'
 import ChannelContract from './ChannelContract'
 import ChannelManager from './ChannelManager'
 import IohTeeOptions from './IohTeeOptions'

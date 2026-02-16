@@ -106,10 +106,9 @@ export default class PostgresChannelsDatabase extends AbstractChannelsDatabase<E
       return acc
     }, [])
     if (nonEmpty.length) {
-      return this.filterByState(0, nonEmpty)[0]
-    } else {
-      return null
+      return this.filterByState(0, nonEmpty).at(0) ?? null
     }
+    return null
   }
 
   findBySenderReceiver(

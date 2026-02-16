@@ -1,0 +1,124 @@
+import {
+  TransactionReceipt,
+  parseEventLogs,
+  ParseEventLogsReturnType,
+} from 'viem'
+import {
+  BaseContractViem,
+  TxOptions,
+  CtorParamsViem as CtorParams,
+  isCtorAccountParamPure,
+} from '@riaskov/iohtee-abi-wrapper'
+export { isCtorAccountParamPure, CtorParams, TxOptions }
+
+export interface <%= it.contractName %>Event {
+  eventName: string
+  args: any
+  address: `0x${string}`
+  blockHash: `0x${string}`
+  blockNumber: bigint
+  data: `0x${string}`
+  logIndex: number
+  removed: boolean
+  topics: [] | [`0x${string}`, ...`0x${string}`[]]
+  transactionHash: `0x${string}`
+  transactionIndex: number
+}
+
+<% it.events.forEach((event) => { %>
+export interface <%= event.name %> {
+<% if (event.inputs.length) { %>
+  args: {
+<% event.inputs.forEach((input, index) => { %>
+    <%= input.name || `arg${index}` %>: <%= it.helpers.renderType(input.type, input.components) %>
+<% }) %>
+  }
+<% } %>
+}
+
+<% }) %>
+export enum <%= it.contractName %>EventName {
+<% it.events.forEach((event, index) => { %>
+  <%= event.name %> = "<%= event.name %>"<%= index < it.events.length - 1 ? ',' : '' %>
+<% }) %>
+}
+
+const abi = JSON.parse(`<%= it.abi %>`)
+
+export class <%= it.contractName %>Contract extends BaseContractViem {
+/// GETTERS
+<% it.getters.forEach((method) => { %>
+  async <%= method.name %><%= method.namePostfix ?? '' %>(<%= it.helpers.renderMethodInput(method.inputs) %>): Promise<<%= it.helpers.renderMethodOutput(method) %>> {
+    return (await this.publicClient().readContract({
+      address: this.address(),
+      abi: this.abi(),
+      functionName: "<%= method.name %>",
+      args: [<%= it.helpers.renderParams(method.inputs) %>],
+    })) as never as <%= it.helpers.renderMethodOutput(method) %>
+  }
+
+<% }) %>
+/// SETTERS
+<% it.functions.forEach((method) => { %>
+  async <%= method.name %><%= method.namePostfix ?? '' %>(<%= it.helpers.renderMethodInput(method.inputs, true) %>options?: TxOptions): Promise<TransactionReceipt>{
+    const { request } = await this.publicClient().simulateContract({
+      chain: this.walletClient().chain,
+      address: this.address(),
+      abi: this.abi(),
+      functionName: "<%= method.name %>",
+      args: [<%= it.helpers.renderParams(method.inputs) %>],
+      account: this.walletClient().account,
+      value: options?.value,
+    })
+    const txId = await this.walletClient().writeContract(request)
+
+    return await this.publicClient().waitForTransactionReceipt({
+      hash: txId,
+      confirmations: 3,
+      timeout: 45_000,
+    })
+  }
+
+<% }) %>
+/// EVENTS
+<% it.events.forEach((event) => { %>
+  is<%= event.name %>Event(eventName: string): boolean {
+    return eventName === "<%= event.name %>"
+  }
+
+<% }) %>
+  static parseLogs(receipt: TransactionReceipt): ParseEventLogsReturnType {
+    return parseEventLogs({
+      abi: abi as any,
+      logs: receipt.logs,
+    }) as any
+  }
+
+  static hasEvent(receipt: TransactionReceipt, eventName: <%= it.contractName %>EventName): boolean {
+    return parseEventLogs({ abi: abi, logs: receipt.logs }).some((log: any) => log.eventName === eventName)
+  }
+
+  static extractEventFromReceipt<T>(receipt: TransactionReceipt, eventName: <%= it.contractName %>EventName): T {
+    return parseEventLogs({ abi: abi, logs: receipt.logs }).find((log: any) => log.eventName === eventName) as T
+  }
+
+  static parseEvents(receipt: TransactionReceipt): <%= it.contractName %>Event[] {
+    return parseEventLogs({ abi: abi, logs: receipt.logs }).map((log: any) => ({
+      eventName: log.eventName,
+      args: log.args,
+      address: log.address,
+      blockHash: log.blockHash,
+      blockNumber: log.blockNumber,
+      data: log.data,
+      logIndex: log.logIndex,
+      removed: log.removed,
+      topics: log.topics,
+      transactionHash: log.transactionHash,
+      transactionIndex: log.transactionIndex,
+    }))
+  }
+
+  constructor(deployedContractAddress: `0x${string}`, params: CtorParams) {
+    super(deployedContractAddress, params, abi)
+  }
+}

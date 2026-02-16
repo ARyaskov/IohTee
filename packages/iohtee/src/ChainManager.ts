@@ -1,21 +1,17 @@
 import Signature from './Signature'
-import { ethers, Wallet } from 'ethers'
+import { type LocalAccount } from 'viem/accounts'
 
 export default class ChainManager {
-  private wallet: Wallet
+  private readonly account: LocalAccount
 
-  constructor(wallet: Wallet) {
-    this.wallet = wallet
+  constructor(account: LocalAccount) {
+    this.account = account
   }
 
-  async sign(address: `0x${string}`, data: `0x${string}`): Promise<Signature> {
-    return new Promise<Signature>(async (resolve, reject) => {
-      try {
-        const signature = await this.wallet.signMessage(ethers.getBytes(data))
-        resolve(new Signature(signature))
-      } catch (error) {
-        reject(error)
-      }
+  async sign(_address: `0x${string}`, data: `0x${string}`): Promise<Signature> {
+    const signature = await this.account.signMessage({
+      message: { raw: data },
     })
+    return new Signature(signature)
   }
 }

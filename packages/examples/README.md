@@ -1,45 +1,57 @@
-# Machinomy Examples
+# @riaskov/iohtee-examples
 
-[Machinomy](https://github.com/machinomy/machinomy/tree/master/packages/machinomy) examples.
+Runnable examples for `@riaskov/iohtee` covering ETH and token payment flows.
 
-[`client.ts`](./src/client.ts) - Example of Machinomy client. It sends a payment and buys a content from server.
+## Stack
 
-[`server.ts`](./src/server.ts) - Example of a server. Uses Machinomy to accept payments for content.
+- Node.js `>=24`
+- TypeScript `6.0.0-beta`
+- `viem` `2.45.0`
+- Fastify-based demo gateways
 
-[`machinomy.ts`](./src/machinomy.ts) - Self-contained emulation of buying and selling a content.
+## Setup
 
-[`sender.ts`](./src/sender.ts) - Sending payments through channels. Example of a sender.
-
-[`receiver.ts`](./src/receiver.ts) - Sending payments through channels. Example of a receiver.
-Usage:
-``` 
-  $ cd machinomy/packages/examples/
-  $ DEBUG=* yarn sender && yarn receiverTokens
+```bash
+cp example.env .env
 ```
 
-[`senderTokens.ts`](./src/senderTokens.ts) - Sending tokens through channels. Example of a sender.
+Fill at least:
 
-[`receiverTokens.ts`](./src/receiverTokens.ts) - Sending tokens through channels. Example of a receiver.
-Usage:
-``` 
-  $ cd machinomy/packages/examples/
-  $ DEBUG=* yarn senderTokens && yarn receiverTokens
+- `RPC_URL`
+- `CHAIN_ID`
+- `ACCOUNT_MNEMONIC`
+- `PAYMENT_META`
+- `TOKEN_CONTRACT` (for token flows)
+- `TOKEN_UNIDIRECTIONAL_ADDRESS` (for token channel settlement)
+
+## ETH flow scripts
+
+```bash
+pnpm --filter @riaskov/iohtee-examples run hub
+pnpm --filter @riaskov/iohtee-examples run client
+pnpm --filter @riaskov/iohtee-examples run sender
+pnpm --filter @riaskov/iohtee-examples run receiver
 ```
 
-Web site: [machinomy.com](http://machinomy.com).
-Twitter: [@machinomy](http://twitter.com/machinomy).
-Support/Discussion: [Gitter](https://gitter.im/machinomy/machinomy).
+## Token flow scripts
 
-:exclamation:
-Please, pay attention, this package is the part of [Machinomy Monorepo](https://github.com/machinomy/machinomy) and it's intended to use with other monorepo's packages. 
-
-:no_entry: You **should not** git clone this repository alone
-
-:white_check_mark: You **should** git clone the main repository via
-```
-git clone https://github.com/machinomy/machinomy.git
-or 
-git clone git@github.com:machinomy/machinomy.git
+```bash
+pnpm --filter @riaskov/iohtee-examples run hub:tokens
+pnpm --filter @riaskov/iohtee-examples run client:tokens
+pnpm --filter @riaskov/iohtee-examples run sender:tokens
+pnpm --filter @riaskov/iohtee-examples run receiver:tokens
 ```
 
-**For documentation, usage and contributing please see [Machinomy Monorepo](https://github.com/machinomy/machinomy).**
+## Lifecycle scenario
+
+```bash
+pnpm --filter @riaskov/iohtee-examples run machinomy
+```
+
+## Quality gates
+
+```bash
+pnpm --filter @riaskov/iohtee-examples run lint
+pnpm --filter @riaskov/iohtee-examples run test
+pnpm --filter @riaskov/iohtee-examples run build
+```

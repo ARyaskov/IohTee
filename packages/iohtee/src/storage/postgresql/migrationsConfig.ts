@@ -1,7 +1,5 @@
-import { ConnectionString } from 'connection-string'
-
 export default function migrationsConfig(connectionUrl: string) {
-  let c = new ConnectionString(connectionUrl)
+  const url = new URL(connectionUrl)
   return {
     cmdOptions: {
       'migrations-dir':
@@ -11,10 +9,10 @@ export default function migrationsConfig(connectionUrl: string) {
       defaultEnv: 'defaultPg',
       defaultPg: {
         driver: 'pg',
-        user: `${c.user}`,
-        password: `${c.password}`,
-        host: `${c.hostname}`,
-        database: `${c.segments![0]}`,
+        user: decodeURIComponent(url.username),
+        password: decodeURIComponent(url.password),
+        host: url.hostname,
+        database: url.pathname.replace(/^\//, ''),
       },
     },
   }

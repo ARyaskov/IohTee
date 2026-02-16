@@ -1,138 +1,132 @@
 import path from 'node:path'
-import fs from 'node:fs'
-import { AbiFunction, AbiEvent } from 'viem'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { Abi, AbiEvent, AbiFunction, AbiParameter, AbiItem } from 'viem'
 import { build } from 'esbuild'
-import Handlebars from 'handlebars'
-import Context, { MethodAbi } from './context.js'
-import * as helpers from './helpers.js'
+import { Eta } from 'eta'
+import Context, { MethodAbi, WrapperBackend } from './context.js'
+import { createTemplateHelpers } from './helpers.js'
 
 const ABI_TYPE_FUNCTION = 'function'
 const ABI_TYPE_EVENT = 'event'
 
-function isAbiFunction(abi: AbiFunction): boolean {
+function isAbiFunction(abi: AbiItem): abi is AbiFunction {
   return abi.type === ABI_TYPE_FUNCTION
 }
 
-function isAbiEvent(abi: AbiEvent): boolean {
+function isAbiEvent(abi: AbiItem): abi is AbiEvent {
   return abi.type === ABI_TYPE_EVENT
 }
 
-export default class ContractTemplate {
-  handlebars: typeof Handlebars
-  templatesDir: string
-  outputDir: string
-  private _template?: Handlebars.TemplateDelegate<Context>
+function buildTemplateName(backend: WrapperBackend): string {
+  return backend === 'ethers' ? 'contract.ethers.eta' : 'contract.viem.eta'
+}
 
-  constructor(templatesDir: string, outputDir: string) {
-    this.handlebars = Handlebars.create()
-    this.templatesDir = templatesDir
-    this.outputDir = outputDir
-    this.registerPartials()
-    this.registerHelpers()
-  }
+function normalizeMethods(abiMethods: AbiFunction[]): MethodAbi[] {
+  const nameCount: Record<string, number> = {}
 
-  get template() {
-    if (this._template) {
-      return this._template
-    } else {
-      let contents = this.readTemplate('contract.mustache')
-      this._template = this.handlebars.compile<Context>(contents, {
-        noEscape: true,
-      })
-      return this._template
+  return abiMethods.map((abi) => {
+    const normalized: MethodAbi = {
+      ...abi,
+      singleReturnValue: abi.outputs.length === 1,
+      inputs: abi.inputs.map((input, index) => ({
+        ...input,
+        name: input.name || `param${index}`,
+      })) as AbiParameter[],
     }
-  }
 
-  registerPartials() {
-    fs.readdirSync(this.templatesDir).forEach((file) => {
-      let match = file.match(/^_(\w+)\.(handlebars|mustache)/)
-      if (match) {
-        this.handlebars.registerPartial(match[1], this.readTemplate(file))
-      }
-    })
-  }
-
-  registerHelpers() {
-    this.handlebars.registerHelper('inputType', helpers.inputType)
-    this.handlebars.registerHelper('outputType', helpers.outputType)
-  }
-
-  render(abiFilePath: string, minified?: boolean) {
-    let artifact = JSON.parse(fs.readFileSync(abiFilePath).toString())
-    const sourceAbi = JSON.stringify(artifact.abi)
-    let abi = artifact.abi
-    if (abi) {
-      let methods = abi.filter(isAbiFunction).map((abi: MethodAbi) => {
-        if (abi.outputs.length === 1) {
-          abi.singleReturnValue = true
-        }
-        abi.inputs = abi.inputs.map((input, index) => {
-          input.name = input.name ? input.name : `param${index}`
-          return input
-        })
-        return abi
-      })
-      const nameCount: Record<string, number> = {}
-
-      methods = methods.map((abi: any) => {
-        const originalName = abi.name
-
-        if (nameCount[originalName] >= 0) {
-          nameCount[originalName]++
-          abi['namePostfix'] = nameCount[originalName]
-        } else {
-          nameCount[originalName] = 0
-        }
-
-        return abi
-      })
-
-      let getters = methods.filter(
-        (abi: MethodAbi) =>
-          abi.stateMutability === 'view' || abi.stateMutability === 'pure',
-      )
-      let functions = methods.filter(
-        (abi: MethodAbi) =>
-          abi.stateMutability !== 'view' && abi.stateMutability !== 'pure',
-      )
-
-      let events = abi.filter(isAbiEvent)
-
-      let contractName = path.parse(abiFilePath).name
-      const basename = path.basename(abiFilePath, path.extname(abiFilePath))
-      const filePath = `${this.outputDir}/${basename}Contract.ts`
-      const relativeArtifactPath = path.relative(this.outputDir, abiFilePath)
-
-      let context: Context = {
-        artifact: JSON.stringify(artifact, null, 2),
-        abi: JSON.stringify(sourceAbi),
-        contractName: contractName,
-        relativeArtifactPath: relativeArtifactPath,
-        getters: getters,
-        functions: functions,
-        events: events,
-      }
-      let code = this.template(context)
-      fs.writeFileSync(filePath, code)
-      if (minified) {
-        build({
-          entryPoints: [filePath],
-          outfile: `${filePath}.min.js`,
-          bundle: false,
-          minify: true,
-          format: 'esm',
-          platform: 'node',
-          sourcemap: false,
-          target: ['es2020'],
-        }).then()
-      }
+    const originalName = normalized.name
+    if (nameCount[originalName] !== undefined) {
+      nameCount[originalName] += 1
+      normalized.namePostfix = nameCount[originalName]
     } else {
+      nameCount[originalName] = 0
+    }
+
+    return normalized
+  })
+}
+
+export default class ContractTemplate {
+  private readonly eta: Eta
+  private readonly outputDir: string
+  private readonly backend: WrapperBackend
+
+  constructor(
+    templatesDir: string,
+    outputDir: string,
+    backend: WrapperBackend,
+  ) {
+    this.eta = new Eta({
+      views: templatesDir,
+      autoEscape: false,
+      autoTrim: false,
+    })
+    this.outputDir = outputDir
+    this.backend = backend
+  }
+
+  async render(abiFilePath: string, minified?: boolean): Promise<void> {
+    const artifact = JSON.parse(readFileSync(abiFilePath, 'utf8')) as {
+      abi?: Abi
+      [key: string]: unknown
+    }
+
+    const abi = artifact.abi
+    if (!abi) {
       throw new Error(`No ABI found in ${abiFilePath}.`)
     }
-  }
 
-  protected readTemplate(name: string) {
-    let file = path.resolve(this.templatesDir, name)
-    return fs.readFileSync(file).toString()
+    const sourceAbi = JSON.stringify(abi)
+    const methods = normalizeMethods(abi.filter(isAbiFunction))
+
+    const getters = methods.filter(
+      (method) =>
+        method.stateMutability === 'view' || method.stateMutability === 'pure',
+    )
+    const functions = methods.filter(
+      (method) =>
+        method.stateMutability !== 'view' && method.stateMutability !== 'pure',
+    )
+    const events = abi.filter(isAbiEvent)
+
+    const contractName = path.parse(abiFilePath).name
+    const basename = path.basename(abiFilePath, path.extname(abiFilePath))
+    const filePath = path.resolve(this.outputDir, `${basename}Contract.ts`)
+    const relativeArtifactPath = path.relative(this.outputDir, abiFilePath)
+
+    const context: Context = {
+      artifact: JSON.stringify(artifact, null, 2),
+      abi: sourceAbi,
+      contractName,
+      relativeArtifactPath,
+      getters,
+      functions,
+      events,
+      backend: this.backend,
+      isViem: this.backend === 'viem',
+      isEthers: this.backend === 'ethers',
+      helpers: createTemplateHelpers(),
+    }
+
+    const templateName = buildTemplateName(this.backend)
+    const code = await this.eta.renderAsync(templateName, context)
+    if (!code) {
+      throw new Error(`Unable to render template: ${templateName}`)
+    }
+
+    writeFileSync(filePath, code, 'utf8')
+
+    if (!minified) return
+
+    await build({
+      entryPoints: [filePath],
+      outfile: `${filePath}.min.js`,
+      bundle: false,
+      minify: true,
+      format: 'esm',
+      platform: 'node',
+      sourcemap: false,
+      target: ['es2022'],
+    })
   }
 }

@@ -1,75 +1,62 @@
-import path from 'path'
-import fs from 'fs-extra'
+/**
+ * Sender demo: opens a channel and creates one off-chain payment.
+ */
+
+import { writeFileSync } from 'node:fs'
 import { IohTee } from '@riaskov/iohtee'
-import Logger from '@machinomy/logger'
 import { mnemonicToAccount } from 'viem/accounts'
+import {
+  logStep,
+  removeIfExists,
+  resolveDataFile,
+  runtimeConfig,
+  sqliteUrl,
+} from './common.js'
 
-const LOG = new Logger('iohtee-sender')
+async function run(): Promise<void> {
+  const { chainId, mnemonic, rpcUrl } = runtimeConfig()
+  const dbPath = resolveDataFile(import.meta.url, 'sender-receiver.db')
+  const paymentPath = resolveDataFile(import.meta.url, 'payment.json')
+  removeIfExists(dbPath)
 
-async function run() {
-  const dbPath = path.resolve(__dirname, '../sender-receiver.db')
-  fs.removeSync(dbPath)
+  const minimumChannelAmount = 10_000n
+  const channelValue = 1_000_000n
+  const paymentPrice = 200_000n
 
-  const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
-  const RPC_URL = String(process.env.RPC_URL).trim()
-  const CHAIN_ID = Number(process.env.CHAIN_ID)
+  const senderHdPath = "m/44'/60'/0'/0/1"
+  const receiverHdPath = "m/44'/60'/0'/0/0"
 
-  const minimumChannelAmount = 1n * 10n ** 4n
-  const channelValue = 1n * 10n ** 6n
-  const paymentPrice = 200000n
-
-  LOG.info(`PROVIDER = ${RPC_URL}`)
-  LOG.info(`MNEMONIC = ${MNEMONIC}`)
-
-  const senderAccountHdPath = `m/44'/60'/0'/0/1`
-
-  const senderAccount = mnemonicToAccount(MNEMONIC, {
-    path: senderAccountHdPath,
-  })
-
-  const receiverAccount = mnemonicToAccount(MNEMONIC, {
-    path: `m/44'/60'/0'/0/0`,
-  })
+  const senderAccount = mnemonicToAccount(mnemonic, { path: senderHdPath })
+  const receiverAccount = mnemonicToAccount(mnemonic, { path: receiverHdPath })
 
   const iohtee = new IohTee({
-    networkId: CHAIN_ID,
-    httpRpcUrl: RPC_URL,
-    mnemonic: MNEMONIC,
-    hdPath: senderAccountHdPath,
+    networkId: chainId,
+    httpRpcUrl: rpcUrl,
+    mnemonic,
+    hdPath: senderHdPath,
     options: {
-      databaseUrl: `sqlite://${dbPath}`,
-      minimumChannelAmount: minimumChannelAmount,
+      databaseUrl: sqliteUrl(import.meta.url, 'sender-receiver.db'),
+      minimumChannelAmount,
     },
   })
-  LOG.info(
-    `Start opening IohTee channel between sender ${senderAccount.address} and receiver ${receiverAccount.address} with value ${channelValue} Wei`,
-  )
-  LOG.info(
-    `For remote Ethereum nodes (e.g. Amoy or Sepolia) it can taking a 15-30 seconds.`,
-  )
+
+  logStep('Sender', senderAccount.address)
+  logStep('Receiver', receiverAccount.address)
+  logStep('Opening channel')
 
   await iohtee.open(receiverAccount.address, channelValue)
-
-  LOG.info(`Channel was opened.`)
-  LOG.info(
-    `Trace the last transaction via https://amoy.polygonscan.com/address/${senderAccount.address}`,
-  )
 
   const payment = await iohtee.payment({
     receiver: receiverAccount.address,
     price: paymentPrice,
   })
 
-  LOG.info('Payment: ')
-  LOG.info(payment.payment)
-
-  fs.writeFileSync('payment.json', JSON.stringify(payment.payment))
-
-  LOG.info('Sender done.')
-
-  process.exit(0)
+  writeFileSync(paymentPath, JSON.stringify(payment.payment, null, 2), 'utf8')
+  logStep('Payment written', paymentPath)
+  await iohtee.shutdown()
 }
 
-run().catch((err) => {
-  console.error(err)
+run().catch((error) => {
+  console.error(error)
+  process.exit(1)
 })

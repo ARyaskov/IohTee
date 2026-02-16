@@ -7,12 +7,11 @@
 [codecov]: https://codecov.io/gh/machinomy/machinomy
 [codecov-img]: https://codecov.io/gh/machinomy/machinomy/branch/master/graph/badge.svg
 
-### ! Upgrading to v2 is in progress! Expect bugs !
+### ! Upgrading to v3 is in progress! Expect bugs !
 
 IohTee repository. The second life of [Machinomy library](https://github.com/machinomy/machinomy).
 We're upgrading it to contemporary standards (TypeScript 5+, Node.js 18+, ES2023+) and adding new features.
-Please note, this is NOT monorepo anymore due to some Yarn v4 monorepos limitations: you have to install deps and build
-each package separately.
+This repository is a pnpm monorepo.
 
 Available sub-projects:
 - [IohTee](packages/iohtee) is a Node.js library for micropayments in Ether over HTTP. It allows you to send and receive a minuscule amount of money instantly.
@@ -29,26 +28,20 @@ Available sub-projects:
 
 Web site: [iohtee.toivo.tech](https://iohtee.toivo.tech)
 
-Twitter:
-
-FAQ: 
-
 ## Installation
 
-[//]: # (Using [yarn]&#40;https://yarnpkg.com/lang/en/&#41; and Node.js **v18** is mandatory &#40;**don't use npm!**&#41;)
+[//]: # ()
+[//]: # (    $ pnpm add @riaskov/iohtee)
 
 [//]: # ()
-[//]: # (    $ yarn add machinomy)
-
-[//]: # ()
-[//]: # (The library supports mainnet, Ropsten, and [Rinkeby]&#40;https://www.rinkeby.io/&#41; networks.)
+[//]: # (The library supports mainnet, Amoy and Sepolia networks.)
 
 ## Tinkering
 
 It takes two to tango: a seller and a buyer. Seller is `packages/examples/src/server.ts` script. Build it or run through node-ts.
 ```
 $ git clone https://github.com/ARyaskov/IohTee
-$ cd IohTee && yarn && yarn build
+$ cd IohTee && pnpm install && pnpm run build
 $ node packages/examples/src/hub.js
 ```
 
@@ -81,8 +74,8 @@ The process is more convoluted than buying. Better consult [packages/examples/sr
 
 ```
 $ git clone https://github.com/ARyaskov/IohTee
-$ cd IohTee && yarn && yarn build && cd packages/examples
-$ yarn run sender && yarn run receiver
+$ cd IohTee && pnpm install && pnpm run build && cd packages/examples
+$ pnpm run sender && pnpm run receiver
 ```
 
 Look at [sender.ts](packages/examples/src/sender.ts) and [receiver.ts](packages/examples/src/receiver.ts) for more information.
@@ -99,13 +92,13 @@ For more advanced documentation go to [doc/](doc/) folder.
 
 **Developers:** IohTee is for you. Feel free to use it, break it, fork it, and make the world better. The code is standard TypeScript, no special skills required:
 
-    $ yarn
+    $ pnpm install
 
-Using [yarn v4](https://yarnpkg.com/lang/en/) is mandatory (**don't use npm!**)
+Using [pnpm](https://pnpm.io/) and Node.js **v22+** is mandatory.
 
 Apply migrations (eg. for PostgreSQL, refer [packages/iohtee/database.json](packages/iohtee/database.json)):
 
-    $ PGUSER=user PGPASSWORD=pass PGHOSTADDR=localhost PGDATABASE=dbname yarn migrate
+    $ PGUSER=user PGPASSWORD=pass PGHOSTADDR=localhost PGDATABASE=dbname pnpm --filter @riaskov/iohtee run migrate
 
 **Non-Developers:** You are lovely. As a starter, help us spread the word! Tell a friend right now.
 If not enough, developers need flesh-world guidance. It starts with proper documentation and a pinch of fantasy.

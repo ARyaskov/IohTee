@@ -1,22 +1,48 @@
-# Machinomy Berry Playground
+# @riaskov/iohtee-playground
 
-[![Module type: ESM](https://img.shields.io/badge/module%20type-esm-brightgreen)]()
-[![NodeVersion: NodeVersion](https://img.shields.io/badge/Node.js->=21-brightgreen)]()
+Fastify playground service for testing paywall flows end-to-end.
 
-[Machinomy](https://github.com/ARyaskov/machinomy/tree/master/packages/machinomy) examples.
+## Stack
 
-### ! Upgrading to v2 is in progress! Expect bugs !
+- Node.js `>=24`
+- TypeScript `6.0.0-beta`
+- Fastify `5`
+- `node:test`
+- `node:sqlite`
 
-:exclamation:
-Please, pay attention, this package is the part of [Machinomy Monorepo](https://github.com/ARyaskov/machinomy) and it's intended to use with other monorepo's packages. 
+## Run
 
-:no_entry: You **should not** git clone this repository alone
-
-:white_check_mark: You **should** git clone the main repository via
-```
-git clone https://github.com/ARyaskov/machinomy.git
-or 
-git clone git@github.com:ARyaskov/machinomy.git
+```bash
+pnpm --filter @riaskov/iohtee-playground run start
 ```
 
-**For documentation, usage and contributing please see [Machinomy Monorepo](https://github.com/ARyaskov/machinomy).**
+Build/test/lint:
+
+```bash
+pnpm --filter @riaskov/iohtee-playground run lint
+pnpm --filter @riaskov/iohtee-playground run test
+pnpm --filter @riaskov/iohtee-playground run build
+```
+
+## Environment
+
+Required:
+
+- `HOST`
+- `PORT`
+- `GATEWAY_URL` (base URL of payment gateway)
+- `ACCOUNT_ADDRESS_0` (receiver account)
+
+Optional:
+
+- `PAYWALL_PRICE_WEI` (default: `1000`)
+- `PAYWALL_TOKEN_TTL_SECONDS` (default: `1800`)
+- `PLAYGROUND_DB_PATH` (default: `:memory:`)
+
+## Routes
+
+- `GET /health`
+- `POST /payments/accept`
+- `GET /hello` (paywalled)
+
+`/payments/accept` proxies payment acceptance to configured gateway and caches token metadata in sqlite.

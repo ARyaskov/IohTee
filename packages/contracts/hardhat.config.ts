@@ -1,40 +1,45 @@
-import "dotenv/config"
-import "@nomicfoundation/hardhat-viem"
-import "@nomicfoundation/hardhat-toolbox-viem"
+import 'dotenv/config'
+import { defineConfig } from 'hardhat/config'
+import * as hardhatToolboxViem from '@nomicfoundation/hardhat-toolbox-viem'
+import * as hardhatNetworkHelpers from '@nomicfoundation/hardhat-network-helpers'
 
-const config = {
+const config = defineConfig({
+  plugins: [
+    (hardhatToolboxViem as any).default ?? hardhatToolboxViem,
+    (hardhatNetworkHelpers as any).default ?? hardhatNetworkHelpers,
+  ],
   solidity: {
-    version: "0.8.26",
+    version: '0.8.28',
     settings: {
       optimizer: {
         enabled: true,
         runs: 200,
       },
-      evmVersion: "cancun"
+      evmVersion: 'cancun',
     },
   },
-  defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
-      chainId: 31337
+      type: 'edr-simulated',
+      chainId: 31337,
     },
     polygon: {
-      url: process.env.POLYGON_RPC_URL,
-      accounts: [process.env.ACCOUNT_PRIVATE_KEY_0],
-      chainId: 137
+      type: 'http',
+      url: process.env.POLYGON_RPC_URL ?? 'http://localhost:8545',
+      accounts: process.env.ACCOUNT_PRIVATE_KEY_0
+        ? [process.env.ACCOUNT_PRIVATE_KEY_0]
+        : [],
+      chainId: 137,
     },
     polygonAmoy: {
-      url: process.env.POLYGON_AMOY_RPC_URL,
-      accounts: [process.env.ACCOUNT_PRIVATE_KEY_0],
-      chainId: 80002
-    }
-  },
-  etherscan: {
-    apiKey: {
-      polygon: process.env.POLYGONSCAN_API_KEY,
-      polygonAmoy: process.env.POLYGONSCAN_API_KEY
+      type: 'http',
+      url: process.env.POLYGON_AMOY_RPC_URL ?? 'http://localhost:8545',
+      accounts: process.env.ACCOUNT_PRIVATE_KEY_0
+        ? [process.env.ACCOUNT_PRIVATE_KEY_0]
+        : [],
+      chainId: 80002,
     },
-  }
-}
+  },
+})
 
 export default config

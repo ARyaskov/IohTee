@@ -1,6 +1,8 @@
 node_modules/
 .env
 yarn-error.log
+pnpm-debug.log*
+.pnpm-store/
 **/*.d.ts
 **/*.js
 **/*.js.map
@@ -16,6 +18,5 @@ packages/contracts/build
 packages/machinomy/coverage
 .nyc_output
 !truffle-config.js
-.yarn/install-state.gz
 **/*.db
 **/*.db-*

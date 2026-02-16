@@ -1,163 +1,167 @@
 /**
- * To run the file, it requires two environment variables to be set.
- * `RPC_URL` is a JSON RPC endpoint. Alchemy works just fine. For Polygon Amoy test network,
- * you could set it to `RPC_URL=https://rpc-amoy.polygon.technology`. Another variable is `MNEMONIC`.
- * It is a [12-word seed phrase](https://github.com/pirapira/ethereum-word-list/blob/master/README.md#mnemonic-phrase).
- * For example, `MNEMONIC=tool school decrease elegant fix awful eyebrow immense noble erase dish labor`
+ * Example paid-content server and payment gateway.
  *
- * Start this file then:
- *
- * yarn build
- * PROVIDER_URL="https://rpc-amoy.polygon.technology" MNEMONIC="tool school decrease elegant fix awful eyebrow immense noble erase dish labor" node hub.js
- *
- * The script runs 3 core endpoints:
- * `http://localhost:3000/content` provides an example of the paid content.
- * `http://localhost:3001/accept` accepts payment.
- * `http://localhost:3001/verify/:token` verifies token that `/accept` generates.
- *
- * The client side for buying the content is provided in `client.ts` file.
+ * Required env:
+ * - RPC_URL
+ * - ACCOUNT_MNEMONIC
+ * - CHAIN_ID
  */
 
-import express from 'express'
+import Fastify from 'fastify'
 import {
-  IohTee,
   AcceptTokenRequestSerde,
+  IohTee,
   PaymentChannelSerde,
 } from '@riaskov/iohtee'
-import bodyParser from 'body-parser'
 import { mnemonicToAccount } from 'viem/accounts'
-import path from 'path'
+import { isHexToken, logStep, runtimeConfig, sqliteUrl } from './common.js'
 
-function isValidToken(token: string): boolean {
-  const tokenRegex = /^0x[0-9a-fA-F]{64}$/
+const HOST = '127.0.0.1'
+const APP_PORT = 3000
+const HUB_PORT = 3001
 
-  return tokenRegex.test(token)
+function paywallHeaders(
+  receiver: `0x${string}`,
+  gateway: string,
+): Record<string, string> {
+  return {
+    'Paywall-Version': '1.0.0',
+    'Paywall-Price': '1000',
+    'Paywall-Address': receiver,
+    'Paywall-Gateway': gateway,
+  }
 }
 
-async function main() {
-  const urlScheme = !!process.env.USE_HTTPS ? 'https://' : 'http://'
-  const dbPath = path.resolve(__dirname, '../hub.db')
-  const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
-  const RPC_URL = String(process.env.RPC_URL).trim()
-  const CHAIN_ID = Number(process.env.CHAIN_ID)
+function parseTokenFromAuthorization(
+  header: string | undefined,
+): `0x${string}` | null {
+  if (!header) {
+    return null
+  }
+  const [scheme, token] = header.split(' ')
+  if (scheme?.toLowerCase() !== 'paywall' || !token || !isHexToken(token)) {
+    return null
+  }
+  return token
+}
 
-  const HOST = '127.0.0.1'
-  const APP_PORT = 3000
-  const HUB_PORT = 3001
+async function main(): Promise<void> {
+  const { chainId, mnemonic, rpcUrl } = runtimeConfig()
+  const scheme = process.env.USE_HTTPS ? 'https' : 'http'
+  const gatewayUrl = `${scheme}://${HOST}:${HUB_PORT}/accept`
 
-  const senderAccountHdPath = `m/44'/60'/0'/0/1`
-  const receiverAccountHdPath = `m/44'/60'/0'/0/1`
-
-  const senderAccount = mnemonicToAccount(MNEMONIC, {
-    path: senderAccountHdPath,
+  const receiverAccount = mnemonicToAccount(mnemonic, {
+    path: "m/44'/60'/0'/0/1",
   })
 
-  const receiverAccount = mnemonicToAccount(MNEMONIC, {
-    path: receiverAccountHdPath,
-  })
-
-  /**
-   * Account that receives payments.
-   */
-  const receiver = receiverAccount.address
-
-  /**
-   * Create iohtee instance that provides API for accepting payments.
-   */
   const iohtee = new IohTee({
-    networkId: CHAIN_ID,
-    httpRpcUrl: RPC_URL,
-    mnemonic: MNEMONIC,
-    hdPath: receiverAccountHdPath,
+    networkId: chainId,
+    httpRpcUrl: rpcUrl,
+    mnemonic,
+    hdPath: "m/44'/60'/0'/0/1",
     options: {
-      databaseUrl: `sqlite://${dbPath}`,
+      databaseUrl: sqliteUrl(import.meta.url, 'hub.db'),
     },
   })
 
-  const hub = express()
-  hub.use(bodyParser.json())
-  hub.use(bodyParser.urlencoded({ extended: false }))
+  const hub = Fastify({ logger: true })
 
-  /**
-   * Receive an off-chain payment issued by `iohtee buy` command.
-   */
-  hub.post('/accept', async (req, res) => {
-    const body = await iohtee.acceptPayment(req.body)
-    res.status(202).header('Paywall-Token', body.token).send(body)
+  hub.post('/accept', async (request, reply) => {
+    const body = await iohtee.acceptPayment(request.body)
+    return reply.code(202).header('Paywall-Token', body.token).send(body)
   })
 
-  /**
-   * Verify the token that `/accept` generates.
-   */
-  hub.get('/verify/:token', async (req, res) => {
-    const token = req.params.token as string
-    const acceptTokenRequest = AcceptTokenRequestSerde.instance.deserialize({
-      token,
-    })
-    const isAccepted = (await iohtee.acceptToken(acceptTokenRequest)).status
-    if (isAccepted) {
-      res.status(200).send({ status: 'ok' })
-    } else {
-      res.status(400).send({ status: 'token is invalid' })
-    }
-  })
+  hub.get<{ Params: { token: string } }>(
+    '/verify/:token',
+    async (request, reply) => {
+      let isAccepted = false
+      try {
+        const acceptTokenRequest = AcceptTokenRequestSerde.instance.deserialize(
+          {
+            token: request.params.token,
+          },
+        )
+        isAccepted = (await iohtee.acceptToken(acceptTokenRequest)).status
+      } catch {
+        isAccepted = false
+      }
 
-  hub.get('/channels', async (req, res) => {
+      if (isAccepted) {
+        return reply.code(200).send({ status: 'ok' as const })
+      }
+      return reply.code(400).send({ status: 'token is invalid' as const })
+    },
+  )
+
+  hub.get('/channels', async (_request, reply) => {
     const channels = await iohtee.channels()
-    res.status(200).send(channels.map(PaymentChannelSerde.instance.serialize))
+    return reply
+      .code(200)
+      .send(
+        channels.map((channel) =>
+          PaymentChannelSerde.instance.serialize(channel),
+        ),
+      )
   })
 
-  hub.get('/claim/:channelid', async (req, res) => {
-    try {
-      const channelId = req.params.channelid as `0x${string}`
-      await iohtee.close(channelId)
-      res.status(200).send('Claimed')
-    } catch (error) {
-      res.status(404).send('No channel found')
-      console.error(error)
+  hub.post<{ Params: { channelId: `0x${string}` } }>(
+    '/claim/:channelId',
+    async (request, reply) => {
+      try {
+        await iohtee.close(request.params.channelId)
+        return reply.code(200).send({ status: 'claimed' as const })
+      } catch (error) {
+        request.log.error({ err: error }, 'failed to close channel')
+        return reply.code(404).send({ status: 'channel not found' as const })
+      }
+    },
+  )
+
+  await hub.listen({ host: HOST, port: HUB_PORT })
+  logStep(`Hub ready at http://${HOST}:${HUB_PORT}`)
+
+  const app = Fastify({ logger: true })
+
+  app.get('/content', async (request, reply) => {
+    const token = parseTokenFromAuthorization(request.headers.authorization)
+    if (!token) {
+      return reply
+        .code(402)
+        .headers(paywallHeaders(receiverAccount.address, gatewayUrl))
+        .send({
+          message: 'Content is not available',
+        })
     }
+
+    const verifyResponse = await fetch(
+      `${scheme}://${HOST}:${HUB_PORT}/verify/${token}`,
+    )
+    const verifyResult = (await verifyResponse.json()) as { status?: string }
+
+    if (verifyResult.status === 'ok') {
+      return reply.code(200).send({ message: 'Thank you for your purchase!' })
+    }
+
+    return reply
+      .code(402)
+      .headers(paywallHeaders(receiverAccount.address, gatewayUrl))
+      .send({
+        message: 'Content is not available',
+      })
   })
 
-  hub.listen(HUB_PORT, () => {
-    console.log('HUB is ready on port ' + HUB_PORT)
-  })
+  await app.listen({ host: HOST, port: APP_PORT })
+  logStep(`Content ready at http://${HOST}:${APP_PORT}`)
 
-  const app = express()
-  const paywallHeaders = () => {
-    let headers: { [index: string]: string } = {}
-    headers['Paywall-Version'] = '1.0.0'
-    headers['Paywall-Price'] = '1000'
-    headers['Paywall-Address'] = receiver
-    headers['Paywall-Gateway'] = `${urlScheme}${HOST}:${HUB_PORT}/accept`
-    return headers
+  const shutdown = async (): Promise<void> => {
+    await Promise.allSettled([app.close(), hub.close(), iohtee.shutdown()])
   }
 
-  /**
-   * Example of serving a paid content. You can buy it with `iohtee buy http://localhost:3000/content` command.
-   */
-  app.get('/content', async (req, res) => {
-    let reqUrl = `${urlScheme}${HOST}:${HUB_PORT}/verify`
-    let content = req.get('authorization')
-    if (content) {
-      let token = content.split(' ')[1]
-      if (!isValidToken(token)) {
-        throw new Error(`Invalid token received: ${token}`)
-      }
-      let response = await fetch(reqUrl + '/' + token)
-      let json = await response.json()
-      let status = json.status
-      if (status === 'ok') {
-        res.send('Thank you for your purchase!')
-      } else {
-        res.status(402).set(paywallHeaders()).send('Content is not available')
-      }
-    } else {
-      res.status(402).set(paywallHeaders()).send('Content is not available')
-    }
+  process.once('SIGINT', () => {
+    void shutdown().finally(() => process.exit(0))
   })
-
-  app.listen(APP_PORT, function () {
-    console.log('Content provider is ready on ' + APP_PORT)
+  process.once('SIGTERM', () => {
+    void shutdown().finally(() => process.exit(0))
   })
 }
 

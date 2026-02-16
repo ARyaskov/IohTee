@@ -1,12 +1,11 @@
 import { MigrateOption } from './MigrateOption'
 import { Transport } from './transport'
+import { join } from 'node:path'
+import { homedir } from 'node:os'
 
-/**
- * Params for IohTee. Currently IohTee supports nedb, SQLite3 and PostgreSQL as a database engine.
- * Nedb is a default engine.
- */
 export interface IohTeeOptions {
   databaseUrl: string
+  tokenUnidirectionalAddress?: `0x${string}`
   minimumChannelAmount?: bigint
   minimumSettlementPeriod?: number
   settlementPeriod?: number
@@ -18,8 +17,8 @@ export interface IohTeeOptions {
 
 export namespace IohTeeOptions {
   export function defaults(options?: IohTeeOptions): IohTeeOptions {
-    let defaultOptions = {
-      databaseUrl: 'nedb://iohtee',
+    const defaultOptions: IohTeeOptions = {
+      databaseUrl: `sqlite://${join(homedir(), '.iohtee', 'storage.db')}`,
     }
     return Object.assign({}, defaultOptions, options)
   }

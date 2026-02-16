@@ -1,9 +1,8 @@
-import * as tmp from 'tmp'
+import { mkdtemp } from 'node:fs/promises'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
 
-export function tmpFileName(): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    tmp.tmpName((err, path) => {
-      err ? reject(err) : resolve(path)
-    })
-  })
+export async function tmpFileName(): Promise<string> {
+  const dir = await mkdtemp(join(tmpdir(), 'iohtee-'))
+  return join(dir, 'storage.sqlite')
 }

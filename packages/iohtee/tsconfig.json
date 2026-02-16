@@ -1,17 +1,6 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "declaration": true,
-    "outDir": "lib/",
-    "types": [
-      "@machinomy/types-eth-sig-util",
-      "@types/db-migrate-base",
-      "@types/mocha",
-      "@types/node"
-    ]
-  },
-  "include": [
-    "./src/**/*"
-  ]
+    "outDir": "lib"
+  }
 }

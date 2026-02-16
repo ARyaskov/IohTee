@@ -1,68 +1,59 @@
-import path from 'path'
-import fs from 'fs-extra'
+/**
+ * Receiver demo: reads off-chain payment and settles channel on-chain.
+ */
+
+import { readFileSync } from 'node:fs'
 import { IohTee } from '@riaskov/iohtee'
-import Logger from '@machinomy/logger'
 import { mnemonicToAccount } from 'viem/accounts'
+import {
+  logStep,
+  removeIfExists,
+  resolveDataFile,
+  runtimeConfig,
+  sqliteUrl,
+} from './common.js'
 
-const payment = require(path.resolve('./payment.json'))
+async function run(): Promise<void> {
+  const { chainId, mnemonic, rpcUrl } = runtimeConfig()
+  const dbPath = resolveDataFile(import.meta.url, 'sender-receiver.db')
+  const paymentPath = resolveDataFile(import.meta.url, 'payment.json')
+  removeIfExists(dbPath)
 
-const LOG = new Logger('iohtee-receiver')
+  const payment = JSON.parse(readFileSync(paymentPath, 'utf8')) as {
+    channelId: `0x${string}`
+  } & Record<string, unknown>
 
-async function run() {
-  const dbPath = path.resolve(__dirname, '../sender-receiver.db')
-  fs.removeSync(dbPath)
+  const senderHdPath = "m/44'/60'/0'/0/0"
+  const receiverHdPath = "m/44'/60'/0'/0/1"
 
-  const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
-  const RPC_URL = String(process.env.RPC_URL).trim()
-  const CHAIN_ID = Number(process.env.CHAIN_ID)
-
-  const minimumChannelAmount = 1n * 10n ** 4n
-
-  LOG.info(`PROVIDER = ${RPC_URL}`)
-  LOG.info(`MNEMONIC = ${MNEMONIC}`)
-
-  const senderAccountHdPath = `m/44'/60'/0'/0/0`
-  const receiverAccountHdPath = `m/44'/60'/0'/0/1`
-
-  const senderAccount = mnemonicToAccount(MNEMONIC, {
-    path: senderAccountHdPath,
-  })
-
-  const receiverAccount = mnemonicToAccount(MNEMONIC, {
-    path: receiverAccountHdPath,
-  })
+  const senderAccount = mnemonicToAccount(mnemonic, { path: senderHdPath })
+  const receiverAccount = mnemonicToAccount(mnemonic, { path: receiverHdPath })
 
   const iohtee = new IohTee({
-    networkId: CHAIN_ID,
-    httpRpcUrl: RPC_URL,
-    mnemonic: MNEMONIC,
-    hdPath: senderAccountHdPath,
+    networkId: chainId,
+    httpRpcUrl: rpcUrl,
+    mnemonic,
+    hdPath: senderHdPath,
     options: {
-      databaseUrl: `sqlite://${dbPath}`,
-      minimumChannelAmount: minimumChannelAmount,
+      databaseUrl: sqliteUrl(import.meta.url, 'sender-receiver.db'),
+      minimumChannelAmount: 10_000n,
     },
   })
 
-  LOG.info(`Receiver: ${receiverAccount}`)
-  LOG.info(`Accept payment: ${JSON.stringify(payment)}`)
+  logStep('Sender', senderAccount.address)
+  logStep('Receiver', receiverAccount.address)
+  logStep('Accepting payment')
 
-  await iohtee.acceptPayment({
-    payment: payment,
-  })
+  await iohtee.acceptPayment({ payment })
 
-  LOG.info(`Start closing channel with channelID ${payment.channelId}`)
-
+  logStep('Closing channel', payment.channelId)
   await iohtee.close(payment.channelId)
 
-  LOG.info(`Channel ${payment.channelId} was successfully closed.`)
-  LOG.info(
-    `Trace the last transaction via https://amoy.polygonscan.com/address/${receiverAccount}`,
-  )
-  LOG.info(`Receiver done.`)
-
-  process.exit(0)
+  logStep('Channel closed', payment.channelId)
+  await iohtee.shutdown()
 }
 
-run().catch((err) => {
-  console.error(err)
+run().catch((error) => {
+  console.error(error)
+  process.exit(1)
 })

@@ -1,20 +1,17 @@
-import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify'
+import { loadConfig } from './config.js'
+import { createServer } from './server.js'
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  )
+async function bootstrap(): Promise<void> {
+  const config = loadConfig()
+  const { app } = await createServer(config)
 
-  app.setGlobalPrefix('api/v0')
-  console.log(
-    `Running with HOST=${process.env.HOST || '0.0.0.0'} PORT=${process.env.PORT || 3000}`,
-  )
-  await app.listen(process.env.PORT || 3000, process.env.HOST || '0.0.0.0')
+  await app.listen({
+    host: config.host,
+    port: config.port,
+  })
 }
-bootstrap()
+
+bootstrap().catch((error: unknown) => {
+  console.error(error)
+  process.exit(1)
+})

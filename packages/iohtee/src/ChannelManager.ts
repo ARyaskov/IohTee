@@ -9,23 +9,20 @@ import ChannelId from './ChannelId'
 import { EventEmitter } from 'events'
 import IPaymentsDatabase from './storage/IPaymentsDatabase'
 import ITokensDatabase from './storage/ITokensDatabase'
-import Logger from '@machinomy/logger'
+import Logger from './log'
 import { PaymentChannel } from './PaymentChannel'
 import ChannelInflator from './ChannelInflator'
-import * as uuid from 'uuid'
 import {
   keccak256,
   stringToHex,
-  toHex,
-  WriteContractReturnType,
   PublicClient,
   WalletClient,
   GetBlockNumberReturnType,
   TransactionReceipt,
 } from 'viem'
+import { randomBytes } from 'node:crypto'
 import { PaymentNotValidError, InvalidChannelError } from './Exceptions'
 import { RemoteChannelInfo } from './RemoteChannelInfo'
-import { recoverPersonalSignature } from '@metamask/eth-sig-util'
 import { ChannelState } from '@riaskov/iohtee-contracts'
 
 const LOG = new Logger('channel-manager')
@@ -41,8 +38,9 @@ function generateToken(payment: any): string {
       value: payment.value.toString(),
       channelValue: payment.channelValue.toString(),
     }) + new Date().toISOString()
-  const hash = keccak256(stringToHex(dataString))
-  return toHex(hash)
+  return keccak256(
+    stringToHex(`${dataString}-${randomBytes(16).toString('hex')}`),
+  )
 }
 
 export default class ChannelManager
@@ -167,7 +165,10 @@ export default class ChannelManager
   async spendChannel(payment: Payment, token?: string): Promise<Payment> {
     const chan = PaymentChannel.fromPayment(payment)
     await this.channelsDao.saveOrUpdate(chan)
-    let _token = token || payment.token || uuid.v4().replace(/-/g, '')
+    const _token =
+      token ||
+      payment.token ||
+      keccak256(`0x${randomBytes(32).toString('hex')}` as `0x${string}`)
     await this.paymentsDao.save(_token, payment)
     return payment
   }

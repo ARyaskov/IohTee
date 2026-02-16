@@ -1,17 +1,22 @@
 {
   "compilerOptions": {
+    "rootDir": "./src",
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "sourceMap": true,
+    "declaration": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "sourceRoot": "src/",
-    "outDir": "lib/",
-    "types": [
-      "@machinomy/types-eth-sig-util",
-      "@types/db-migrate-base",
-      "@types/mocha",
-      "@types/node"
-    ],
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["node"]
   },
-  "include": [
-    "./src/**/*"
+  "include": ["./src/**/*"],
+  "exclude": [
+    "./src/**/*.test.ts",
+    "./src/storage/**/migrations/**"
   ]
 }

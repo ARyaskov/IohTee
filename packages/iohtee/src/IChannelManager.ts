@@ -2,7 +2,7 @@ import Payment from './payment'
 import { EventEmitter } from 'events'
 import { PaymentChannel } from './PaymentChannel'
 import { RemoteChannelInfo } from './RemoteChannelInfo'
-import { TransactionReceipt, WriteContractReturnType } from 'viem'
+import { TransactionReceipt } from 'viem'
 
 export default interface IChannelManager extends EventEmitter {
   openChannel(

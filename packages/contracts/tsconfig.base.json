@@ -1,13 +1,18 @@
 {
   "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM"],
     "sourceRoot": "src/",
     "outDir": "lib/",
-    "types": [
-      "@machinomy/types-ethereumjs-units",
-      "@types/node",
-      "@types/mocha"
-    ],
+    "types": ["node"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleDetection": "force",
     "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*"

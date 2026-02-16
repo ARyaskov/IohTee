@@ -1,9 +1,7 @@
-import * as sinon from 'sinon'
+import { beforeEach, describe, it, mock } from 'node:test'
+import assert from 'node:assert/strict'
+import { Pool } from 'pg'
 import EnginePostgres from './storage/postgresql/EnginePostgres'
-
-const expect = require('expect')
-
-const PGClient = require('pg').Client
 
 describe('EnginePostgres', () => {
   let engine: EnginePostgres
@@ -12,126 +10,56 @@ describe('EnginePostgres', () => {
     engine = new EnginePostgres()
   })
 
-  describe('isConnected', () => {
-    it('defaults to false', () => {
-      expect(engine.isConnected()).toBe(false)
-    })
+  it('defaults to disconnected', () => {
+    assert.equal(engine.isConnected(), false)
   })
 
-  describe('connect', () => {
-    it('connects to the database', () => {
-      const stub = sinon.stub(PGClient.prototype, 'connect').resolves()
+  it('connects once for concurrent callers', async () => {
+    const queryMock = mock.method(
+      Pool.prototype,
+      'query',
+      async () => ({ rows: [] }) as never,
+    )
 
-      return engine.connect().then(() => {
-        expect(stub.callCount).toBe(1)
-        stub.restore()
-      })
-    })
+    await Promise.all([engine.connect(), engine.connect(), engine.connect()])
 
-    it('prevents multiple concurrent connections', () => {
-      const stub = sinon.stub(PGClient.prototype, 'connect').resolves()
-
-      return Promise.all([
-        engine.connect(),
-        engine.connect(),
-        engine.connect(),
-      ]).then(() => {
-        expect(stub.callCount).toBe(1)
-        stub.restore()
-      })
-    })
-
-    it('marks isConnected as true', () => {
-      const stub = sinon.stub(PGClient.prototype, 'connect').resolves()
-
-      return engine.connect().then(() => {
-        expect(engine.isConnected()).toBe(true)
-        stub.restore()
-      })
-    })
+    assert.equal(queryMock.mock.callCount(), 1)
+    assert.equal(engine.isConnected(), true)
   })
 
-  describe('close', () => {
-    it('closes connection to the database', () => {
-      const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
-      const endStub = sinon.stub(PGClient.prototype, 'end').resolves()
+  it('closes connection', async () => {
+    mock.method(Pool.prototype, 'query', async () => ({ rows: [] }) as never)
+    const endMock = mock.method(
+      Pool.prototype,
+      'end',
+      async () => undefined as never,
+    )
 
-      return engine
-        .connect()
-        .then(() => engine.close())
-        .then(() => expect(endStub.callCount).toBe(1))
-        .then(() => {
-          connectStub.restore()
-          endStub.restore()
-        })
-    })
+    await engine.connect()
+    await engine.close()
 
-    it('marks isConnected as false', () => {
-      const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
-      const endStub = sinon.stub(PGClient.prototype, 'end').resolves()
-
-      return engine
-        .connect()
-        .then(() => engine.close())
-        .then(() => {
-          expect(engine.isConnected()).toBe(false)
-          connectStub.restore()
-          endStub.restore()
-        })
-    })
+    assert.equal(endMock.mock.callCount(), 1)
+    assert.equal(engine.isConnected(), false)
   })
 
-  describe('drop', () => {
-    it('truncates all tables', () => {
-      const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
-      const queryStub = sinon.stub(PGClient.prototype, 'query').resolves()
+  it('drop truncates all tables', async () => {
+    const queryMock = mock.method(
+      Pool.prototype,
+      'query',
+      async () => ({ rows: [] }) as never,
+    )
 
-      return engine
-        .connect()
-        .then(() => engine.drop())
-        .then(() => {
-          expect(queryStub.callCount).toBe(3)
-          expect(queryStub.calledWith('TRUNCATE channel CASCADE'))
-          expect(queryStub.calledWith('TRUNCATE payment CASCADE'))
-          expect(queryStub.calledWith('TRUNCATE token CASCADE'))
-          connectStub.restore()
-          queryStub.restore()
-        })
-    })
+    await engine.drop()
 
-    it('lazily connects to the database', () => {
-      const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
-      const queryStub = sinon.stub(PGClient.prototype, 'query').resolves()
-
-      return engine.drop().then(() => {
-        expect(connectStub.callCount).toBe(1)
-        connectStub.restore()
-        queryStub.restore()
-      })
-    })
+    const calls = queryMock.mock.calls.map((call) => call.arguments[0])
+    assert.ok(calls.includes('TRUNCATE channel CASCADE'))
+    assert.ok(calls.includes('TRUNCATE payment CASCADE'))
+    assert.ok(calls.includes('TRUNCATE token CASCADE'))
   })
 
-  describe('exec', () => {
-    it('returns an instance of the client', () => {
-      const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
-
-      return engine
-        .connect()
-        .then(() =>
-          engine.exec((client: any) =>
-            expect(client instanceof PGClient).toBe(true),
-          ),
-        )
-        .then(() => connectStub.restore())
-    })
-
-    it('lazily connects to the database', () => {
-      const connectStub = sinon.stub(PGClient.prototype, 'connect').resolves()
-
-      return engine
-        .exec(() => 'beep')
-        .then(() => expect(connectStub.callCount).toBe(1))
-        .then(() => connectStub.restore())
-    })
+  it('exec exposes pool', async () => {
+    mock.method(Pool.prototype, 'query', async () => ({ rows: [] }) as never)
+    const result = await engine.exec((client) => typeof client.query)
+    assert.equal(result, 'function')
   })
 })

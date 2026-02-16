@@ -1,7 +1,7 @@
-import { buildModule } from "@nomicfoundation/hardhat-ignition/modules"
+import { buildModule } from '@nomicfoundation/hardhat-ignition/modules'
 
-const UnidirectionalModule = buildModule("UnidirectionalModule", (m) => {
-  const unidirectional = m.contract("Unidirectional")
+const UnidirectionalModule = buildModule('UnidirectionalModule', (m) => {
+  const unidirectional = m.contract('Unidirectional')
 
   return { unidirectional }
 })

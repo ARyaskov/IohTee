@@ -1,0 +1,99 @@
+import { Interface, TransactionReceipt, type InterfaceAbi } from 'ethers'
+import {
+  BaseContractEthers,
+  TxOptions,
+  CtorParamsEthers as CtorParams,
+  isCtorAccountParamPure,
+} from '@riaskov/iohtee-abi-wrapper'
+export { isCtorAccountParamPure, CtorParams, TxOptions }
+
+export interface <%= it.contractName %>Event {
+  eventName: string
+  args: unknown
+  log: unknown
+}
+
+<% it.events.forEach((event) => { %>
+export interface <%= event.name %> {
+<% if (event.inputs.length) { %>
+  args: {
+<% event.inputs.forEach((input, index) => { %>
+    <%= input.name || `arg${index}` %>: <%= it.helpers.renderType(input.type, input.components) %>
+<% }) %>
+  }
+<% } %>
+}
+
+<% }) %>
+export enum <%= it.contractName %>EventName {
+<% it.events.forEach((event, index) => { %>
+  <%= event.name %> = "<%= event.name %>"<%= index < it.events.length - 1 ? ',' : '' %>
+<% }) %>
+}
+
+const abi = JSON.parse(`<%= it.abi %>`) as InterfaceAbi
+
+export class <%= it.contractName %>Contract extends BaseContractEthers {
+/// GETTERS
+<% it.getters.forEach((method) => { %>
+  async <%= method.name %><%= method.namePostfix ?? '' %>(<%= it.helpers.renderMethodInput(method.inputs) %>): Promise<<%= it.helpers.renderMethodOutput(method) %>> {
+    return (await this.contract().getFunction("<%= method.name %>")(
+      <%= it.helpers.renderParams(method.inputs) %>
+    )) as <%= it.helpers.renderMethodOutput(method) %>
+  }
+
+<% }) %>
+/// SETTERS
+<% it.functions.forEach((method) => { %>
+  async <%= method.name %><%= method.namePostfix ?? '' %>(<%= it.helpers.renderMethodInput(method.inputs, true) %>options?: TxOptions): Promise<TransactionReceipt> {
+    const fn = this.contract().getFunction("<%= method.name %>")
+    const args = [<%= it.helpers.renderParams(method.inputs) %>] as const
+
+    const tx = await (options?.value !== undefined
+      ? fn(...args, { value: options.value })
+      : fn(...args))
+
+    return (await tx.wait(3)) as TransactionReceipt
+  }
+
+<% }) %>
+/// EVENTS
+<% it.events.forEach((event) => { %>
+  is<%= event.name %>Event(eventName: string): boolean {
+    return eventName === "<%= event.name %>"
+  }
+
+<% }) %>
+  static parseEvents(receipt: TransactionReceipt): <%= it.contractName %>Event[] {
+    const iface = new Interface(abi)
+    const result: <%= it.contractName %>Event[] = []
+
+    for (const log of receipt.logs) {
+      try {
+        const parsed = iface.parseLog(log)
+        if (!parsed) continue
+        result.push({
+          eventName: parsed.name,
+          args: parsed.args,
+          log,
+        })
+      } catch {
+        // Ignore unrelated logs.
+      }
+    }
+
+    return result
+  }
+
+  static hasEvent(receipt: TransactionReceipt, eventName: <%= it.contractName %>EventName): boolean {
+    return this.parseEvents(receipt).some((event) => event.eventName === eventName)
+  }
+
+  static extractEventFromReceipt<T>(receipt: TransactionReceipt, eventName: <%= it.contractName %>EventName): T {
+    return this.parseEvents(receipt).find((event) => event.eventName === eventName) as T
+  }
+
+  constructor(deployedContractAddress: `0x${string}`, params: CtorParams) {
+    super(deployedContractAddress, params, abi)
+  }
+}

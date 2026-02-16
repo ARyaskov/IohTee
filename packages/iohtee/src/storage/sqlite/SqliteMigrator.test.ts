@@ -1,51 +1,25 @@
-import * as sinon from 'sinon'
-import { assert } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
+import { mkdtempSync, rmSync } from 'node:fs'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
+import { EngineSqlite } from './EngineSqlite'
 import { SqliteMigrator } from './SqliteMigrator'
 
 describe('SqliteMigrator', () => {
-  let migrator = new SqliteMigrator('sqlite://./example')
+  it('applies schema and updates version', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'iohtee-sqlite-'))
+    const dbPath = join(dir, 'test.db')
 
-  describe('.isLatest', () => {
-    specify('pass db-migrate.check', async () => {
-      let trueStub = sinon
-        .stub(migrator.dbmigrate, 'check')
-        .returns(Promise.resolve(true))
-      assert.isTrue(await migrator.isLatest())
-      assert.isTrue(trueStub.called)
-      trueStub.restore()
+    try {
+      const engine = new EngineSqlite(`sqlite://${dbPath}`)
+      const migrator = new SqliteMigrator(engine)
 
-      let falseStub = sinon
-        .stub(migrator.dbmigrate, 'check')
-        .returns(Promise.resolve(false))
-      assert.isFalse(await migrator.isLatest())
-      assert.isTrue(falseStub.called)
-      falseStub.restore()
-    })
-  })
-
-  describe('.sync', () => {
-    specify('pass db-migrate.sync', async () => {
-      let destination = 'n'
-      let stub = sinon
-        .stub(migrator.dbmigrate, 'sync')
-        .returns(Promise.resolve())
-      await migrator.sync(destination)
-      assert.isTrue(stub.calledWith(destination))
-      stub.restore()
-    })
-
-    specify('pass latest migration to db-migrate.sync', async () => {
-      let destination = 'm'
-      let last = sinon
-        .stub(migrator, 'lastMigrationNumber')
-        .returns(Promise.resolve(destination))
-      let stub = sinon
-        .stub(migrator.dbmigrate, 'sync')
-        .returns(Promise.resolve())
+      assert.equal(await migrator.isLatest(), false)
       await migrator.sync()
-      assert.isTrue(stub.calledWith(destination))
-      stub.restore()
-      last.restore()
-    })
+      assert.equal(await migrator.isLatest(), true)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
   })
 })

@@ -1,94 +1,82 @@
 /**
- * To run the file, it requires two environment variables to be set.
- * `RPC_URL` is a JSON RPC endpoint. Alchemy works just fine. For Polygon Amoy test network,
- * you could set it to `RPC_URL=https://rpc-amoy.polygon.technology`. Another variable is `MNEMONIC`.
- * It is a [12-word seed phrase](https://github.com/pirapira/ethereum-word-list/blob/master/README.md#mnemonic-phrase).
- * For example, `MNEMONIC=tool school decrease elegant fix awful eyebrow immense noble erase dish labor`
+ * Example client that buys paywalled content from /content endpoint.
  *
- * Start this file then:
- *
- * yarn build
- * PROVIDER_URL="https://rpc-amoy.polygon.technology" MNEMONIC="tool school decrease elegant fix awful eyebrow immense noble erase dish labor" node client.js
- *
- * It will open a channel towards the server side, and send a single payment.
- *
- * The server side (the Hub) for selling the content is provided in `hub.ts` file.
+ * Required env:
+ * - RPC_URL
+ * - ACCOUNT_MNEMONIC
+ * - CHAIN_ID
+ * Optional env:
+ * - TARGET (default: http://127.0.0.1:3000/content)
  */
 
 import { IohTee } from '@riaskov/iohtee'
-import path from 'path'
-import { mnemonicToAccount } from 'viem/accounts'
+import { logStep, requiredEnv, runtimeConfig, sqliteUrl } from './common.js'
+
+function requiredHeader(headers: Headers, name: string): string {
+  const value = headers.get(name)
+  if (!value) {
+    throw new Error(`Missing required response header: ${name}`)
+  }
+  return value
+}
 
 async function main(): Promise<string> {
-  const MNEMONIC = String(process.env.ACCOUNT_MNEMONIC).trim()
-  const RPC_URL = String(process.env.RPC_URL).trim()
-  const CHAIN_ID = Number(process.env.CHAIN_ID)
-  const TARGET = 'https://play.iohtee.toivo.tech/hello'
+  const { chainId, mnemonic, rpcUrl } = runtimeConfig()
+  const target = process.env.TARGET?.trim() || 'http://127.0.0.1:3000/content'
 
-  const senderAccountHdPath = `m/44'/60'/0'/0/0`
-  const receiverAccountHdPath = `m/44'/60'/0'/0/1`
-
-  const senderAccount = mnemonicToAccount(MNEMONIC, {
-    path: senderAccountHdPath,
-  })
-
-  const receiverAccount = mnemonicToAccount(MNEMONIC, {
-    path: receiverAccountHdPath,
-  })
-
-  /**
-   * Account that send payments payments.
-   */
-  console.log('sender address', senderAccount.address)
-
-  /**
-   * Create iohtee instance that provides API for accepting payments.
-   */
+  const senderHdPath = "m/44'/60'/0'/0/0"
 
   const iohtee = new IohTee({
-    networkId: CHAIN_ID,
-    httpRpcUrl: RPC_URL,
-    mnemonic: MNEMONIC,
-    hdPath: senderAccountHdPath,
+    networkId: chainId,
+    httpRpcUrl: rpcUrl,
+    mnemonic,
+    hdPath: senderHdPath,
     options: {
-      databaseUrl: `sqlite://${path.resolve(__dirname, '../client.db')}`,
+      databaseUrl: sqliteUrl(import.meta.url, 'client.db'),
     },
   })
 
-  let response = await fetch(TARGET)
-  let headers = response.headers
+  const challengeResponse = await fetch(target)
+  if (challengeResponse.status !== 402) {
+    const body = await challengeResponse.text()
+    await iohtee.shutdown()
+    return body
+  }
 
-  /**
-   * Request token to content access
-   */
+  const gateway = requiredHeader(challengeResponse.headers, 'paywall-gateway')
+  const receiver = requiredHeader(
+    challengeResponse.headers,
+    'paywall-address',
+  ) as `0x${string}`
+  const price = BigInt(
+    requiredHeader(challengeResponse.headers, 'paywall-price'),
+  )
+
+  const meta = requiredEnv('PAYMENT_META')
   const result = await iohtee.buy({
-    price: BigInt(String(headers.get('paywall-price'))),
-    gateway: headers.get('paywall-gateway')!,
-    receiver: headers.get('paywall-address')! as `0x${string}`,
-    meta: 'metaidexample',
+    price,
+    gateway,
+    receiver,
+    meta,
   })
 
-  const token = result.token
+  logStep('Payment token created', result.token)
 
-  /**
-   * Request paid content
-   */
-  const content = await fetch(TARGET, {
+  const paidResponse = await fetch(target, {
     headers: {
-      authorization: `paywall ${token} ${'metaidexample'} ${String(
-        headers.get('paywall-price'),
-      )}`,
+      authorization: `paywall ${result.token} ${meta} ${price.toString()}`,
     },
   })
 
-  const body = content.body! as any
-  return body.read().toString()
+  const content = await paidResponse.text()
+  await iohtee.shutdown()
+  return content
 }
 
 main()
-  .then((content: string) => {
-    console.log('Bought content: ')
-    console.log(`"${content}"`)
+  .then((content) => {
+    logStep('Bought content')
+    console.log(content)
     process.exit(0)
   })
   .catch((error) => {

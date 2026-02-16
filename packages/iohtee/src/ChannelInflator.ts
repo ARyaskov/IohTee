@@ -1,16 +1,17 @@
 import { PaymentChannel, PaymentChannelJSON } from './PaymentChannel'
 import { Unidirectional, ChannelState } from '@riaskov/iohtee-contracts'
+import ChannelTokenContract from './ChannelTokenContract'
 
 export default class ChannelInflator {
   channelEthContract: Unidirectional
-  // channelTokenContract: ChannelTokenContract
+  channelTokenContract: ChannelTokenContract | null
 
   constructor(
     channelEthContract: Unidirectional,
-    // channelTokenContract: ChannelTokenContract,
+    channelTokenContract: ChannelTokenContract | null,
   ) {
     this.channelEthContract = channelEthContract
-    // this.channelTokenContract = channelTokenContract
+    this.channelTokenContract = channelTokenContract
   }
 
   static isTokenContractDefined(tokenContract: string | undefined): boolean {
@@ -53,10 +54,14 @@ export default class ChannelInflator {
 
   actualContract(
     tokenContract?: string,
-  ): Unidirectional /* TODO FIXME | ChannelTokenContract instead of undefined */ {
+  ): Unidirectional | ChannelTokenContract {
     if (ChannelInflator.isTokenContractDefined(tokenContract)) {
-      // return this.channelTokenContract
-      return this.channelEthContract
+      if (!this.channelTokenContract) {
+        throw new Error(
+          'TokenUnidirectional contract is not configured. Set options.tokenUnidirectionalAddress.',
+        )
+      }
+      return this.channelTokenContract
     } else {
       return this.channelEthContract
     }

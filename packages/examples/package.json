@@ -1,8 +1,12 @@
 {
   "private": true,
   "name": "@riaskov/iohtee-examples",
-  "version": "2.0.0",
-  "description": "Examples of IohTee  usage",
+  "version": "3.0.0",
+  "description": "Examples of IohTee usage",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "author": "Sergey Ukustov <sergey.ukustov@machinomy.com>",
   "contributors": [
     {
@@ -14,51 +18,40 @@
   "keywords": [
     "micropayments",
     "ethereum",
-    "express"
+    "iohtee"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/ARyaskov/iohtee.git"
   },
   "scripts": {
-    "build": "yarn format && tsc --project tsconfig.json",
-    "format": "npx prettier --write \"src/**/*.ts\"",
-    "test": "exit 0",
+    "build": "pnpm run format && pnpm run clean && tsc --project tsconfig.json",
+    "clean": "rimraf dist",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tsc --project tsconfig.json --noEmit",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "coverage": "exit 0",
-    "hub": "tsx src/server.ts",
-    "run:machinomy": "tsx src/machinomy.ts",
-    "sender": "yarn build && DEBUG=* node ./src/sender.js",
-    "receiver": "yarn build && DEBUG=* node ./src/receiver.js",
-    "senderTokens": "yarn build && DEBUG=* node ./src/senderTokens.js",
-    "receiverTokens": "yarn build && DEBUG=* node ./src/receiverTokens.js",
-    "clientTokens": "yarn build && DEBUG=* node ./src/clientTokens.js",
-    "serverTokens": "yarn build && DEBUG=* node ./src/serverTokens.js"
+    "hub": "tsx src/hub.ts",
+    "hub:tokens": "tsx src/hubTokens.ts",
+    "machinomy": "tsx src/machinomy.ts",
+    "sender": "tsx src/sender.ts",
+    "sender:tokens": "tsx src/senderTokens.ts",
+    "receiver": "tsx src/receiver.ts",
+    "receiver:tokens": "tsx src/receiverTokens.ts",
+    "client": "tsx src/client.ts",
+    "client:tokens": "tsx src/clientTokens.ts"
   },
   "dependencies": {
-    "@machinomy/types-bn": "^0.0.3",
-    "@riaskov/iohtee": "^2.0.1",
-    "@seald-io/nedb": "^4.0.4",
-    "@types/express-serve-static-core": "^4.19.3",
-    "@types/fs-extra": "^11.0.4",
-    "body-parser": "^1.20.2",
-    "commander": "^12.1.0",
-    "debug": "^4.3.5",
-    "decko": "^1.2.0",
-    "ethereumjs-util": "^7.1.5",
-    "express": "^4.19.2",
-    "fs-extra": "^11.2.0",
-    "prompt": "^1.3.0",
-    "request": "*",
-    "safe-buffer": "^5.2.1",
-    "types-rlp": "^0.0.1",
-    "uuid": "^10.0.0",
-    "viem": "*"
+    "@riaskov/iohtee": "workspace:*",
+    "dotenv": "^16.4.5",
+    "fastify": "^5.0.0",
+    "viem": "2.45.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/mocha": "^10.0.7",
-    "@types/node": "^20.14.9",
-    "tsx": "*",
-    "typescript": "*"
+    "@types/node": "^24.3.0",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.20.3",
+    "typescript": "6.0.0-beta"
   }
 }

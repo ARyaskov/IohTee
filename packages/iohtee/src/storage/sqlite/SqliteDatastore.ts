@@ -1,45 +1,34 @@
-import * as betterSQLite3 from 'better-sqlite3'
+import type { DatabaseSync, StatementSync } from 'node:sqlite'
 
 export default class SqliteDatastore {
-  database: betterSQLite3.Database
+  readonly database: DatabaseSync
 
-  constructor(database: betterSQLite3.Database) {
+  constructor(database: DatabaseSync) {
     this.database = database
   }
 
-  run(query: string, params?: any): void {
-    try {
-      this.database.prepare(query).run(params)
-    } catch (error) {
-      console.error('Error executing run:', error)
-      throw error
+  run(query: string, params?: Record<string, any>) {
+    const statement = this.database.prepare(query)
+    if (params) {
+      statement.run(params as any)
+      return
     }
+    statement.run()
   }
 
-  close(): void {
-    try {
-      this.database.close()
-    } catch (error) {
-      console.error('Error closing the database:', error)
-      throw error
-    }
+  close() {
+    this.database.close()
   }
 
-  get<A>(query: string, params?: any): A | null {
-    try {
-      return this.database.prepare(query).get(params) as A | null
-    } catch (error) {
-      console.error('Error executing get:', error)
-      throw error
-    }
+  get<A>(query: string, params?: Record<string, any>): A | null {
+    const statement: StatementSync = this.database.prepare(query)
+    const result = params ? statement.get(params as any) : statement.get()
+    return (result as A | undefined) ?? null
   }
 
-  all<A>(query: string, params?: any): Array<A> {
-    try {
-      return this.database.prepare(query).all(params) as Array<A>
-    } catch (error) {
-      console.error('Error executing all:', error)
-      throw error
-    }
+  all<A>(query: string, params?: Record<string, any>): Array<A> {
+    const statement: StatementSync = this.database.prepare(query)
+    const result = params ? statement.all(params as any) : statement.all()
+    return result as Array<A>
   }
 }

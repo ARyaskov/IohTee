@@ -10,15 +10,20 @@ import ChainManager from './ChainManager'
 import Client, { ClientImpl } from './client'
 import { Transport } from './transport'
 import { Unidirectional } from '@riaskov/iohtee-contracts'
-import { Wallet } from 'ethers'
+import { type LocalAccount } from 'viem/accounts'
+import ChannelTokenContract from './ChannelTokenContract'
 
 export default class Registry {
-  account: `0x${string}`
-  mnemonic: string
-  publicClient: PublicClient
-  walletClient: WalletClient
-  options: IohTeeOptions
+  readonly account: `0x${string}`
+  readonly mnemonic: string
+  readonly publicClient: PublicClient
+  readonly walletClient: WalletClient
+  readonly options: IohTeeOptions
+  readonly signerAccount: LocalAccount
+  readonly hdPath: `m/44'/60'/${string}`
+
   unidirectional: Unidirectional | null = null
+  tokenUnidirectional: ChannelTokenContract | null = null
   channelInflator: ChannelInflator | null = null
   _channelContract: ChannelContract | null = null
   _storage: Storage | null = null
@@ -26,8 +31,6 @@ export default class Registry {
   _paymentManager: PaymentManager | null = null
   _client: Client | null = null
   _channelManager: IChannelManager | null = null
-  ethersWallet: Wallet | null = null
-  hdPath: `m/44'/60'/${string}`
 
   constructor(
     account: `0x${string}`,
@@ -35,7 +38,7 @@ export default class Registry {
     walletClient: WalletClient,
     mnemonic: string,
     hdPath: `m/44'/60'/${string}`,
-    ethersWallet: Wallet,
+    signerAccount: LocalAccount,
     options: IohTeeOptions,
   ) {
     this.account = account
@@ -44,14 +47,17 @@ export default class Registry {
     this.options = options
     this.mnemonic = mnemonic
     this.hdPath = hdPath
-    this.ethersWallet = ethersWallet
+    this.signerAccount = signerAccount
   }
 
   async inflator(): Promise<ChannelInflator> {
     if (!this.channelInflator) {
       const channelEthContract = await this.channelEthContract()
-      // const channelTokenContract = await this.channelTokenContract()
-      this.channelInflator = new ChannelInflator(channelEthContract)
+      const tokenContract = this.channelTokenContractOrNull()
+      this.channelInflator = new ChannelInflator(
+        channelEthContract,
+        tokenContract,
+      )
     }
     return this.channelInflator
   }
@@ -59,22 +65,17 @@ export default class Registry {
   async channelEthContract(): Promise<Unidirectional> {
     if (!this.unidirectional) {
       this.unidirectional = new Unidirectional(null, {
-        publicClientViem: this.publicClient as any,
-        walletClientViem: this.walletClient as any,
+        publicClientViem: this.publicClient as never,
+        walletClientViem: this.walletClient as never,
       })
     }
     return this.unidirectional
   }
 
-  // @memoize
-  // async channelTokenContract (): Promise<ChannelTokenContract> {
-  //   return new ChannelTokenContract(this.web3, this.options.chainCachePeriod || 0)
-  // }
-
   async channelContract(): Promise<ChannelContract> {
     if (!this._channelContract) {
       const channelEthContract = await this.channelEthContract()
-      // const channelTokenContract = await this.channelTokenContract()
+      const channelTokenContract = this.channelTokenContractOrNull()
       const storage = await this.storage()
       const channelsDatabase = storage.channelsDatabase
       this._channelContract = new ChannelContract(
@@ -82,7 +83,7 @@ export default class Registry {
         this.walletClient,
         channelsDatabase,
         channelEthContract,
-        // channelTokenContract,
+        channelTokenContract,
       )
     }
 
@@ -99,15 +100,15 @@ export default class Registry {
 
   async chainManager(): Promise<ChainManager> {
     if (!this._chainManager) {
-      this._chainManager = new ChainManager(this.ethersWallet!)
+      this._chainManager = new ChainManager(this.signerAccount)
     }
     return this._chainManager
   }
 
   async paymentManager(): Promise<PaymentManager> {
     if (!this._paymentManager) {
-      let chainManager = await this.chainManager()
-      let channelContract = await this.channelContract()
+      const chainManager = await this.chainManager()
+      const channelContract = await this.channelContract()
       this._paymentManager = new PaymentManager(
         chainManager,
         channelContract,
@@ -119,10 +120,8 @@ export default class Registry {
 
   async client(): Promise<Client> {
     if (!this._client) {
-      let transport = this.options.transport
-        ? this.options.transport
-        : new Transport()
-      let channelManager = await this.channelManager()
+      const transport = this.options.transport ?? new Transport()
+      const channelManager = await this.channelManager()
       this._client = new ClientImpl(transport, channelManager)
     }
     return this._client
@@ -130,12 +129,12 @@ export default class Registry {
 
   async channelManager(): Promise<IChannelManager> {
     if (!this._channelManager) {
-      let storage = await this.storage()
-      let payments = storage.paymentsDatabase
-      let channels = storage.channelsDatabase
-      let tokens = storage.tokensDatabase
-      let channelContract = await this.channelContract()
-      let paymentManager = await this.paymentManager()
+      const storage = await this.storage()
+      const payments = storage.paymentsDatabase
+      const channels = storage.channelsDatabase
+      const tokens = storage.tokensDatabase
+      const channelContract = await this.channelContract()
+      const paymentManager = await this.paymentManager()
       this._channelManager = new ChannelManager(
         this.account,
         this.publicClient,
@@ -149,5 +148,38 @@ export default class Registry {
       )
     }
     return this._channelManager
+  }
+
+  private channelTokenContractOrNull(): ChannelTokenContract | null {
+    if (this.tokenUnidirectional) {
+      return this.tokenUnidirectional
+    }
+
+    const configuredAddress =
+      this.options.tokenUnidirectionalAddress ??
+      this.readTokenUnidirectionalAddressFromEnv()
+
+    if (!configuredAddress || configuredAddress === '0x') {
+      return null
+    }
+
+    this.tokenUnidirectional = new ChannelTokenContract(
+      this.publicClient,
+      this.walletClient,
+      configuredAddress,
+    )
+    return this.tokenUnidirectional
+  }
+
+  private readTokenUnidirectionalAddressFromEnv(): `0x${string}` | undefined {
+    if (
+      typeof process === 'undefined' ||
+      !process.env ||
+      typeof process.env.TOKEN_UNIDIRECTIONAL_ADDRESS !== 'string'
+    ) {
+      return undefined
+    }
+
+    return process.env.TOKEN_UNIDIRECTIONAL_ADDRESS as `0x${string}`
   }
 }

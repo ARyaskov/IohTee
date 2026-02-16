@@ -4,9 +4,9 @@ import IEngine from './IEngine'
 import IPaymentsDatabase from './IPaymentsDatabase'
 import ChannelId from '../ChannelId'
 
-export default abstract class AbstractPaymentsDatabase<T extends IEngine>
-  implements IPaymentsDatabase
-{
+export default abstract class AbstractPaymentsDatabase<
+  T extends IEngine,
+> implements IPaymentsDatabase {
   kind: string
 
   engine: T

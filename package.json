@@ -1,7 +1,7 @@
 {
   "name": "@riaskov/iohtee-monorepo",
   "private": true,
-  "version": "2.0.0",
+  "version": "3.0.0",
   "repository": "git@github.com:ARyaskov/IohTee.git",
   "author": "Sergey Ukustov and Machinomy Team <sergey.ukustov@machinomy.com>",
   "contributors": [
@@ -12,12 +12,13 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
-    "build": "yarn workspaces foreach -A -p -v -i run build",
-    "test": "wsrun test $PKG",
-    "coverage": "wsrun coverage $PKG"
+    "build": "pnpm -r --if-present run build",
+    "test": "pnpm -r --if-present run test",
+    "format": "pnpm -r --if-present run format",
+    "coverage": "pnpm -r --if-present run coverage"
   },
   "dependencies": {
-    "@riaskov/iohtee-contracts": "npm:^5.0.5",
+    "@riaskov/iohtee-contracts": "workspace:*",
     "dotenv": "^16.4.5",
     "humanize-plus": "^1.8.2",
     "request": "^2.88.2",
@@ -27,7 +28,7 @@
     "@types/chai": "^4.3.16",
     "@types/chai-as-promised": "^7.1.8",
     "@types/humanize-plus": "^1.8.2",
-    "@types/node": "^20.14.9",
+    "@types/node": "^22.13.4",
     "@types/request": "^2.48.12",
     "chai": "^5.1.1",
     "chai-as-promised": "^7.1.2",
@@ -45,14 +46,16 @@
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.5.1",
     "ts-node": "^7.0.x",
-    "typescript": "5.5.2",
+    "typescript": "6.0.0-beta",
     "vm-browserify": "^1.1.2",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4",
     "webpack-merge": "^5.10.0"
   },
-  "resolutions": {
-    "@riaskov/iohtee-contracts": "npm:*"
+  "pnpm": {
+    "overrides": {
+      "@riaskov/iohtee-contracts": "workspace:*"
+    }
   },
-  "packageManager": "yarn@4.4.0"
+  "packageManager": "pnpm@10.0.0"
 }

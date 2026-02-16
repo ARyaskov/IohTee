@@ -1,13 +1,8 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
-    "types": [
-      "@machinomy/types-truffle-deployer",
-      "@machinomy/types-truffle",
-      "@machinomy/types-ethereumjs-units",
-      "@types/node",
-      "@types/mocha"
-    ]
+    "types": ["node"],
+    "strict": true
   },
   "include": [
     "migrations/**/*"

@@ -1,48 +1,49 @@
-import * as util from 'ethereumjs-util'
+import { parseSignature, serializeSignature } from 'viem'
 
 export interface SignatureParts {
   v: number
-  r: string
-  s: string
+  r: `0x${string}`
+  s: `0x${string}`
 }
 
 export default class Signature {
-  rpcSig: string
+  readonly rpcSig: `0x${string}`
 
   constructor(rpcSig: string) {
-    this.rpcSig = rpcSig
+    this.rpcSig = rpcSig as `0x${string}`
   }
 
-  public static fromRpcSig(rpcSig: string) {
+  public static fromRpcSig(rpcSig: string): Signature {
     return new Signature(rpcSig)
   }
 
-  public static fromParts(parts: SignatureParts) {
-    const serialized = util.toRpcSig(
-      parts.v,
-      util.toBuffer(parts.r),
-      util.toBuffer(parts.s),
+  public static fromParts(parts: SignatureParts): Signature {
+    const v = BigInt(parts.v)
+    return new Signature(
+      serializeSignature({
+        r: parts.r,
+        s: parts.s,
+        v,
+      }),
     )
-    const sig = new Signature(serialized)
-    sig.rpcSig = sig.rpcSig.slice(0, -2) + parts.v.toString(16)
-    return sig
   }
 
   public toString(): `0x${string}` {
-    return this.rpcSig as `0x${string}`
+    return this.rpcSig
   }
 
   public toParts(): SignatureParts {
-    const parts = util.fromRpcSig(this.rpcSig)
+    const parts = parseSignature(this.rpcSig)
+    const v = Number(parts.v ?? BigInt(parts.yParity) + 27n)
 
     return {
-      v: parts.v,
-      r: `0x${parts.r.toString('hex')}`,
-      s: `0x${parts.s.toString('hex')}`,
+      v,
+      r: parts.r,
+      s: parts.s,
     }
   }
 
   public isEqual(other: Signature): boolean {
-    return this.toString() === other.toString()
+    return this.rpcSig.toLowerCase() === other.rpcSig.toLowerCase()
   }
 }

@@ -8,9 +8,7 @@ export class AcceptPaymentResponse {
   }
 }
 
-export class AcceptPaymentResponseSerde
-  implements Serde<AcceptPaymentResponse>
-{
+export class AcceptPaymentResponseSerde implements Serde<AcceptPaymentResponse> {
   static instance: AcceptPaymentResponseSerde = new AcceptPaymentResponseSerde()
 
   serialize(obj: AcceptPaymentResponse): object {

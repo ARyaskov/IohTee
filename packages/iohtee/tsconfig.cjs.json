@@ -1,8 +1,9 @@
 {
-  "extends": ["../../tsconfig.cjs.json", "./tsconfig.base"],
+  "extends": ["../../tsconfig.cjs.json", "./tsconfig.base.json"],
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "outDir": "lib/cjs",
-    "esModuleInterop": true
+    "ignoreDeprecations": "6.0"
   }
 }

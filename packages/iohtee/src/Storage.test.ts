@@ -1,10 +1,6 @@
 // import * as expect from 'expect'
 // import ChannelInflator from './ChannelInflator'
 // import Storage from './Storage'
-// import { EngineNedb } from './storage/nedb/EngineNedb'
-// import { NedbChannelsDatabase } from './storage/nedb/NedbChannelsDatabase'
-// import { NedbTokensDatabase } from './storage/nedb/NedbTokensDatabase'
-// import { NedbPaymentsDatabase } from './storage/nedb/NedbPaymentsDatabase'
 // import EnginePostgres from './storage/postgresql/EnginePostgres'
 // import PostgresChannelsDatabase from './storage/postgresql/PostgresChannelsDatabase'
 // import PostgresTokensDatabase from './storage/postgresql/PostgresTokensDatabase'
@@ -34,22 +30,6 @@
 //
 //   afterEach(() => {
 //     contractStub.restore()
-//   })
-//
-//   context('for Nedb', async () => {
-//     const url = 'nedb://'
-//
-//     specify('provide Nedb databases', async () => {
-//       const storage = await Storage.build(url, inflator)
-//       expect(storage.engine instanceof EngineNedb).toBeTruthy()
-//       expect(
-//         storage.channelsDatabase instanceof NedbChannelsDatabase,
-//       ).toBeTruthy()
-//       expect(storage.tokensDatabase instanceof NedbTokensDatabase).toBeTruthy()
-//       expect(
-//         storage.paymentsDatabase instanceof NedbPaymentsDatabase,
-//       ).toBeTruthy()
-//     })
 //   })
 //
 //   context('for Sqlite', async () => {

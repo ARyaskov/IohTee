@@ -1,6 +1,5 @@
 // import * as sinon from 'sinon'
 // import { BigNumber } from 'bignumber.js'
-// import ChannelEthContract from './ChannelEthContract'
 // import ChannelTokenContract from './ChannelTokenContract'
 // import { PaymentChannel } from './PaymentChannel'
 // import TokensDatabase from './storage/postgresql/PostgresTokensDatabase'
@@ -96,9 +95,7 @@
 //       closeOnInvalidPayment: true,
 //     } as MachinomyOptions
 //
-//     // const channelEthContract = new ChannelEthContract(web3)
 //     // const channelTokenContract = new ChannelTokenContract(web3)
-//     const channelEthContract = {} as ChannelEthContract
 //     const channelTokenContract = {} as ChannelTokenContract
 //     channelContract = new ChannelContract(
 //       web3,

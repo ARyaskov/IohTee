@@ -1,4 +1,4 @@
-import Logger from '@machinomy/logger'
+import Logger from './log'
 import ChannelInflator from './ChannelInflator'
 import IChannelsDatabase from './storage/IChannelsDatabase'
 import Payment from './payment'
@@ -9,14 +9,34 @@ import {
   ChannelState,
   Unidirectional,
 } from '@riaskov/iohtee-contracts'
+import ChannelTokenContract from './ChannelTokenContract'
 
 const LOG = new Logger('channel-contract')
+
+type ChannelContractLike = {
+  claim: (
+    channelId: `0x${string}`,
+    value: bigint,
+    signature: `0x${string}`,
+  ) => Promise<TransactionReceipt>
+  channelState: (channelId: `0x${string}`) => Promise<ChannelState>
+  getSettlementPeriod: (channelId: `0x${string}`) => Promise<bigint>
+  startSettling: (channelId: `0x${string}`) => Promise<TransactionReceipt>
+  settle: (channelId: `0x${string}`) => Promise<TransactionReceipt>
+  canClaim: (
+    channelId: `0x${string}`,
+    payment: bigint,
+    receiver: `0x${string}`,
+    signature: `0x${string}`,
+  ) => Promise<boolean>
+  channel: (channelId: `0x${string}`) => Promise<Channel>
+}
 
 export default class ChannelContract {
   publicClient: PublicClient
   walletClient: WalletClient
   channelEthContract: Unidirectional
-  // channelTokenContract: ChannelTokenContract
+  channelTokenContract: ChannelTokenContract | null
   channelsDao: IChannelsDatabase
 
   constructor(
@@ -24,12 +44,12 @@ export default class ChannelContract {
     walletClient: WalletClient,
     channelsDao: IChannelsDatabase,
     channelEthContract: Unidirectional,
-    // channelTokenContract: ChannelTokenContract,
+    channelTokenContract: ChannelTokenContract | null,
   ) {
     this.publicClient = publicClient
     this.walletClient = walletClient
     this.channelEthContract = channelEthContract
-    // this.channelTokenContract = channelTokenContract
+    this.channelTokenContract = channelTokenContract
     this.channelsDao = channelsDao
   }
 
@@ -45,14 +65,17 @@ export default class ChannelContract {
     }
 
     if (ChannelInflator.isTokenContractDefined(tokenContract)) {
-      // TODO FIXME return this.channelTokenContract.open(sender, receiver, value, settlementPeriod, tokenContract!, channelId)
-      return this.channelEthContract.openChannel(
+      if (!this.channelTokenContract) {
+        throw new Error(
+          'TokenUnidirectional contract is not configured. Set options.tokenUnidirectionalAddress.',
+        )
+      }
+      return this.channelTokenContract.openChannel(
         channelIdentifier,
         receiver,
         settlementPeriod,
-        {
-          value,
-        },
+        tokenContract as `0x${string}`,
+        value,
       )
     } else {
       return this.channelEthContract.openChannel(
@@ -82,10 +105,16 @@ export default class ChannelContract {
     tokenContract?: `0x${string}`,
   ): Promise<TransactionReceipt> {
     if (ChannelInflator.isTokenContractDefined(tokenContract)) {
-      // TODO FIXME return this.channelTokenContract.deposit(sender, channelId, value, tokenContract!)
-      return this.channelEthContract.deposit(channelId, {
+      if (!this.channelTokenContract) {
+        throw new Error(
+          'TokenUnidirectional contract is not configured. Set options.tokenUnidirectionalAddress.',
+        )
+      }
+      return this.channelTokenContract.deposit(
+        channelId,
         value,
-      })
+        tokenContract as `0x${string}`,
+      )
     } else {
       return this.channelEthContract.deposit(channelId, {
         value,
@@ -121,8 +150,16 @@ export default class ChannelContract {
     if (channel) {
       const tokenContract = channel.tokenContract
       if (ChannelInflator.isTokenContractDefined(tokenContract)) {
-        // TODO FIXME return this.channelTokenContract.paymentDigest(channelId, value, tokenContract)
-        return this.channelEthContract.paymentDigest(channelId, value)
+        if (!this.channelTokenContract) {
+          throw new Error(
+            'TokenUnidirectional contract is not configured. Set options.tokenUnidirectionalAddress.',
+          )
+        }
+        return this.channelTokenContract.paymentDigest(
+          channelId,
+          value,
+          tokenContract as `0x${string}`,
+        )
       } else {
         return this.channelEthContract.paymentDigest(channelId, value)
       }
@@ -137,8 +174,12 @@ export default class ChannelContract {
     const receiver: `0x${string}` = payment.receiver
     const signature: `0x${string}` = payment.signature
     if (ChannelInflator.isTokenContractDefined(payment.tokenContract)) {
-      // TODO FIXME return this.channelTokenContract.canClaim(channelId, value, receiver, signature)
-      return this.channelEthContract.canClaim(
+      if (!this.channelTokenContract) {
+        throw new Error(
+          'TokenUnidirectional contract is not configured. Set options.tokenUnidirectionalAddress.',
+        )
+      }
+      return this.channelTokenContract.canClaim(
         channelId,
         value,
         receiver,
@@ -161,11 +202,18 @@ export default class ChannelContract {
 
   async getContractByChannelId(
     channelId: `0x${string}`,
-  ): Promise<Unidirectional> {
+  ): Promise<ChannelContractLike> {
     const channel = await this.channelsDao.firstById(channelId)
     if (channel) {
-      // const tokenContract = channel.tokenContract
-      // TODO FIXME return ChannelInflator.isTokenContractDefined(tokenContract) ? this.channelTokenContract : this.channelEthContract
+      const tokenContract = channel.tokenContract
+      if (ChannelInflator.isTokenContractDefined(tokenContract)) {
+        if (!this.channelTokenContract) {
+          throw new Error(
+            'TokenUnidirectional contract is not configured. Set options.tokenUnidirectionalAddress.',
+          )
+        }
+        return this.channelTokenContract
+      }
       return this.channelEthContract
     } else {
       LOG.info(`getContractByChannelId(): Channel ${channelId} is undefined`)

@@ -1,9 +1,9 @@
 {
-  "extends": ["../../tsconfig.esm.json", "./tsconfig.base"],
+  "extends": ["../../tsconfig.esm.json", "./tsconfig.base.json"],
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "outDir": "lib/esm",
-    "esModuleInterop": true
+    "ignoreDeprecations": "6.0"
   }
 }

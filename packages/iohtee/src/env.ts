@@ -1,5 +1,10 @@
 export interface IEnv {
-  MACHINOMY_NETWORK?: string
+  IOHTEE_NETWORK?: string
+  IOHTEE_SENDER_ACCOUNT?: string
+  IOHTEE_SENDER_PASSWORD?: string
+  IOHTEE_RECEIVER_ACCOUNT?: string
+  IOHTEE_RECEIVER_PASSWORD?: string
+  IOHTEE_DATABASE_URL?: string
   CONTRACT_ADDRESS?: string
 }
 

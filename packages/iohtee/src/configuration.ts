@@ -1,5 +1,5 @@
 import { homedir } from 'node:os'
-import Logger from '@machinomy/logger'
+import Logger from './log'
 import { resolve, join } from 'node:path'
 import {
   createPublicClient,
@@ -8,17 +8,19 @@ import {
   PublicClient,
   WalletClient,
   Chain,
+  custom,
 } from 'viem'
 import * as env from './env'
 import { DefaultUnidirectionalAddress } from '@riaskov/iohtee-contracts'
 import { polygonAmoy } from 'viem/chains'
+import { readFileSync } from 'node:fs'
 
-const BASE_DIR = '.machinomy'
+const BASE_DIR = '.iohtee'
 const CONFIGURATION_FILE = 'config.json'
 const DATABASE_FILE = 'storage.db'
 export const VERSION = '2.0.0'
-export const PROTOCOL = 'machinomy/' + VERSION
-export const PAYWALL_PATH = 'api/paywall/' + PROTOCOL
+export const PROTOCOL = `iohtee/${VERSION}`
+export const PAYWALL_PATH = `api/paywall/${PROTOCOL}`
 
 const log = new Logger('configuration')
 
@@ -30,31 +32,29 @@ const CONTRACTS = {
 
 export const contractAddress = (): string => {
   const container = env.container()
-  const network = container.MACHINOMY_NETWORK || 'polygonAmoy'
+  const network = container.IOHTEE_NETWORK || 'polygonAmoy'
   const address = container.CONTRACT_ADDRESS
   if (address) {
     return address
-  } else {
-    return (CONTRACTS as any)[network]
   }
+  const fallback = (CONTRACTS as Record<string, string | undefined>)[network]
+  if (!fallback) {
+    throw new Error(`Unsupported network: ${network}`)
+  }
+  return fallback
 }
 
-export const baseDirPath = (): string => {
-  return resolve(join(homedir(), BASE_DIR))
-}
+export const baseDirPath = (): string => resolve(join(homedir(), BASE_DIR))
 
-export const configFilePath = (): string => {
-  return join(baseDirPath(), CONFIGURATION_FILE)
-}
+export const configFilePath = (): string =>
+  join(baseDirPath(), CONFIGURATION_FILE)
 
-const databaseFilePath = (): string => {
-  return 'nedb://' + join(baseDirPath(), DATABASE_FILE)
-}
+const databaseFilePath = (): string =>
+  `sqlite://${join(baseDirPath(), DATABASE_FILE)}`
 
 export interface IConfigurationOptions {
   account?: string
   password?: string
-  engine?: string
   databaseUrl?: string
 }
 
@@ -72,13 +72,9 @@ export class Configuration {
   }
 }
 
-/**
- * @returns {object}
- */
-export const configurationOptions = () => {
+export const configurationOptions = (): Record<string, unknown> => {
   try {
-    const fs = require('fs')
-    return JSON.parse(fs.readFileSync(configFilePath(), 'utf8'))
+    return JSON.parse(readFileSync(configFilePath(), 'utf8'))
   } catch (error) {
     log.error(error)
     return {}
@@ -87,28 +83,32 @@ export const configurationOptions = () => {
 
 export const sender = (): Configuration => {
   try {
-    const options = configurationOptions()
+    const options = configurationOptions() as {
+      sender?: { account?: string; password?: string; databaseUrl?: string }
+    }
+
     return new Configuration({
-      account: process.env.MACHINOMY_SENDER_ACCOUNT || options.sender.account,
-      password:
-        process.env.MACHINOMY_SENDER_PASSWORD || options.sender.password,
-      engine: process.env.MACHINOMY_DATABASE_URL || options.sender.databaseUrl,
+      account: process.env.IOHTEE_SENDER_ACCOUNT || options.sender?.account,
+      password: process.env.IOHTEE_SENDER_PASSWORD || options.sender?.password,
+      databaseUrl: process.env.IOHTEE_DATABASE_URL || options.sender?.databaseUrl,
     })
-  } catch (error) {
+  } catch {
     return new Configuration({})
   }
 }
 
 export const receiver = (): Configuration => {
   try {
-    const options = configurationOptions()
+    const options = configurationOptions() as {
+      receiver?: { account?: string; password?: string; databaseUrl?: string }
+    }
+
     return new Configuration({
-      account:
-        process.env.MACHINOMY_RECEIVER_ACCOUNT || options.receiver.account,
+      account: process.env.IOHTEE_RECEIVER_ACCOUNT || options.receiver?.account,
       password:
-        process.env.MACHINOMY_RECEIVER_PASSWORD || options.receiver.password,
-      engine:
-        process.env.MACHINOMY_DATABASE_URL || options.receiver.databaseUrl,
+        process.env.IOHTEE_RECEIVER_PASSWORD || options.receiver?.password,
+      databaseUrl:
+        process.env.IOHTEE_DATABASE_URL || options.receiver?.databaseUrl,
     })
   } catch (error) {
     log.error(error)
@@ -120,48 +120,42 @@ export function publicClient(): PublicClient {
   const defaultRpcUrl = process.env.RPC_URL || 'http://localhost:8545'
 
   if (typeof window !== 'undefined' && (window as any).ethereum) {
-    const publicClient = createPublicClient({
-      transport: (window as any).ethereum,
-    })
-    return publicClient as any
-  } else {
-    const publicClient = createPublicClient({
-      transport: http(defaultRpcUrl, {
-        batch: true,
-      }),
-    })
-    return publicClient as any
+    return createPublicClient({
+      transport: custom((window as any).ethereum),
+    }) as PublicClient
   }
+
+  return createPublicClient({
+    transport: http(defaultRpcUrl, {
+      batch: true,
+    }),
+  }) as PublicClient
 }
 
 export function walletClient(chain: Chain = polygonAmoy): WalletClient {
   const defaultRpcUrl = process.env.RPC_URL || 'http://localhost:8545'
 
   if (typeof window !== 'undefined' && (window as any).ethereum) {
-    const walletClient = createWalletClient({
-      chain: chain,
-      transport: (window as any).ethereum,
-    })
-    return walletClient as WalletClient
-  } else {
-    const walletClient = createWalletClient({
-      chain: chain,
-      transport: http(defaultRpcUrl, {
-        batch: true,
-      }),
-    })
-    return walletClient as WalletClient
+    return createWalletClient({
+      chain,
+      transport: custom((window as any).ethereum),
+    }) as WalletClient
   }
+
+  return createWalletClient({
+    chain,
+    transport: http(defaultRpcUrl, {
+      batch: true,
+    }),
+  }) as WalletClient
 }
 
 export function httpRpc(): string {
-  const result = process.env.RPC_URL || 'http://localhost:8545'
-
-  return result
+  return process.env.RPC_URL || 'http://localhost:8545'
 }
 
 export function mnemonic(): string {
-  return String(process.env.ACCOUNT_MNEMONIC!).trim()
+  return String(process.env.ACCOUNT_MNEMONIC ?? '').trim()
 }
 
 export function hdPath(): `m/44'/60'/${string}` {

@@ -3,23 +3,21 @@
 import 'dotenv/config'
 import '@nomicfoundation/hardhat-viem'
 import * as hre from 'hardhat'
-import { getAddress, isAddressEqual, PublicClient } from 'viem'
-import { assert } from 'chai'
-import { loadFixture } from '@nomicfoundation/hardhat-toolbox-viem/network-helpers'
-import { channelId, Unidirectional } from '../src/index'
-import { ethers } from 'ethers'
-
-const sigTestArtifact = require('../abi/SigTest.json').abi
+import { isAddressEqual, PublicClient } from 'viem'
+import { beforeEach, describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 
 describe('SigTest', async () => {
   let publicClient: PublicClient
-  let ethersSigner
+  let ownerWallet
   let deployedContract
+  let sigTestArtifact: any
 
   async function deploySigTestFixture() {
-    const [ownerWallet, otherWallet] = await hre.viem.getWalletClients()
-    deployedContract = await hre.viem.deployContract('SigTest')
-    publicClient = await hre.viem.getPublicClient()
+    const { viem } = await hre.network.connect()
+    const [ownerWallet, otherWallet] = await viem.getWalletClients()
+    deployedContract = await viem.deployContract('SigTest')
+    publicClient = await viem.getPublicClient()
 
     return {
       ownerWallet,
@@ -28,8 +26,10 @@ describe('SigTest', async () => {
   }
 
   beforeEach(async () => {
-    await loadFixture(deploySigTestFixture)
-    ethersSigner = (await hre.ethers.getSigners())[0]
+    const { networkHelpers } = await hre.network.connect()
+    const fixture = await networkHelpers.loadFixture(deploySigTestFixture)
+    ownerWallet = fixture.ownerWallet
+    sigTestArtifact = (await hre.artifacts.readArtifact('SigTest')).abi
   })
 
   it('should successfully restore address from signature', async () => {
@@ -43,9 +43,10 @@ describe('SigTest', async () => {
       args: [channelId, payment],
     })) as never as `0x${string}`
 
-    const signature = await ethersSigner.signMessage(
-      ethers.getBytes(paymentDigest),
-    )
+    const signature = await ownerWallet.signMessage({
+      account: ownerWallet.account,
+      message: { raw: paymentDigest },
+    })
 
     let result = (await publicClient.readContract({
       address: deployedContract!.address,
@@ -53,6 +54,6 @@ describe('SigTest', async () => {
       functionName: 'testSig',
       args: [channelId, payment, signature],
     })) as never as `0x${string}`
-    assert.isTrue(isAddressEqual(result, ethersSigner.address))
+    assert.equal(isAddressEqual(result, ownerWallet.account.address), true)
   })
 })

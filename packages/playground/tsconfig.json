@@ -1,10 +1,22 @@
 {
   "extends": "../../tsconfig.esm.json",
   "compilerOptions": {
-    "sourceRoot": "src/",
-    "outDir": "dist/",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "sourceRoot": "src",
+    "types": ["node"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true
   },
   "include": [
-    "./src/**/*"
+    "src/**/*"
   ]
 }

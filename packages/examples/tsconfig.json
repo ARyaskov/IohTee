@@ -1,11 +1,15 @@
 {
   "extends": "../../tsconfig.esm.json",
   "compilerOptions": {
-    "types": [
-      "@types/mocha"
-    ]
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "types": ["node"],
+    "noEmitOnError": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": true
   },
-  "include": [
-    "./src/**/*"
-  ]
+  "include": ["./src/**/*.ts"]
 }

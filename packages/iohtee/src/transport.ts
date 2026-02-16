@@ -1,6 +1,5 @@
-import { RequestResponse, RequiredUriUrl, CoreOptions } from 'request'
 import Payment from './payment'
-import Logger from '@machinomy/logger'
+import Logger from './log'
 import {
   AcceptPaymentRequest,
   AcceptPaymentRequestSerde,
@@ -26,99 +25,107 @@ import {
   PaymentRequiredResponseSerializer,
 } from './PaymentRequiredResponse'
 import { BadResponseError } from './Exceptions'
-let req = require('request')
-
-const request: (
-  opts: RequiredUriUrl & CoreOptions,
-) => Promise<RequestResponse> = (opts: RequiredUriUrl & CoreOptions) => {
-  return new Promise((resolve: Function, reject: Function) => {
-    req(opts, (err: Error, res: any) => {
-      if (err) {
-        reject(err)
-      }
-      resolve(res)
-    })
-  })
-}
 
 const LOG = new Logger('transport')
 
-// noinspection MagicNumberJS
-export const STATUS_CODES = {
-  PAYMENT_REQUIRED: 402,
-  OK: 200,
+export interface TransportResponse {
+  statusCode: number
+  headers: Record<string, string>
+  body: unknown
 }
 
-/**
- * Parse response headers and return the token.
- *
- * @param {object} response
- * @return {string}
- */
-const extractPaywallToken = (response: RequestResponse): string => {
-  let token = response.headers['paywall-token'] as string
-  if (token) {
-    LOG.info('Got token from the server')
-    return token
-  } else {
-    throw new Error('Can not find a token in the response')
+async function request(
+  input: URL | string,
+  init?: RequestInit,
+): Promise<TransportResponse> {
+  const response = await fetch(input, init)
+  const headers: Record<string, string> = {}
+  response.headers.forEach((value, key) => {
+    headers[key.toLowerCase()] = value
+  })
+
+  const contentType = response.headers.get('content-type') ?? ''
+  const body = contentType.includes('application/json')
+    ? await response.json()
+    : await response.text()
+
+  return {
+    statusCode: response.status,
+    headers,
+    body,
   }
 }
 
+export const STATUS_CODES = {
+  PAYMENT_REQUIRED: 402,
+  OK: 200,
+} as const
+
+const extractPaywallToken = (response: TransportResponse): string => {
+  const token = response.headers['paywall-token']
+  if (!token) {
+    throw new Error('Can not find a token in the response')
+  }
+  LOG.info('Got token from the server')
+  return token
+}
+
 export interface GetWithTokenCallbacks {
-  onWillLoad?: Function
-  onDidLoad?: Function
+  onWillLoad?: () => void
+  onDidLoad?: () => void
 }
 
 export interface RequestTokenOpts {
-  onWillSendPayment?: Function
-  onDidSendPayment?: Function
+  onWillSendPayment?: () => void
+  onDidSendPayment?: () => void
 }
 
 export class Transport {
   /**
-   * Request URI sending a paywall token.
-   * @return {Promise<object>}
+   * Requests a protected resource using a paywall token.
+   *
+   * @param uri Full URL of the protected resource.
+   * @param token Paywall token received from the gateway.
+   * @param opts Lifecycle callbacks invoked before/after loading.
+   * @returns HTTP-like response object with status, headers and body.
    */
-  getWithToken(
+  async getWithToken(
     uri: string,
     token: string,
     opts: GetWithTokenCallbacks = {},
-  ): Promise<RequestResponse> {
-    let headers = {
-      authorization: 'Paywall ' + token,
+  ): Promise<TransportResponse> {
+    const headers = {
+      authorization: `Paywall ${token}`,
     }
+
     LOG.info(`Getting ${uri} using access token ${token}`)
-    if (opts.onWillLoad) {
-      opts.onWillLoad()
-    }
-    return this.get(uri, headers).then((result) => {
-      if (opts.onDidLoad) {
-        opts.onDidLoad()
-      }
-      return result
-    })
+    opts.onWillLoad?.()
+    const result = await this.get(uri, headers)
+    opts.onDidLoad?.()
+    return result
   }
 
-  get(uri: string, headers?: object): Promise<RequestResponse> {
-    let options = {
-      method: 'GET',
-      uri: uri,
-      headers: headers,
+  get(
+    uri: string,
+    headers?: Record<string, string>,
+  ): Promise<TransportResponse> {
+    LOG.info(`Getting ${uri} using headers`, headers)
+    const init: RequestInit = { method: 'GET' }
+    if (headers) {
+      init.headers = headers
     }
-    LOG.info(`Getting ${uri} using headers and options`, headers, options)
-    return request(options)
+    return request(uri, init)
   }
 
   /**
-   * Request token from the server's gateway
-   * @param {string} uri - Full url to the gateway.
-   * @param {Payment} payment
-   * @param {{uri: string, headers: object, onWillPreflight: function, onDidPreflight: function, onWillOpenChannel: function, onDidOpenChannel: function, onWillSendPayment: function, onDidSendPayment: function, onWillLoad: function, onDidLoad: function}} opts
-   * @return {Promise<string>}
+   * Request token from the server's gateway.
+   *
+   * @param uri Full URL to the gateway endpoint.
+   * @param payment Serialized payment payload to exchange for a paywall token.
+   * @param opts Lifecycle callbacks invoked before/after sending payment.
+   * @returns Paywall token string from the `paywall-token` response header.
    */
-  // Partial<Payment> doesn't let error "TS2790: The operand of a 'delete' operator must be optional." occur
-  requestToken(
+  async requestToken(
     uri: string,
     payment: Partial<Payment>,
     opts: RequestTokenOpts = {},
@@ -126,78 +133,92 @@ export class Transport {
     if (!payment.tokenContract) {
       delete payment.tokenContract
     }
-    let options = {
-      method: 'POST',
-      uri: uri,
-      json: true,
-      body: payment,
-    }
+
     LOG.info('Getting request token in exchange for payment', payment)
-    if (opts.onWillSendPayment) {
-      opts.onWillSendPayment()
-    }
-    return request(options)
-      .then(extractPaywallToken)
-      .then((result) => {
-        if (opts.onDidSendPayment) {
-          opts.onDidSendPayment()
-        }
-        return result
-      })
+    opts.onWillSendPayment?.()
+
+    const res = await request(uri, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(payment),
+    })
+
+    const token = extractPaywallToken(res)
+    opts.onDidSendPayment?.()
+    return token
   }
 
+  /**
+   * Sends signed payment payload to merchant gateway.
+   *
+   * @param paymentRequest Request with serialized payment and optional purchase meta.
+   * @param gateway Full gateway URL.
+   * @returns Parsed acceptance response from gateway.
+   */
   async doPayment(
     paymentRequest: AcceptPaymentRequest,
     gateway: string,
   ): Promise<AcceptPaymentResponse> {
-    const options = {
+    const res = await request(gateway, {
       method: 'POST',
-      uri: gateway,
-      json: true,
       headers: {
-        'Content-Type': 'application/json',
+        'content-type': 'application/json',
       },
-      credentials: 'include',
-      body: AcceptPaymentRequestSerde.instance.serialize(paymentRequest),
-    }
-    const res = await request(options)
+      body: JSON.stringify(
+        AcceptPaymentRequestSerde.instance.serialize(paymentRequest),
+      ),
+    })
+
     return AcceptPaymentResponseSerde.instance.deserialize(res.body)
   }
 
+  /**
+   * Verifies a previously issued token at gateway.
+   *
+   * @param tokenRequest Request containing token.
+   * @param gateway Full gateway URL.
+   * @returns Token verification response.
+   */
   async doVerify(
     tokenRequest: AcceptTokenRequest,
     gateway: string,
   ): Promise<AcceptTokenResponse> {
-    const options = {
+    const res = await request(gateway, {
       method: 'POST',
-      uri: gateway,
-      json: true,
       headers: {
-        'Content-Type': 'application/json',
+        'content-type': 'application/json',
       },
-      credentials: 'include',
-      body: AcceptTokenRequestSerde.instance.serialize(tokenRequest),
-    }
-
-    const res = await request(options)
+      body: JSON.stringify(
+        AcceptTokenRequestSerde.instance.serialize(tokenRequest),
+      ),
+    })
 
     return AcceptTokenResponseSerde.instance.deserialize(res.body)
   }
 
+  /**
+   * Performs preflight request (`402` / `200`) and parses paywall headers.
+   *
+   * @param paymentRequiredRequest Preflight request descriptor.
+   * @param gateway Full gateway URL.
+   * @returns Parsed paywall requirements.
+   */
   async paymentRequired(
     paymentRequiredRequest: PaymentRequiredRequest,
     gateway: string,
   ): Promise<PaymentRequiredResponse> {
-    const options = {
-      method: 'GET',
-      uri: PaymentRequiredRequestSerializer.instance.serialize(
+    const res = await request(
+      PaymentRequiredRequestSerializer.instance.serialize(
         paymentRequiredRequest,
         gateway,
       ),
-      credentials: 'include',
-    }
+      {
+        method: 'GET',
+      },
+    )
 
-    const res = await request(options)
     switch (res.statusCode) {
       case STATUS_CODES.PAYMENT_REQUIRED:
       case STATUS_CODES.OK:
@@ -210,9 +231,4 @@ export class Transport {
   }
 }
 
-/**
- * Build Transport instance.
- */
-export const build = (): Transport => {
-  return new Transport()
-}
+export const build = (): Transport => new Transport()

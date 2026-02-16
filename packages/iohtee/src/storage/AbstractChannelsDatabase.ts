@@ -2,14 +2,14 @@ import { PaymentChannel, PaymentChannelJSON } from '../PaymentChannel'
 import { namespaced } from '../util/namespaced'
 import IEngine from './IEngine'
 import IChannelsDatabase from './IChannelsDatabase'
-import Logger from '@machinomy/logger'
+import Logger from '../log'
 import ChannelInflator from '../ChannelInflator'
 
 const LOG = new Logger('abstract-channels-database')
 
-export default abstract class AbstractChannelsDatabase<T extends IEngine>
-  implements IChannelsDatabase
-{
+export default abstract class AbstractChannelsDatabase<
+  T extends IEngine,
+> implements IChannelsDatabase {
   engine: T
 
   kind: string

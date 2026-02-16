@@ -1,80 +1,84 @@
-// import path from 'path'
-// import fs from 'fs-extra'
-// import BigNumber from 'bignumber.js'
-// import Web3 from 'web3'
-// import Machinomy from 'machinomy'
-// import HDWalletProvider from '@machinomy/hdwallet-provider'
-// import Logger from '@machinomy/logger'
-// import contracts from '@machinomy/contracts'
-//
-// const PROVIDER = process.env.PROVIDER || 'https://rinkeby.infura.io'
-// const MNEMONIC_SENDER =
-//   process.env.MNEMONIC_SENDER ||
-//   'peanut giggle name tree canoe tube render ketchup survey segment army will'
-// const MNEMONIC_RECEIVER =
-//   process.env.MNEMONIC_RECEIVER ||
-//   'dance mutual spike analyst together average reject pudding hazard move fence install'
-// const LOG = new Logger('machinomy-sender')
-//
-// async function run() {
-//   fs.removeSync(path.resolve('./sender-receiver'))
-//
-//   const provider1 = HDWalletProvider.mnemonic({
-//     mnemonic: MNEMONIC_SENDER!,
-//     rpc: PROVIDER,
-//   })
-//   const provider2 = HDWalletProvider.mnemonic({
-//     mnemonic: MNEMONIC_RECEIVER!,
-//     rpc: PROVIDER,
-//   })
-//   const senderAccount = (await provider1.getAddresses())[0]
-//   const receiverAccount = (await provider2.getAddresses())[0]
-//   const web3 = new Web3(provider1)
-//   const channelValue = new BigNumber(20)
-//   const paymentPrice = new BigNumber(5)
-//   const instanceTestToken: contracts.TestToken.Contract =
-//     await contracts.TestToken.contract(provider1).deployed()
-//   const tokenContract = instanceTestToken.address
-//
-//   LOG.info(`PROVIDER = ${PROVIDER}`)
-//   LOG.info(`MNEMONIC SENDER = ${MNEMONIC_SENDER}`)
-//   LOG.info(`MNEMONIC RECEIVER = ${MNEMONIC_RECEIVER}`)
-//   LOG.info(`Token contract = ${tokenContract}`)
-//
-//   const machinomy = new Machinomy(senderAccount, web3, {
-//     databaseUrl: 'nedb://sender-receiver/database.nedb',
-//   })
-//
-//   LOG.info(
-//     `Start opening Machinomy channel between sender ${senderAccount} and receiver ${receiverAccount} with value ${channelValue} tokens`,
-//   )
-//   LOG.info(
-//     `For remote Ethereum nodes (e.g. Rinkeby or Ropsten) it can taking a 30-60 seconds.`,
-//   )
-//
-//   await machinomy.open(receiverAccount, channelValue, undefined, tokenContract)
-//
-//   LOG.info(`Channel was opened.`)
-//   LOG.info(
-//     `Trace the last transaction via https://rinkeby.etherscan.io/address/${senderAccount}`,
-//   )
-//
-//   const payment = await machinomy.payment({
-//     receiver: receiverAccount,
-//     price: paymentPrice,
-//     tokenContract: tokenContract,
-//   })
-//
-//   LOG.info('Payment: ')
-//   LOG.info(payment.payment)
-//
-//   fs.writeFileSync('payment.json', JSON.stringify(payment.payment))
-//
-//   LOG.info('Sender done.')
-//
-//   process.exit(0)
-// }
-//
-// run().catch((err) => {
-//   console.error(err)
-// })
+/**
+ * Token sender demo: opens a token channel and creates off-chain token payment.
+ *
+ * Required env:
+ * - RPC_URL
+ * - ACCOUNT_MNEMONIC
+ * - CHAIN_ID
+ * - TOKEN_CONTRACT
+ * - TOKEN_UNIDIRECTIONAL_ADDRESS
+ */
+
+import { writeFileSync } from 'node:fs'
+import { IohTee } from '@riaskov/iohtee'
+import { mnemonicToAccount } from 'viem/accounts'
+import {
+  logStep,
+  removeIfExists,
+  requiredAddressEnv,
+  resolveDataFile,
+  runtimeConfig,
+  sqliteUrl,
+} from './common.js'
+
+async function run(): Promise<void> {
+  const { chainId, mnemonic, rpcUrl } = runtimeConfig()
+  const tokenContract = requiredAddressEnv('TOKEN_CONTRACT')
+  const tokenUnidirectionalAddress = requiredAddressEnv(
+    'TOKEN_UNIDIRECTIONAL_ADDRESS',
+  )
+
+  const dbPath = resolveDataFile(import.meta.url, 'sender-receiver-tokens.db')
+  const paymentPath = resolveDataFile(import.meta.url, 'payment-tokens.json')
+  removeIfExists(dbPath)
+
+  const minimumChannelAmount = 10_000n
+  const channelValue = 1_000_000n
+  const paymentPrice = 200_000n
+
+  const senderHdPath = "m/44'/60'/0'/0/1"
+  const receiverHdPath = "m/44'/60'/0'/0/0"
+
+  const senderAccount = mnemonicToAccount(mnemonic, { path: senderHdPath })
+  const receiverAccount = mnemonicToAccount(mnemonic, { path: receiverHdPath })
+
+  const iohtee = new IohTee({
+    networkId: chainId,
+    httpRpcUrl: rpcUrl,
+    mnemonic,
+    hdPath: senderHdPath,
+    options: {
+      databaseUrl: sqliteUrl(import.meta.url, 'sender-receiver-tokens.db'),
+      minimumChannelAmount,
+      tokenUnidirectionalAddress,
+    },
+  })
+
+  logStep('Sender', senderAccount.address)
+  logStep('Receiver', receiverAccount.address)
+  logStep('Token contract', tokenContract)
+  logStep('Opening token channel')
+
+  await iohtee.open(
+    receiverAccount.address,
+    channelValue,
+    undefined,
+    tokenContract,
+  )
+
+  const payment = await iohtee.payment({
+    receiver: receiverAccount.address,
+    price: paymentPrice,
+    tokenContract,
+  })
+
+  writeFileSync(paymentPath, JSON.stringify(payment.payment, null, 2), 'utf8')
+  logStep('Token payment written', paymentPath)
+
+  await iohtee.shutdown()
+}
+
+run().catch((error) => {
+  console.error(error)
+  process.exit(1)
+})

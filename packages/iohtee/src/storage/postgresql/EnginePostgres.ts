@@ -1,11 +1,11 @@
 import IEngine from '../IEngine'
-import * as pg from 'pg'
+import { Pool } from 'pg'
 import IExec from '../IExec'
 
-export default class EnginePostgres implements IEngine, IExec<pg.Client> {
+export default class EnginePostgres implements IEngine, IExec<Pool> {
   private readonly url?: string
-  private connectionInProgress?: Promise<pg.Client>
-  private _client?: pg.Client
+  private pool?: Pool
+  private connectionInProgress?: Promise<Pool>
 
   constructor(url?: string) {
     this.url = url
@@ -16,48 +16,45 @@ export default class EnginePostgres implements IEngine, IExec<pg.Client> {
   }
 
   isConnected(): boolean {
-    return Boolean(this._client)
+    return Boolean(this.pool)
   }
 
   async close(): Promise<void> {
-    if (!this._client) {
-      return Promise.resolve()
-    }
-
-    await this._client.end()
-    this._client = undefined
+    if (!this.pool) return
+    await this.pool.end()
+    this.pool = undefined
+    this.connectionInProgress = undefined
   }
 
   async drop(): Promise<void> {
-    await this.exec((client) => {
-      return Promise.all([
+    await this.exec((client) =>
+      Promise.all([
         client.query('TRUNCATE channel CASCADE'),
         client.query('TRUNCATE payment CASCADE'),
         client.query('TRUNCATE token CASCADE'),
-      ])
-    })
+      ]).then(() => undefined),
+    )
   }
 
-  async exec<B>(fn: (client: pg.Client) => B): Promise<B> {
-    let client = await this.ensureConnection()
+  async exec<B>(fn: (client: Pool) => B): Promise<B> {
+    const client = await this.ensureConnection()
     return fn(client)
   }
 
-  async ensureConnection(): Promise<pg.Client> {
-    if (this._client) {
-      return this._client
+  async ensureConnection(): Promise<Pool> {
+    if (this.pool) {
+      return this.pool
     }
 
     if (this.connectionInProgress) {
       return this.connectionInProgress
     }
 
-    const connectionString = { connectionString: this.url }
-    const client = new pg.Client(connectionString)
+    const pool = new Pool({ connectionString: this.url })
 
-    this.connectionInProgress = client.connect().then(() => {
-      this._client = client
-      return client
+    this.connectionInProgress = pool.query('SELECT 1').then(() => {
+      this.pool = pool
+      return pool
     })
 
     return this.connectionInProgress

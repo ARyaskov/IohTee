@@ -1,13 +1,12 @@
 import {
-  AbiEvent,
   TransactionReceipt,
   parseEventLogs,
   ParseEventLogsReturnType,
 } from 'viem'
 import {
-  BaseContract,
+  BaseContractViem,
   TxOptions,
-  CtorParams,
+  CtorParamsViem as CtorParams,
   isCtorAccountParamPure,
 } from '@riaskov/iohtee-abi-wrapper'
 export { isCtorAccountParamPure, CtorParams, TxOptions }
@@ -35,6 +34,7 @@ export interface DidClaim {
 export interface DidDeposit {
   args: {
     channelId: `0x${string}`
+
     deposit: bigint
   }
 }
@@ -42,8 +42,11 @@ export interface DidDeposit {
 export interface DidOpen {
   args: {
     channelId: `0x${string}`
+
     sender: `0x${string}`
+
     receiver: `0x${string}`
+
     value: bigint
   }
 }
@@ -63,25 +66,32 @@ export interface DidStartSettling {
 export interface debug1 {
   args: {
     addr1: `0x${string}`
+
     addr2: `0x${string}`
   }
 }
 
 export enum UnidirectionalEventName {
   DidClaim = 'DidClaim',
+
   DidDeposit = 'DidDeposit',
+
   DidOpen = 'DidOpen',
+
   DidSettle = 'DidSettle',
+
   DidStartSettling = 'DidStartSettling',
+
   debug1 = 'debug1',
 }
 
 const abi = JSON.parse(
-  `"[{\"inputs\":[],\"name\":\"ECDSAInvalidSignature\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"}],\"name\":\"ECDSAInvalidSignatureLength\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"ECDSAInvalidSignatureS\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"DidClaim\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"deposit\",\"type\":\"uint256\"}],\"name\":\"DidDeposit\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"DidOpen\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"DidSettle\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"DidStartSettling\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr1\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr2\",\"type\":\"address\"}],\"name\":\"debug1\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"payment\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"origin\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"canClaim\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"origin\",\"type\":\"address\"}],\"name\":\"canDeposit\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"canSettle\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"origin\",\"type\":\"address\"}],\"name\":\"canStartSettling\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"channels\",\"outputs\":[{\"internalType\":\"address payable\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"address payable\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"settlingPeriod\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"settlingUntil\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"payment\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"claim\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"deposit\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"isAbsent\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"isOpen\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"isPresent\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"isSettling\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"settlingPeriod\",\"type\":\"uint256\"}],\"name\":\"open\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"payment\",\"type\":\"uint256\"}],\"name\":\"paymentDigest\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"settle\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"channelId\",\"type\":\"bytes32\"}],\"name\":\"startSettling\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"`,
+  `[{"inputs":[],"name":"ECDSAInvalidSignature","type":"error"},{"inputs":[{"internalType":"uint256","name":"length","type":"uint256"}],"name":"ECDSAInvalidSignatureLength","type":"error"},{"inputs":[{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"ECDSAInvalidSignatureS","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"DidClaim","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"},{"indexed":false,"internalType":"uint256","name":"deposit","type":"uint256"}],"name":"DidDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":true,"internalType":"address","name":"receiver","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"DidOpen","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"DidSettle","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"DidStartSettling","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"addr1","type":"address"},{"indexed":true,"internalType":"address","name":"addr2","type":"address"}],"name":"debug1","type":"event"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"payment","type":"uint256"},{"internalType":"address","name":"origin","type":"address"},{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"canClaim","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"address","name":"origin","type":"address"}],"name":"canDeposit","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"canSettle","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"address","name":"origin","type":"address"}],"name":"canStartSettling","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"channels","outputs":[{"internalType":"address payable","name":"sender","type":"address"},{"internalType":"address payable","name":"receiver","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"settlingPeriod","type":"uint256"},{"internalType":"uint256","name":"settlingUntil","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"payment","type":"uint256"},{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"claim","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"deposit","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isAbsent","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isOpen","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isPresent","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isSettling","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"address","name":"receiver","type":"address"},{"internalType":"uint256","name":"settlingPeriod","type":"uint256"}],"name":"open","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"payment","type":"uint256"}],"name":"paymentDigest","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"settle","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"startSettling","outputs":[],"stateMutability":"nonpayable","type":"function"}]`,
 )
 
-export class UnidirectionalContract extends BaseContract {
+export class UnidirectionalContract extends BaseContractViem {
   /// GETTERS
+
   async canClaim(
     channelId: `0x${string}`,
     payment: bigint,
@@ -189,6 +199,7 @@ export class UnidirectionalContract extends BaseContract {
   }
 
   /// SETTERS
+
   async claim(
     channelId: `0x${string}`,
     payment: bigint,
@@ -304,36 +315,36 @@ export class UnidirectionalContract extends BaseContract {
   }
 
   /// EVENTS
-  isDidClaimEvent(something: AbiEvent): boolean {
-    return something.name === 'DidClaim'
+
+  isDidClaimEvent(eventName: string): boolean {
+    return eventName === 'DidClaim'
   }
 
-  isDidDepositEvent(something: AbiEvent): boolean {
-    return something.name === 'DidDeposit'
+  isDidDepositEvent(eventName: string): boolean {
+    return eventName === 'DidDeposit'
   }
 
-  isDidOpenEvent(something: AbiEvent): boolean {
-    return something.name === 'DidOpen'
+  isDidOpenEvent(eventName: string): boolean {
+    return eventName === 'DidOpen'
   }
 
-  isDidSettleEvent(something: AbiEvent): boolean {
-    return something.name === 'DidSettle'
+  isDidSettleEvent(eventName: string): boolean {
+    return eventName === 'DidSettle'
   }
 
-  isDidStartSettlingEvent(something: AbiEvent): boolean {
-    return something.name === 'DidStartSettling'
+  isDidStartSettlingEvent(eventName: string): boolean {
+    return eventName === 'DidStartSettling'
   }
 
-  isdebug1Event(something: AbiEvent): boolean {
-    return something.name === 'debug1'
+  isdebug1Event(eventName: string): boolean {
+    return eventName === 'debug1'
   }
 
   static parseLogs(receipt: TransactionReceipt): ParseEventLogsReturnType {
-    const logs = parseEventLogs({
+    return parseEventLogs({
       abi: abi as any,
       logs: receipt.logs,
-    })
-    return logs as any
+    }) as any
   }
 
   static hasEvent(
@@ -355,21 +366,19 @@ export class UnidirectionalContract extends BaseContract {
   }
 
   static parseEvents(receipt: TransactionReceipt): UnidirectionalEvent[] {
-    return parseEventLogs({ abi: abi, logs: receipt.logs }).map((log: any) => {
-      return {
-        eventName: log.eventName,
-        args: log.args,
-        address: log.address,
-        blockHash: log.blockHash,
-        blockNumber: log.blockNumber,
-        data: log.data,
-        logIndex: log.logIndex,
-        removed: log.removed,
-        topics: log.topics,
-        transactionHash: log.transactionHash,
-        transactionIndex: log.transactionIndex,
-      }
-    })
+    return parseEventLogs({ abi: abi, logs: receipt.logs }).map((log: any) => ({
+      eventName: log.eventName,
+      args: log.args,
+      address: log.address,
+      blockHash: log.blockHash,
+      blockNumber: log.blockNumber,
+      data: log.data,
+      logIndex: log.logIndex,
+      removed: log.removed,
+      topics: log.topics,
+      transactionHash: log.transactionHash,
+      transactionIndex: log.transactionIndex,
+    }))
   }
 
   constructor(deployedContractAddress: `0x${string}`, params: CtorParams) {
