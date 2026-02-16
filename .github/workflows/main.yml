@@ -1,72 +1,62 @@
-name: Machinomy CI
+name: IohTee CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     env:
       NODE_ENV: test
-      YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
+          cache: pnpm
 
-      - name: Setup CMake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.29.0'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v4
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install Yarn v4
-        run: npm install -g yarn@berry
-
-      - name: Configure Yarn v4
-        run: yarn set version berry
-
-      - name: Add Yarn to PATH
-        run: echo "$HOME/.yarn/bin" >> $GITHUB_PATH
-
-      - name: Install global dependencies
+      - name: ABI Wrapper lint/build/test
         run: |
-          npm install node-gyp --global --no-save
-          npm install codecov --global --no-save
-          npm install hardhat --global --no-save
+          pnpm --filter @riaskov/iohtee-abi-wrapper run lint
+          pnpm --filter @riaskov/iohtee-abi-wrapper run build
+          pnpm --filter @riaskov/iohtee-abi-wrapper run test
 
-      - name: AbiWrapper:Build project
-        run: cd packages/abi-wrapper && yarn && yarn build
+      - name: Contracts lint/build
+        run: |
+          pnpm --filter @riaskov/iohtee-contracts run lint
+          pnpm --filter @riaskov/iohtee-contracts run build
 
-#      - name: IohTeeContracts:Build project
-#        run: cd packages/contracts && yarn && yarn build
+      - name: IohTee lint/build/test
+        run: |
+          pnpm --filter @riaskov/iohtee run lint
+          pnpm --filter @riaskov/iohtee run build
+          pnpm --filter @riaskov/iohtee run test
 
-      - name: IohTeeExamples:Build project
-        run: cd packages/examples && yarn && yarn build
+      - name: Examples lint/build/test
+        run: |
+          pnpm --filter @riaskov/iohtee-examples run lint
+          pnpm --filter @riaskov/iohtee-examples run build
+          pnpm --filter @riaskov/iohtee-examples run test
 
-      - name: IohTee:Build project
-        run: cd packages/iohtee && yarn && yarn build
-
-      - name: IohTeePlayground:Build project
-        run: cd packages/playground && yarn && yarn build
+      - name: Playground lint/build/test
+        run: |
+          pnpm --filter @riaskov/iohtee-playground run lint
+          pnpm --filter @riaskov/iohtee-playground run build
+          pnpm --filter @riaskov/iohtee-playground run test
