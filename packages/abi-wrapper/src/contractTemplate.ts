@@ -46,6 +46,36 @@ function normalizeMethods(abiMethods: AbiFunction[]): MethodAbi[] {
   })
 }
 
+type ArtifactLike = {
+  abi: Abi
+  [key: string]: unknown
+}
+
+function parseArtifactOrRawAbi(
+  abiFilePath: string,
+  fileContent: string,
+): ArtifactLike {
+  const parsed = JSON.parse(fileContent) as unknown
+
+  if (Array.isArray(parsed)) {
+    return { abi: parsed as Abi }
+  }
+
+  if (parsed && typeof parsed === 'object') {
+    const artifact = parsed as { abi?: unknown; [key: string]: unknown }
+    if (Array.isArray(artifact.abi)) {
+      return {
+        ...artifact,
+        abi: artifact.abi as Abi,
+      }
+    }
+  }
+
+  throw new Error(
+    `No ABI found in ${abiFilePath}. Expected either a raw ABI array or an artifact object with "abi".`,
+  )
+}
+
 export default class ContractTemplate {
   private readonly eta: Eta
   private readonly outputDir: string
@@ -66,15 +96,11 @@ export default class ContractTemplate {
   }
 
   async render(abiFilePath: string, minified?: boolean): Promise<void> {
-    const artifact = JSON.parse(readFileSync(abiFilePath, 'utf8')) as {
-      abi?: Abi
-      [key: string]: unknown
-    }
-
+    const artifact = parseArtifactOrRawAbi(
+      abiFilePath,
+      readFileSync(abiFilePath, 'utf8'),
+    )
     const abi = artifact.abi
-    if (!abi) {
-      throw new Error(`No ABI found in ${abiFilePath}.`)
-    }
 
     const sourceAbi = JSON.stringify(abi)
     const methods = normalizeMethods(abi.filter(isAbiFunction))
