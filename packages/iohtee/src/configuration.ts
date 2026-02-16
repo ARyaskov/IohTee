@@ -90,7 +90,8 @@ export const sender = (): Configuration => {
     return new Configuration({
       account: process.env.IOHTEE_SENDER_ACCOUNT || options.sender?.account,
       password: process.env.IOHTEE_SENDER_PASSWORD || options.sender?.password,
-      databaseUrl: process.env.IOHTEE_DATABASE_URL || options.sender?.databaseUrl,
+      databaseUrl:
+        process.env.IOHTEE_DATABASE_URL || options.sender?.databaseUrl,
     })
   } catch {
     return new Configuration({})
