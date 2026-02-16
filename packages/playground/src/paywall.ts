@@ -52,10 +52,7 @@ function paywallHeaders(
   }
 }
 
-async function verifyTokenWithGateway(
-  config: PlaygroundConfig,
-  token: string,
-): Promise<boolean> {
+async function verifyTokenWithGateway(config: PlaygroundConfig, token: string) {
   const response = await fetch(
     `${config.gatewayUrl}${PAYMENTS_PREFIX}/verify/${token}`,
     {
@@ -111,7 +108,7 @@ export async function forwardAcceptPayment(
   reply: FastifyReply,
   config: PlaygroundConfig,
   store: SqliteTokenStore,
-): Promise<void> {
+) {
   const response = await fetch(
     `${config.gatewayUrl}${PAYMENTS_PREFIX}/accept`,
     {

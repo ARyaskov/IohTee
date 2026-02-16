@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance } from 'fastify'
+import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { PlaygroundConfig } from './config.js'
 import { createPaywalledRouteHandler, forwardAcceptPayment } from './paywall.js'
 import { SqliteTokenStore } from './sqliteStore.js'
@@ -22,9 +22,13 @@ export async function createServer(
 
   app.get(
     '/hello',
-    createPaywalledRouteHandler(config, store, async (_request, reply) => {
-      return reply.status(200).send('Thank you for the payment!')
-    }),
+    createPaywalledRouteHandler(
+      config,
+      store,
+      async (_request: FastifyRequest, reply: FastifyReply) => {
+        return reply.status(200).send('Thank you for the payment!')
+      },
+    ),
   )
 
   app.addHook('onClose', async () => {
