@@ -16,7 +16,7 @@ type CliArgs = {
 async function main(): Promise<void> {
   const args = (await yargs(hideBin(process.argv))
     .scriptName('iohtee-abi-wrapper')
-    .usage('$0 [options] <glob-pattern>')
+    .usage('$0 [options] <input>')
     .option('output', {
       describe: 'Folder for generated files',
       alias: 'o',
@@ -46,12 +46,12 @@ async function main(): Promise<void> {
     .parse()) as CliArgs
 
   if (!args._.length) {
-    throw new Error('No ABI glob-pattern provided.')
+    throw new Error('No ABI input path provided.')
   }
 
-  const pattern = String(args._[0])
+  const inputs = args._.map((value) => String(value))
   const abiWrapper = new AbiWrapper(
-    pattern,
+    inputs,
     args.output,
     args.minify,
     args.docs,

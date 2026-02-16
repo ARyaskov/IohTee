@@ -13,7 +13,7 @@ export { isCtorAccountParamPure, CtorParams, TxOptions }
 
 export interface <%= it.contractName %>Event {
   eventName: string
-  args: any
+  args: unknown
   address: `0x${string}`
   blockHash: `0x${string}`
   blockNumber: bigint
@@ -25,25 +25,29 @@ export interface <%= it.contractName %>Event {
   transactionIndex: number
 }
 
-<% it.events.forEach((event) => { %>
+<% it.events.forEach((event, eventIndex) => { -%>
 export interface <%= event.name %> {
-<% if (event.inputs.length) { %>
+<% if (event.inputs.length) { -%>
   args: {
-<% event.inputs.forEach((input, index) => { %>
+<% event.inputs.forEach((input, index) => { -%>
     <%= input.name || `arg${index}` %>: <%= it.helpers.renderType(input.type, input.components) %>
-<% }) %>
+<% }) -%>
   }
-<% } %>
+<% } -%>
 }
+<% if (eventIndex < it.events.length - 1) { -%>
 
-<% }) %>
+<% } -%>
+<% }) -%>
 export enum <%= it.contractName %>EventName {
-<% it.events.forEach((event, index) => { %>
-  <%= event.name %> = "<%= event.name %>"<%= index < it.events.length - 1 ? ',' : '' %>
-<% }) %>
+<% it.events.forEach((event, index) => { -%>
+  <%= event.name %> = '<%= event.name %>'<%= index < it.events.length - 1 ? ',' : '' %>
+<% }) -%>
 }
 
-const abi = JSON.parse(`<%= it.abi %>`)
+const abi = JSON.parse(
+  `<%= it.abi %>`,
+)
 
 export class <%= it.contractName %>Contract extends BaseContractViem {
 /// GETTERS
@@ -52,7 +56,7 @@ export class <%= it.contractName %>Contract extends BaseContractViem {
     return (await this.publicClient().readContract({
       address: this.address(),
       abi: this.abi(),
-      functionName: "<%= method.name %>",
+      functionName: '<%= method.name %>',
       args: [<%= it.helpers.renderParams(method.inputs) %>],
     })) as never as <%= it.helpers.renderMethodOutput(method) %>
   }
@@ -60,12 +64,12 @@ export class <%= it.contractName %>Contract extends BaseContractViem {
 <% }) %>
 /// SETTERS
 <% it.functions.forEach((method) => { %>
-  async <%= method.name %><%= method.namePostfix ?? '' %>(<%= it.helpers.renderMethodInput(method.inputs, true) %>options?: TxOptions): Promise<TransactionReceipt>{
+  async <%= method.name %><%= method.namePostfix ?? '' %>(<%= it.helpers.renderMethodInput(method.inputs, true) %>options?: TxOptions): Promise<TransactionReceipt> {
     const { request } = await this.publicClient().simulateContract({
       chain: this.walletClient().chain,
       address: this.address(),
       abi: this.abi(),
-      functionName: "<%= method.name %>",
+      functionName: '<%= method.name %>',
       args: [<%= it.helpers.renderParams(method.inputs) %>],
       account: this.walletClient().account,
       value: options?.value,
@@ -83,7 +87,7 @@ export class <%= it.contractName %>Contract extends BaseContractViem {
 /// EVENTS
 <% it.events.forEach((event) => { %>
   is<%= event.name %>Event(eventName: string): boolean {
-    return eventName === "<%= event.name %>"
+    return eventName === '<%= event.name %>'
   }
 
 <% }) %>
@@ -91,19 +95,19 @@ export class <%= it.contractName %>Contract extends BaseContractViem {
     return parseEventLogs({
       abi: abi as any,
       logs: receipt.logs,
-    }) as any
+    }) as ParseEventLogsReturnType
   }
 
   static hasEvent(receipt: TransactionReceipt, eventName: <%= it.contractName %>EventName): boolean {
-    return parseEventLogs({ abi: abi, logs: receipt.logs }).some((log: any) => log.eventName === eventName)
+    return this.parseLogs(receipt).some((log: any) => log.eventName === eventName)
   }
 
   static extractEventFromReceipt<T>(receipt: TransactionReceipt, eventName: <%= it.contractName %>EventName): T {
-    return parseEventLogs({ abi: abi, logs: receipt.logs }).find((log: any) => log.eventName === eventName) as T
+    return this.parseLogs(receipt).find((log: any) => log.eventName === eventName) as T
   }
 
   static parseEvents(receipt: TransactionReceipt): <%= it.contractName %>Event[] {
-    return parseEventLogs({ abi: abi, logs: receipt.logs }).map((log: any) => ({
+    return this.parseLogs(receipt).map((log: any) => ({
       eventName: log.eventName,
       args: log.args,
       address: log.address,

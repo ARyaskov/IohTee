@@ -1,6 +1,5 @@
-import { existsSync, mkdirSync, rmSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'node:fs'
 import path from 'node:path'
-import { globSync } from 'glob'
 import { Application, TSConfigReader, TypeDocReader } from 'typedoc'
 import ContractTemplate from './contractTemplate.js'
 import { WrapperBackend } from './context.js'
@@ -25,22 +24,54 @@ export function findNearestTsConfig(startPath: string): string | null {
   }
 }
 
+function listJsonFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true })
+    .filter(
+      (entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'),
+    )
+    .map((entry) => path.join(directory, entry.name))
+    .sort((left, right) => left.localeCompare(right))
+}
+
+function resolveInputFileNames(inputPath: string): string[] {
+  const resolvedPath = path.resolve(inputPath)
+
+  if (existsSync(resolvedPath)) {
+    const stat = statSync(resolvedPath)
+    if (stat.isFile()) {
+      return [resolvedPath]
+    }
+    if (stat.isDirectory()) {
+      return listJsonFiles(resolvedPath)
+    }
+  }
+
+  if (inputPath.endsWith('/*') || inputPath.endsWith('\\*')) {
+    const directoryPath = path.resolve(inputPath.slice(0, -2))
+    if (existsSync(directoryPath) && statSync(directoryPath).isDirectory()) {
+      return listJsonFiles(directoryPath)
+    }
+  }
+
+  return []
+}
+
 export class AbiWrapper {
   private readonly templatesDir: string
   private readonly outputDir: string
-  private readonly pattern: string
+  private readonly inputs: string[]
   private readonly minify: boolean
   private readonly docsDir: string | undefined
   private readonly backend: WrapperBackend
 
   constructor(
-    pattern: string,
+    inputs: string | string[],
     outputDir: string,
     minify = false,
     docsDir?: string,
     backend: WrapperBackend = 'viem',
   ) {
-    this.pattern = pattern
+    this.inputs = Array.isArray(inputs) ? inputs : [inputs]
     this.templatesDir = path.join(__dirname, '../templates')
     this.outputDir = outputDir
     this.minify = minify
@@ -88,9 +119,11 @@ export class AbiWrapper {
       mkdirSync(this.outputDir, { recursive: true })
     }
 
-    const fileNames = globSync(this.pattern)
+    const fileNames = [...new Set(this.inputs.flatMap(resolveInputFileNames))]
     if (!fileNames.length) {
-      throw new Error(`No contract artifact found at ${this.pattern}`)
+      throw new Error(
+        `No contract artifact found at ${this.inputs.join(', ')}. Supported inputs: a .json file, a directory, or directory/*`,
+      )
     }
 
     if (this.docsDir) {

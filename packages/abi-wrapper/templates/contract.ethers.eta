@@ -13,40 +13,48 @@ export interface <%= it.contractName %>Event {
   log: unknown
 }
 
-<% it.events.forEach((event) => { %>
+<% it.events.forEach((event, eventIndex) => { -%>
 export interface <%= event.name %> {
-<% if (event.inputs.length) { %>
+<% if (event.inputs.length) { -%>
   args: {
-<% event.inputs.forEach((input, index) => { %>
+<% event.inputs.forEach((input, index) => { -%>
     <%= input.name || `arg${index}` %>: <%= it.helpers.renderType(input.type, input.components) %>
-<% }) %>
+<% }) -%>
   }
-<% } %>
+<% } -%>
 }
+<% if (eventIndex < it.events.length - 1) { -%>
 
-<% }) %>
+<% } -%>
+<% }) -%>
 export enum <%= it.contractName %>EventName {
-<% it.events.forEach((event, index) => { %>
-  <%= event.name %> = "<%= event.name %>"<%= index < it.events.length - 1 ? ',' : '' %>
-<% }) %>
+<% it.events.forEach((event, index) => { -%>
+  <%= event.name %> = '<%= event.name %>'<%= index < it.events.length - 1 ? ',' : '' %>
+<% }) -%>
 }
 
-const abi = JSON.parse(`<%= it.abi %>`) as InterfaceAbi
+const abi = JSON.parse(
+  `<%= it.abi %>`,
+) as InterfaceAbi
 
 export class <%= it.contractName %>Contract extends BaseContractEthers {
 /// GETTERS
 <% it.getters.forEach((method) => { %>
   async <%= method.name %><%= method.namePostfix ?? '' %>(<%= it.helpers.renderMethodInput(method.inputs) %>): Promise<<%= it.helpers.renderMethodOutput(method) %>> {
-    return (await this.contract().getFunction("<%= method.name %>")(
+<% if (method.inputs.length) { %>
+    return (await this.contract().getFunction('<%= method.name %>')(
       <%= it.helpers.renderParams(method.inputs) %>
     )) as <%= it.helpers.renderMethodOutput(method) %>
+<% } else { %>
+    return (await this.contract().getFunction('<%= method.name %>')()) as <%= it.helpers.renderMethodOutput(method) %>
+<% } %>
   }
 
 <% }) %>
 /// SETTERS
 <% it.functions.forEach((method) => { %>
   async <%= method.name %><%= method.namePostfix ?? '' %>(<%= it.helpers.renderMethodInput(method.inputs, true) %>options?: TxOptions): Promise<TransactionReceipt> {
-    const fn = this.contract().getFunction("<%= method.name %>")
+    const fn = this.contract().getFunction('<%= method.name %>')
     const args = [<%= it.helpers.renderParams(method.inputs) %>] as const
 
     const tx = await (options?.value !== undefined
@@ -60,7 +68,7 @@ export class <%= it.contractName %>Contract extends BaseContractEthers {
 /// EVENTS
 <% it.events.forEach((event) => { %>
   is<%= event.name %>Event(eventName: string): boolean {
-    return eventName === "<%= event.name %>"
+    return eventName === '<%= event.name %>'
   }
 
 <% }) %>

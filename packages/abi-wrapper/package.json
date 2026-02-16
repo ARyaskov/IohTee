@@ -1,6 +1,6 @@
 {
   "name": "@riaskov/iohtee-abi-wrapper",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Generate TypeScript wrapper class for Solidity smart contract ABI",
   "license": "Apache-2.0",
   "author": "Machinomy Team <hello@machinomy.com>",
@@ -54,7 +54,7 @@
     "esbuild": "^0.25.9",
     "eta": "^3.5.0",
     "ethers": "^6.15.0",
-    "glob": "^11.0.3",
+    "prettier": "^3.6.2",
     "typedoc": "^0.28.14",
     "viem": "^2.45.0",
     "yargs": "^17.7.2"
@@ -63,7 +63,6 @@
     "@types/node": "^22.13.4",
     "@types/yargs": "^17.0.33",
     "docsify-cli": "^4.4.4",
-    "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "tsx": "^4.20.3",
     "typedoc-plugin-markdown": "^4.9.0",

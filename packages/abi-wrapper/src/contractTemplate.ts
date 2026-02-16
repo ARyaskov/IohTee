@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { Abi, AbiEvent, AbiFunction, AbiParameter, AbiItem } from 'viem'
 import { build } from 'esbuild'
 import { Eta } from 'eta'
+import { format as formatWithPrettier } from 'prettier'
 import Context, { MethodAbi, WrapperBackend } from './context.js'
 import { createTemplateHelpers } from './helpers.js'
 
@@ -140,7 +141,15 @@ export default class ContractTemplate {
       throw new Error(`Unable to render template: ${templateName}`)
     }
 
-    writeFileSync(filePath, code, 'utf8')
+    const formattedCode = await formatWithPrettier(code, {
+      parser: 'typescript',
+      singleQuote: true,
+      semi: false,
+      trailingComma: 'all',
+      printWidth: 80,
+    })
+
+    writeFileSync(filePath, formattedCode, 'utf8')
 
     if (!minified) return
 

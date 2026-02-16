@@ -24,7 +24,7 @@ pnpm add -g @riaskov/iohtee-abi-wrapper
 ## CLI usage
 
 ```bash
-iohtee-abi-wrapper [options] <glob-pattern>
+iohtee-abi-wrapper [options] <input...>
 ```
 
 Examples:
@@ -32,6 +32,13 @@ Examples:
 ```bash
 # Generate wrappers with default backend (viem)
 iohtee-abi-wrapper -o ./generated ./abi/*
+
+# Generate wrappers from directory
+iohtee-abi-wrapper -o ./generated ./abi
+iohtee-abi-wrapper -o ./generated ./abi/
+
+# Generate wrappers from multiple explicit files
+iohtee-abi-wrapper -o ./generated ./abi/A.json ./abi/B.json
 
 # Explicit viem backend
 iohtee-abi-wrapper -o ./generated -b viem ./abi/*
