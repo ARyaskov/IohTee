@@ -17,3 +17,5 @@ export {
   ChannelState,
   DefaultUnidirectionalAddress,
 }
+
+export * from './abi-wrapper'

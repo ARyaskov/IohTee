@@ -4,11 +4,11 @@ import {
   DidOpen,
   isCtorAccountParamPure,
   TxOptions,
-  UnidirectionalContract,
-  UnidirectionalEventName,
-} from './abi-wrapper/UnidirectionalContract'
+  UnidirectionalUpgradeableContract,
+  UnidirectionalUpgradeableEventName,
+} from './abi-wrapper/UnidirectionalUpgradeableContract'
 
-export class Unidirectional extends UnidirectionalContract {
+export class Unidirectional extends UnidirectionalUpgradeableContract {
   constructor(
     deployedContractAddress: `0x${string}` | null,
     params: CtorParams,
@@ -83,15 +83,18 @@ export class Unidirectional extends UnidirectionalContract {
     )
 
     if (
-      !UnidirectionalContract.hasEvent(receipt, UnidirectionalEventName.DidOpen)
+      !UnidirectionalUpgradeableContract.hasEvent(
+        receipt,
+        UnidirectionalUpgradeableEventName.DidOpen,
+      )
     ) {
       throw new Error(`Unidirectional#open(): cannot open channel`)
     }
 
     const didOpenEvent =
-      UnidirectionalContract.extractEventFromReceipt<DidOpen>(
+      UnidirectionalUpgradeableContract.extractEventFromReceipt<DidOpen>(
         receipt,
-        UnidirectionalEventName.DidOpen,
+        UnidirectionalUpgradeableEventName.DidOpen,
       )
 
     if (!didOpenEvent) {

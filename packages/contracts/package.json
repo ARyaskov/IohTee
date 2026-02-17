@@ -1,6 +1,6 @@
 {
   "name": "@riaskov/iohtee-contracts",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "IohTee contracts managed by Hardhat",
   "license": "Apache-2.0",
   "homepage": "https://github.com/ARyaskov/IohTee/blob/main/packages/contracts/.github/README.md",
@@ -39,11 +39,12 @@
   "scripts": {
     "clean": "rimraf lib",
     "compile": "hardhat compile --quiet",
-    "build": "pnpm run format && pnpm run clean && pnpm run compile && pnpm run build:esm && pnpm run build:cjs && pnpm run copy-abi:uni && pnpm run build:types && pnpm run tree-shaking:lib",
+    "build": "pnpm run format && pnpm run clean && pnpm run compile && pnpm run generate:abi-wrapper && pnpm run build:esm && pnpm run build:cjs && pnpm run copy-abi:uni && pnpm run build:types && pnpm run tree-shaking:lib",
     "build:types": "tsc --project tsconfig.types.json",
     "test": "pnpm run compile && hardhat test",
     "lint": "tsc --project tsconfig.json --noEmit",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"ignition/**/*.ts\" \"hardhat.config.ts\"",
+    "generate:abi-wrapper": "pnpm exec iohtee-abi-wrapper -o ./src/abi-wrapper -b viem ./artifacts/contracts/SigTest.sol/SigTest.json ./artifacts/contracts/Unidirectional.sol/Unidirectional.json ./artifacts/contracts/TokenUnidirectional.sol/TokenUnidirectional.json ./artifacts/contracts/UnidirectionalUpgradeable.sol/UnidirectionalUpgradeable.json ./artifacts/contracts/TokenUnidirectionalUpgradeable.sol/TokenUnidirectionalUpgradeable.json ./artifacts/contracts/UUPSProxy.sol/UUPSProxy.json",
     "coverage": "cross-env SOLIDITY_COVERAGE=true hardhat coverage",
     "copy-abi:uni": "cpx \"artifacts/contracts/Unidirectional.sol/Unidirectional.json\" lib/esm/abi/ && cpx \"artifacts/contracts/Unidirectional.sol/Unidirectional.json\" lib/cjs/abi/ && cpx \"artifacts/contracts/Unidirectional.sol/Unidirectional.json\" abi/",
     "build:esm": "rimraf lib/esm && tsc --project tsconfig.esm.json",

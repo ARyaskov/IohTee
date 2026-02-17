@@ -13,7 +13,7 @@ import {
 } from '@riaskov/iohtee-abi-wrapper'
 export { isCtorAccountParamPure, CtorParams, TxOptions }
 
-export interface UnidirectionalEvent {
+export interface TokenUnidirectionalEvent {
   eventName: string
   args: unknown
   address: `0x${string}`
@@ -46,6 +46,7 @@ export interface DidOpen {
     sender: `0x${string}`
     receiver: `0x${string}`
     value: bigint
+    tokenContract: `0x${string}`
   }
 }
 
@@ -60,27 +61,19 @@ export interface DidStartSettling {
     channelId: `0x${string}`
   }
 }
-
-export interface debug1 {
-  args: {
-    addr1: `0x${string}`
-    addr2: `0x${string}`
-  }
-}
-export enum UnidirectionalEventName {
+export enum TokenUnidirectionalEventName {
   DidClaim = 'DidClaim',
   DidDeposit = 'DidDeposit',
   DidOpen = 'DidOpen',
   DidSettle = 'DidSettle',
   DidStartSettling = 'DidStartSettling',
-  debug1 = 'debug1',
 }
 
 const abi = JSON.parse(
-  `[{"inputs":[],"name":"ECDSAInvalidSignature","type":"error"},{"inputs":[{"internalType":"uint256","name":"length","type":"uint256"}],"name":"ECDSAInvalidSignatureLength","type":"error"},{"inputs":[{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"ECDSAInvalidSignatureS","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"DidClaim","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"},{"indexed":false,"internalType":"uint256","name":"deposit","type":"uint256"}],"name":"DidDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":true,"internalType":"address","name":"receiver","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"DidOpen","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"DidSettle","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"DidStartSettling","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"addr1","type":"address"},{"indexed":true,"internalType":"address","name":"addr2","type":"address"}],"name":"debug1","type":"event"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"payment","type":"uint256"},{"internalType":"address","name":"origin","type":"address"},{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"canClaim","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"address","name":"origin","type":"address"}],"name":"canDeposit","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"canSettle","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"address","name":"origin","type":"address"}],"name":"canStartSettling","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"channels","outputs":[{"internalType":"address payable","name":"sender","type":"address"},{"internalType":"address payable","name":"receiver","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"settlingPeriod","type":"uint256"},{"internalType":"uint256","name":"settlingUntil","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"payment","type":"uint256"},{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"claim","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"deposit","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isAbsent","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isOpen","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isPresent","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isSettling","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"address","name":"receiver","type":"address"},{"internalType":"uint256","name":"settlingPeriod","type":"uint256"}],"name":"open","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"payment","type":"uint256"}],"name":"paymentDigest","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"settle","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"startSettling","outputs":[],"stateMutability":"nonpayable","type":"function"}]`,
+  `[{"inputs":[],"name":"ECDSAInvalidSignature","type":"error"},{"inputs":[{"internalType":"uint256","name":"length","type":"uint256"}],"name":"ECDSAInvalidSignatureLength","type":"error"},{"inputs":[{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"ECDSAInvalidSignatureS","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"DidClaim","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"},{"indexed":false,"internalType":"uint256","name":"deposit","type":"uint256"}],"name":"DidDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":true,"internalType":"address","name":"receiver","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"},{"indexed":false,"internalType":"address","name":"tokenContract","type":"address"}],"name":"DidOpen","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"DidSettle","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"DidStartSettling","type":"event"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"payment","type":"uint256"},{"internalType":"address","name":"origin","type":"address"},{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"canClaim","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"address","name":"origin","type":"address"}],"name":"canDeposit","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"canSettle","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"address","name":"origin","type":"address"}],"name":"canStartSettling","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"channels","outputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"receiver","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"settlingPeriod","type":"uint256"},{"internalType":"uint256","name":"settlingUntil","type":"uint256"},{"internalType":"address","name":"tokenContract","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"payment","type":"uint256"},{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"claim","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isAbsent","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isOpen","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isPresent","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"isSettling","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"address","name":"receiver","type":"address"},{"internalType":"uint256","name":"settlingPeriod","type":"uint256"},{"internalType":"address","name":"tokenContract","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"open","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"},{"internalType":"uint256","name":"payment","type":"uint256"},{"internalType":"address","name":"tokenContract","type":"address"}],"name":"paymentDigest","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"settle","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"channelId","type":"bytes32"}],"name":"startSettling","outputs":[],"stateMutability":"nonpayable","type":"function"}]`,
 )
 
-export class UnidirectionalContract extends BaseContractViem {
+export class TokenUnidirectionalContract extends BaseContractViem {
   /// GETTERS
 
   async canClaim(
@@ -132,13 +125,22 @@ export class UnidirectionalContract extends BaseContractViem {
 
   async channels(
     param0: `0x${string}`,
-  ): Promise<[`0x${string}`, `0x${string}`, bigint, bigint, bigint]> {
+  ): Promise<
+    [`0x${string}`, `0x${string}`, bigint, bigint, bigint, `0x${string}`]
+  > {
     return (await this.publicClient().readContract({
       address: this.address(),
       abi: this.abi(),
       functionName: 'channels',
       args: [param0],
-    })) as never as [`0x${string}`, `0x${string}`, bigint, bigint, bigint]
+    })) as never as [
+      `0x${string}`,
+      `0x${string}`,
+      bigint,
+      bigint,
+      bigint,
+      `0x${string}`,
+    ]
   }
 
   async isAbsent(channelId: `0x${string}`): Promise<boolean> {
@@ -180,12 +182,13 @@ export class UnidirectionalContract extends BaseContractViem {
   async paymentDigest(
     channelId: `0x${string}`,
     payment: bigint,
+    tokenContract: `0x${string}`,
   ): Promise<`0x${string}`> {
     return (await this.publicClient().readContract({
       address: this.address(),
       abi: this.abi(),
       functionName: 'paymentDigest',
-      args: [channelId, payment],
+      args: [channelId, payment, tokenContract],
     })) as never as `0x${string}`
   }
 
@@ -217,6 +220,7 @@ export class UnidirectionalContract extends BaseContractViem {
 
   async deposit(
     channelId: `0x${string}`,
+    value: bigint,
     options?: TxOptions,
   ): Promise<TransactionReceipt> {
     const { request } = await this.publicClient().simulateContract({
@@ -224,7 +228,7 @@ export class UnidirectionalContract extends BaseContractViem {
       address: this.address(),
       abi: this.abi(),
       functionName: 'deposit',
-      args: [channelId],
+      args: [channelId, value],
       account: this.walletClient().account,
       value: options?.value,
     })
@@ -241,6 +245,8 @@ export class UnidirectionalContract extends BaseContractViem {
     channelId: `0x${string}`,
     receiver: `0x${string}`,
     settlingPeriod: bigint,
+    tokenContract: `0x${string}`,
+    value: bigint,
     options?: TxOptions,
   ): Promise<TransactionReceipt> {
     const { request } = await this.publicClient().simulateContract({
@@ -248,7 +254,7 @@ export class UnidirectionalContract extends BaseContractViem {
       address: this.address(),
       abi: this.abi(),
       functionName: 'open',
-      args: [channelId, receiver, settlingPeriod],
+      args: [channelId, receiver, settlingPeriod, tokenContract, value],
       account: this.walletClient().account,
       value: options?.value,
     })
@@ -327,10 +333,6 @@ export class UnidirectionalContract extends BaseContractViem {
     return eventName === 'DidStartSettling'
   }
 
-  isdebug1Event(eventName: string): boolean {
-    return eventName === 'debug1'
-  }
-
   static parseLogs(receipt: TransactionReceipt): ParseEventLogsReturnType {
     return parseEventLogs({
       abi: abi as any,
@@ -340,7 +342,7 @@ export class UnidirectionalContract extends BaseContractViem {
 
   static hasEvent(
     receipt: TransactionReceipt,
-    eventName: UnidirectionalEventName,
+    eventName: TokenUnidirectionalEventName,
   ): boolean {
     return this.parseLogs(receipt).some(
       (log: any) => log.eventName === eventName,
@@ -349,14 +351,14 @@ export class UnidirectionalContract extends BaseContractViem {
 
   static extractEventFromReceipt<T>(
     receipt: TransactionReceipt,
-    eventName: UnidirectionalEventName,
+    eventName: TokenUnidirectionalEventName,
   ): T {
     return this.parseLogs(receipt).find(
       (log: any) => log.eventName === eventName,
     ) as T
   }
 
-  static parseEvents(receipt: TransactionReceipt): UnidirectionalEvent[] {
+  static parseEvents(receipt: TransactionReceipt): TokenUnidirectionalEvent[] {
     return this.parseLogs(receipt).map((log: any) => ({
       eventName: log.eventName,
       args: log.args,

@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* tslint:disable */
 import {
   TransactionReceipt,
   parseEventLogs,
@@ -13,7 +15,7 @@ export { isCtorAccountParamPure, CtorParams, TxOptions }
 
 export interface SigTestEvent {
   eventName: string
-  args: any
+  args: unknown
   address: `0x${string}`
   blockHash: `0x${string}`
   blockNumber: bigint
@@ -67,14 +69,14 @@ export class SigTestContract extends BaseContractViem {
     return parseEventLogs({
       abi: abi as any,
       logs: receipt.logs,
-    }) as any
+    }) as ParseEventLogsReturnType
   }
 
   static hasEvent(
     receipt: TransactionReceipt,
     eventName: SigTestEventName,
   ): boolean {
-    return parseEventLogs({ abi: abi, logs: receipt.logs }).some(
+    return this.parseLogs(receipt).some(
       (log: any) => log.eventName === eventName,
     )
   }
@@ -83,13 +85,13 @@ export class SigTestContract extends BaseContractViem {
     receipt: TransactionReceipt,
     eventName: SigTestEventName,
   ): T {
-    return parseEventLogs({ abi: abi, logs: receipt.logs }).find(
+    return this.parseLogs(receipt).find(
       (log: any) => log.eventName === eventName,
     ) as T
   }
 
   static parseEvents(receipt: TransactionReceipt): SigTestEvent[] {
-    return parseEventLogs({ abi: abi, logs: receipt.logs }).map((log: any) => ({
+    return this.parseLogs(receipt).map((log: any) => ({
       eventName: log.eventName,
       args: log.args,
       address: log.address,
