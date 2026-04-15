@@ -44,7 +44,7 @@
   "dependencies": {
     "@riaskov/iohtee": "workspace:*",
     "dotenv": "^16.4.5",
-    "fastify": "^5.0.0",
+    "fastify": "^5.8.5",
     "viem": "2.45.0"
   },
   "devDependencies": {
